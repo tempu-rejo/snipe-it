@@ -256,6 +256,18 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
     }
 
     /**
+     * Establishes the user -> companies relationship
+     *
+     * @author A. Gianotto <snipe@snipe.net>
+     * @since [v7.1.7]
+     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     */
+    public function companies()
+    {
+        return $this->belongsToMany('App\Models\Company', 'users_companies', 'user_id');
+    }
+
+    /**
      * Establishes the user -> department relationship
      *
      * @author A. Gianotto <snipe@snipe.net>
@@ -769,6 +781,21 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
         });
     }
 
+    /**
+     * Query builder scope to return users by company
+     *
+     * @param  \Illuminate\Database\Query\Builder $query Query builder instance
+     * @param  int $id
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function scopeByCompany($query, $id)
+    {
+        return $query->whereHas('companies', function ($query) use ($id) {
+            $query->where('users_companies.company_id', '=', $id);
+        });
+    }
+
+
 
     /**
      * Query builder scope to order on manager
@@ -781,7 +808,9 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
     public function scopeOrderManager($query, $order)
     {
         // Left join here, or it will only return results with parents
-        return $query->leftJoin('users as users_manager', 'users.manager_id', '=', 'users_manager.id')->orderBy('users_manager.first_name', $order)->orderBy('users_manager.last_name', $order);
+        return $query->leftJoin('users as users_manager', 'users.manager_id', '=', 'users_manager.id')
+            ->orderBy('users_manager.first_name', $order)
+            ->orderBy('users_manager.last_name', $order);
     }
 
     /**
@@ -827,18 +856,6 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
     }
 
 
-    /**
-     * Query builder scope to order on company
-     *
-     * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
-     * @param  text                              $order         Order
-     *
-     * @return Illuminate\Database\Query\Builder          Modified query builder
-     */
-    public function scopeOrderCompany($query, $order)
-    {
-        return $query->leftJoin('companies as companies_user', 'users.company_id', '=', 'companies_user.id')->orderBy('companies_user.name', $order);
-    }
 
     public function preferredLocale()
     {
