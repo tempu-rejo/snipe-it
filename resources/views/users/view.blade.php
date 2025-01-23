@@ -318,17 +318,12 @@
 
                   </div>
 
-               
-
                    <!-- company -->
-                    @if (!is_null($user->company))
                     <div class="row">
-
                       <div class="col-md-3">
                         {{ trans('general.companies') }}
                       </div>
                       <div class="col-md-9">
-
                           @foreach ($user->companies as $user->company)
                               @can('view', 'App\Models\Company')
                               <a href="{{ route('companies.show', $user->company->id) }}" class="label label-default" style="margin-right: 5px">
@@ -338,13 +333,10 @@
                                   <span class="label label-default">{{ $user->company->name }}</span>
                               @endcan
                           @endforeach
-
-
                       </div>
-
                     </div>
                    
-                    @endif
+
 
                     <!-- username -->
                     <div class="row">
