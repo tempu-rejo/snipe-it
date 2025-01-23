@@ -325,16 +325,21 @@
                     <div class="row">
 
                       <div class="col-md-3">
-                        {{ trans('general.company') }}
+                        {{ trans('general.companies') }}
                       </div>
                       <div class="col-md-9">
-                          @can('view', 'App\Models\Company')
-                            <a href="{{ route('companies.show', $user->company->id) }}">
-                                {{ $user->company->name }}
-                            </a>
+
+                          @foreach ($user->companies as $user->company)
+                              @can('view', 'App\Models\Company')
+                              <a href="{{ route('companies.show', $user->company->id) }}" class="label label-default" style="margin-right: 5px">
+                                  {{ $user->company->name }}
+                              </a>
                               @else
-                              {{ $user->company->name }}
-                            @endcan
+                                  <span class="label label-default">{{ $user->company->name }}</span>
+                              @endcan
+                          @endforeach
+
+
                       </div>
 
                     </div>
