@@ -211,10 +211,8 @@ final class Company extends SnipeModel
         }
     }
 
-
-    public function users()
-    {
-        return $this->hasMany(User::class, 'company_id');
+    public function users() {
+        return $this->belongsToMany(\App\Models\User::class, 'users_companies', 'company_id');
     }
 
     public function assets()
