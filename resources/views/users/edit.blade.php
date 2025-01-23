@@ -289,14 +289,13 @@
                       <div id="optional_user_details" class="col-md-12" style="display:none">
                           <!-- everything here should be what is considered optional -->
                           <br>
-                          <!-- Company -->
+                          <!-- Companies -->
 
                           <div class="form-group{{ $errors->has('companies') ? ' has-error' : '' }}">
                               <label class="col-md-3 control-label" for="companies[]"> {{ trans('general.companies') }}</label>
                               <div class="col-md-6">
 
                                   @if ($companies->count())
-
                                           <div class="controls">
                                               <select
                                                       name="companies[]"
