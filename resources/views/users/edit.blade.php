@@ -290,6 +290,40 @@
                           <!-- everything here should be what is considered optional -->
                           <br>
                           <!-- Company -->
+
+                          <div class="form-group{{ $errors->has('companies') ? ' has-error' : '' }}">
+                              <label class="col-md-3 control-label" for="companies[]"> {{ trans('general.companies') }}</label>
+                              <div class="col-md-6">
+
+                                  @if ($companies->count())
+
+                                          <div class="controls">
+                                              <select
+                                                      name="companies[]"
+                                                      aria-label="companies[]"
+                                                      id="companies[]"
+                                                      multiple="multiple"
+                                                      class="form-control">
+
+                                                  @foreach ($companies as $id => $company)
+                                                      <option value="{{ $id }}"{!! ($user->companies->pluck('id')->contains($id) ? ' selected="selected"' : '') !!}>
+                                                          {{ $company }}
+                                                      </option>
+                                                  @endforeach
+                                              </select>
+
+                                              <span class="help-block">
+                                      {{ trans('admin/users/table.groupnotes') }}
+                                    </span>
+                                          </div>
+                                  @else
+                                      <p>{{ trans('admin/users/table.nogroup') }} <code>{{ trans('admin/settings/general.admin_settings') }} <i class="fa fa-cogs"></i> > {{ trans('general.groups') }} <i class="fas fa-user-friends"></i></code> </p>
+                                  @endif
+
+
+                          </div>
+                      </div>
+
                           @if (\App\Models\Company::canManageUsersCompanies())
                               @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.select_company'), 'fieldname' => 'company_id'])
                           @endif
