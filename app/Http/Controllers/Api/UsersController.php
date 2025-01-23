@@ -47,7 +47,6 @@ class UsersController extends Controller
             'users.address',
             'users.avatar',
             'users.city',
-            'users.company_id',
             'users.country',
             'users.created_by',
             'users.created_at',
@@ -80,7 +79,7 @@ class UsersController extends Controller
             'users.autoassign_licenses',
             'users.website',
 
-        ])->with('manager', 'groups', 'userloc', 'company', 'department', 'assets', 'licenses', 'accessories', 'consumables', 'createdBy', 'managesUsers', 'managedLocations')
+        ])->with('groups', 'userloc', 'companies', 'department', 'assets', 'licenses', 'accessories', 'consumables', 'createdBy', 'managesUsers', 'managedLocations', 'manager')
             ->withCount([
                 'assets as assets_count' => function(Builder $query) {
                     $query->withoutTrashed();
@@ -102,7 +101,7 @@ class UsersController extends Controller
         }
 
         if ($request->filled('company_id')) {
-            $users = $users->where('users.company_id', '=', $request->input('company_id'));
+            $users = $users->ByCompany($request->get('company_id'));
         }
 
         if ($request->filled('location_id')) {
@@ -243,9 +242,9 @@ class UsersController extends Controller
             case 'created_by':
                 $users = $users->OrderByCreatedBy($order);
                 break;
-            case 'company':
-                $users = $users->OrderCompany($order);
-                break;
+//            case 'company':
+//                $users = $users->OrderCompany($order);
+//                break;
             case 'first_name':
                 $users->orderBy('first_name', $order);
                 $users->orderBy('last_name', $order);
@@ -412,6 +411,8 @@ class UsersController extends Controller
                 $user->groups()->sync([]);
             }
 
+            $user->companies()->sync($request->input('companies'));
+
             return response()->json(Helper::formatStandardApiResponse('success', (new UsersTransformer)->transformUser($user), trans('admin/users/message.success.create')));
         }
 
@@ -512,6 +513,7 @@ class UsersController extends Controller
 
                     // Sync the groups since the user is a superuser and the groups pass validation
                     $user->groups()->sync($request->input('groups'));
+                    $user->companies()->sync($request->input('companies'));
                 }
                 return response()->json(Helper::formatStandardApiResponse('success', (new UsersTransformer)->transformUser($user), trans('admin/users/message.success.update')));
             }

@@ -62,6 +62,7 @@ class UsersController extends Controller
     {
         $this->authorize('create', User::class);
         $groups = Group::pluck('name', 'id');
+        $companies = Company::pluck('name', 'id');
 
         $userGroups = collect();
 
@@ -75,7 +76,7 @@ class UsersController extends Controller
 
         $user = new User;
 
-        return view('users/edit', compact('groups', 'userGroups', 'permissions', 'userPermissions'))
+        return view('users/edit', compact('groups', 'userGroups', 'permissions', 'userPermissions', 'companies'))
             ->with('user', $user);
     }
 
@@ -142,6 +143,8 @@ class UsersController extends Controller
                 $user->groups()->sync([]);
             }
 
+            $user->companies()->sync($request->input('companies'));
+
             if (($request->input('email_user') == 1) && ($request->filled('email'))) {
                 // Send the credentials through email
                 $data = [];
@@ -192,13 +195,14 @@ class UsersController extends Controller
 
             $permissions = config('permissions');
             $groups = Group::pluck('name', 'id');
+            $companies = Company::pluck('name', 'id');
 
             $userGroups = $user->groups()->pluck('name', 'id');
             $user->permissions = $user->decodePermissions();
             $userPermissions = Helper::selectedPermissionsArray($permissions, $user->permissions);
             $permissions = $this->filterDisplayable($permissions);
 
-            return view('users/edit', compact('user', 'groups', 'userGroups', 'permissions', 'userPermissions'))->with('item', $user);
+            return view('users/edit', compact('user', 'groups', 'userGroups', 'permissions', 'userPermissions', 'companies'))->with('item', $user);
         }
 
         return redirect()->route('users.index')->with('error', trans('admin/users/message.user_not_found', compact('id')));
@@ -302,6 +306,7 @@ class UsersController extends Controller
         }
 
         $user->permissions = json_encode($permissions_array);
+        $user->companies()->sync($request->input('companies'));
 
         // Handle uploaded avatar
         app(ImageUploadRequest::class)->handleImages($user, 600, 'avatar', 'avatars', 'avatar');
