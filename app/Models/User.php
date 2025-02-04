@@ -264,7 +264,14 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
      */
     public function companies()
     {
-        return $this->belongsToMany('App\Models\Company', 'users_companies', 'user_id');
+        return $this->hasManyThrough(
+            Company::class,
+            UserCompany::class,
+            'user_id', // this key in pivot
+            'id', // company ID in companies table
+            'company_id_fart',
+            'company_id',
+        );
     }
 
     /**

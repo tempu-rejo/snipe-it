@@ -212,7 +212,14 @@ final class Company extends SnipeModel
     }
 
     public function users() {
-        return $this->belongsToMany(\App\Models\User::class, 'users_companies', 'company_id');
+        return $this->hasManyThrough(
+            User::class,
+            UserCompany::class,
+            'path_id',
+            'course_id',
+            'id',
+            'course_id'
+        );
     }
 
     public function assets()
@@ -247,11 +254,6 @@ final class Company extends SnipeModel
     /**
      * Scoping table queries, determining if a logged in user is part of a company, and only allows the user to access items associated with that company if FMCS is enabled.
      *
-     * This method is the one that the CompanyableTrait uses to contrain queries automatically, however that trait CANNOT be
-     * applied to the user's model, since it causes an infinite loop against the authenticated user.
-     *
-     * @todo - refactor that trait to handle the user's model as well.
-     *
      * @author [A. Gianotto] <snipe@snipe.net>
      * @param $query
      * @param $column
@@ -277,11 +279,13 @@ final class Company extends SnipeModel
     private static function scopeCompanyablesDirectly($query, $column = 'company_id', $table_name = null)
     {
 
-        // Get the company ID of the logged-in user, or set it to null if there is no company associated with the user
+        // Get the company IDs of the logged-in user, or set it to null if there is no company associated with the user
         if (Auth::hasUser()) {
-            $company_id = auth()->user()->company_id;
+            $companies = auth()->user()->companies()->pluck('companies.id');
+            \Log::debug(auth()->user()->id);
+            \Log::debug(print_r($companies, true));
         } else {
-            $company_id = null;
+            $companies = [];
         }
 
 
@@ -291,7 +295,7 @@ final class Company extends SnipeModel
             // Dynamically get the table name if it's not passed in, based on the model we're querying against
             $table = ($table_name) ? $table_name."." : $query->getModel()->getTable().".";
 
-            return $query->where($table.$column, '=', $company_id);
+            return $query->whereIn($table.$column, $companies);
         }
 
     }
