@@ -35,35 +35,39 @@
     </style>
 </head>
 
-
 <body>
 @if ($snipeSettings->logo_print_assets=='1')
-    @if ($snipeSettings->brand == '3')
-        <h2>
+    <div style="text-align:center; margin-bottom: 20px;">
+        @if ($snipeSettings->brand == '3')
             @if ($snipeSettings->logo!='')
-                <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}">
+                <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}"><br>
             @endif
-            {{ $snipeSettings->site_name }}
-        </h2>
-    @elseif ($snipeSettings->brand == '2')
-        @if ($snipeSettings->logo!='')
-            <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}">
+            <span style="font-size:2em; font-weight:bold; display:block; margin-top:10px;">SURAT JALAN</span>
+        @elseif ($snipeSettings->brand == '2')
+            @if ($snipeSettings->logo!='')
+                <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}"><br>
+            @endif
+        @else
+            <span style="font-size:2em; font-weight:bold; display:block; margin-top:10px;">SURAT JALAN</span>
         @endif
-    @else
-        <h2>{{ $snipeSettings->site_name }}</h2>
-    @endif
+    </div>
 @endif
 
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="text-align: left;">
+        <h2>
+            {{ trans('admin/asset_maintenances/general.maintenance') }}: {{ $assetMaintenance->title ?? '' }}
+        </h2>
+    </div>
+    <div style="text-align: right;">
+        {{ trans('Printed On: ')}} {{ Helper::getFormattedDateObject(now(), 'datetime', false) }}
+    </div>
+</div>
+<p></p>
 
-<h3>
-    <p>S U R A T   J A L A N</p>
-    {{ trans('admin/asset_maintenances/general.maintenance') }}: {{ $assetMaintenance->title ?? '' }}
-</h3>
-<p>{{ trans('admin/users/general.all_assigned_list_generation')}} {{ Helper::getFormattedDateObject(now(), 'datetime', false) }}</p>
 <table class="snipe-table table table-striped inventory" id="AssetsMaintenance">
     <tbody>
         <tr>
-            <!-- <th>{{ trans('admin/asset_maintenances/form.asset') }}</th> -->
             <th>{{ trans('general.asset') }}</th>
             <td>{{ optional($assetMaintenance->asset)->present()->fullName ?? '-' }}</td>
         </tr>

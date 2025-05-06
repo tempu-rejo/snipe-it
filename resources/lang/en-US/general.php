@@ -242,6 +242,7 @@ return [
     'pending'				=> 'Pending',
     'people'				=> 'People',
     'per_page'				=> 'Results Per Page',
+    'print'                 => 'Print',
     'previous'				=> 'Previous',
     'processing'			=> 'Processing',
     'profile'				=> 'Your profile',
