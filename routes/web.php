@@ -751,5 +751,4 @@ Route::middleware(['auth'])->get(
     $trail->push('Home', route('home'))
     );
 
-Route::get('hardware/print-checkin-select', [App\Http\Controllers\HardwareController::class, 'printCheckinSelect'])->name('hardware.printCheckinSelect');
-Route::post('hardware/print-checkin', [App\Http\Controllers\HardwareController::class, 'printCheckin'])->name('hardware.printCheckin');
+
