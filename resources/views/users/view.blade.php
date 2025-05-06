@@ -968,10 +968,12 @@
 
         <div class="tab-pane" id="history">
           <div class="table-responsive">
-
-
+            <a href="{{ route('users.printHist', $user->id) }}" class="btn btn-primary" target="_blank">
+              <i class="fa fa-print"></i> Print
+            </a>
             <table
                     data-click-to-select="true"
+                   data-show-print="true"
                     data-cookie-id-table="usersHistoryTable"
                     data-pagination="true"
                     data-id-table="usersHistoryTable"
@@ -1011,7 +1013,7 @@
             </table>
 
           </div>
-        </div><!-- /.tab-pane -->
+        </div>
 
         <div class="tab-pane" id="managed-locations">
 

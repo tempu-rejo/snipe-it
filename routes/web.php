@@ -44,13 +44,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('categories', CategoriesController::class, [
         'parameters' => ['category' => 'category_id'],
     ]);
-    
-    //History print
-    Route::get('hardware/{assetId}/history/print', [App\Http\Controllers\AssetHistController::class, 'print'])->name('hardware.history.print');
-
+        
     // Maintenance printing
     Route::get('maintenances/{assetId}/print', [\App\Http\Controllers\AssetMaintenancesController::class, 'print'])
-        ->name('maintenances.print');
+    ->name('maintenances.print');
+
+    //History print
+    Route::get('users/printHist/{userId}', [\App\Http\Controllers\AssetHistController::class, 'printHist'])
+    ->name('users.printHist');
     /*
     * Labels
     */

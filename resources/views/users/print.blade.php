@@ -55,40 +55,47 @@
 @if (count($users) > 1)
     <div class="pull-right hidden-print">
         <span>{{ trans('general.show_or_hide_eulas') }}</span>
-        <button class="btn btn-default" type="button" data-toggle="collapse" data-target=".eula-row" aria-expanded="false" aria-controls="eula-row" title="EULAs">
+        <button class="btn btn-default" type="button" data-toggle="collapse" data-target=".eula-row show" aria-expanded="true" aria-controls="eula-row" title="EULAs">
             <i class="fa fa-eye-slash"></i>
         </button>
     </div>
 @endif
 
 @if ($snipeSettings->logo_print_assets=='1')
-    @if ($snipeSettings->brand == '3')
-
-        <h2>
+    <div style="text-align:center; margin-bottom: 20px;">
+        @if ($snipeSettings->brand == '3')
             @if ($snipeSettings->logo!='')
-                <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}">
+                <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}"><br>
             @endif
-                IT Asset Accountability Form 
+            <span style="font-size:2em; font-weight:bold; display:block; margin-top:10px;">IT Asset Accountability Form</span>
             <!-- {{ $snipeSettings->site_name }} -->
-        </h2>
-    @elseif ($snipeSettings->brand == '2')
-        @if ($snipeSettings->logo!='')
-            <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}">
+        @elseif ($snipeSettings->brand == '2')
+            @if ($snipeSettings->logo!='')
+                <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}"><br>
+            @endif
+        @else
+            <span style="font-size:2em; font-weight:bold; display:block; margin-top:10px;">IT Asset Accountability Form</span>
+            <!-- <h2>{{ $snipeSettings->site_name }}</h2> -->
         @endif
-    @else
-        <h2>IT Asset Accountability Form</h2>
-        <!-- <h2>{{ $snipeSettings->site_name }}</h2> -->
-    @endif
+    </div>
 @endif
 
 @foreach ($users as $show_user)
     <div id="start_of_user_section"> {{-- used for page breaks when printing --}}</div>
-    <h3>
-        {{ trans('general.assigned_to', ['name' => $show_user->present()->fullName()]) }}
-        {{ ($show_user->employee_num!='') ? ' (#'.$show_user->employee_num.') ' : '' }}
-        {{ ($show_user->jobtitle!='' ? ' - '.$show_user->jobtitle : '') }}
-    </h3>
-    <p></p>{{ trans('admin/users/general.all_assigned_list_generation')}} {{ Helper::getFormattedDateObject(now(), 'datetime', false) }}
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="text-align: left;">
+            <h2>
+                {{ trans('general.assigned_to', ['name' => $show_user->present()->fullName()]) }}
+                {{ ($show_user->employee_num!='') ? ' (#'.$show_user->employee_num.') ' : '' }}
+                {{ ($show_user->jobtitle!='' ? ' - '.$show_user->jobtitle : '') }}
+            </h2>
+        </div>
+        <div style="text-align: right;">
+            {{ trans('Printed On: ')}} {{ Helper::getFormattedDateObject(now(), 'datetime', false) }}
+        </div>
+    </div>
+    <p></p>
+    <!-- {{ trans('admin/users/general.all_assigned_list_generation')}} {{ Helper::getFormattedDateObject(now(), 'datetime', false) }} -->
 
     @if ($show_user->assets->count() > 0)
         @php
@@ -391,8 +398,8 @@
     <table style="margin-top: 80px;">
         @if (!empty($eulas))
         <tr class="collapse eula-row">
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">EULA</td>
-            <td style="padding-right: 10px; vertical-align: top; padding-bottom: 80px;" colspan="3">
+            <!--<td style="padding-right: 10px; vertical-align: top; font-weight: bold;">EULA</td>-->
+            <td style="padding-right: 10px;text-align:center; vertical-align: top; padding-bottom: 50px;" colspan="3">
                 @foreach ($eulas as $key => $eula)
                     {!! $eula !!}
                 @endforeach
@@ -400,7 +407,7 @@
         </tr>
         @endif
         <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Received/Acknowledged By: <!--{{ trans('general.signed_off_by') }}:--></td>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Received/<p></p>Acknowledged By: <!--{{ trans('general.signed_off_by') }}:--></td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td>_____________</td>
