@@ -11,11 +11,7 @@ use Carbon\Carbon;
 
 @section('header_right')
   <div class="pull-right">
-    <a href="{{ route('maintenances.print', $assetMaintenance) }}" class="btn btn-info pull-right" target="print.blade.php">
-       <i class="fas fa-print"></i> PRINT <!--{{ trans('general.print') }} -->
-    </a>
-    
-    <a href="{{ route('maintenances.edit', $assetMaintenance) }}" class="btn btn-default pull-right" style="margin-right: 10px;">
+    <a href="{{ route('maintenances.edit', $assetMaintenance) }}" class="btn btn-default pull-right">
       {{ trans('general.update') }}</a>
 
     <a href="{{ route('maintenances.index') }}" class="btn btn-primary text-right" style="margin-right: 10px;">{{ trans('general.back') }}</a>

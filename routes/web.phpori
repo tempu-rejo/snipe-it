@@ -24,7 +24,6 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatuslabelsController;
 use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\ViewAssetsController;
-use App\Http\Controllers\AssetController;
 use App\Livewire\Importer;
 use App\Models\ReportTemplate;
 use Illuminate\Support\Facades\Route;
@@ -44,13 +43,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('categories', CategoriesController::class, [
         'parameters' => ['category' => 'category_id'],
     ]);
-    
-    //History print
-    Route::get('hardware/{assetId}/history/print', [App\Http\Controllers\AssetHistController::class, 'print'])->name('hardware.history.print');
-
-    // Maintenance printing
-    Route::get('maintenances/{assetId}/print', [\App\Http\Controllers\AssetMaintenancesController::class, 'print'])
-        ->name('maintenances.print');
+  
     /*
     * Labels
     */
@@ -94,7 +87,6 @@ Route::group(['middleware' => 'auth'], function () {
             [LocationsController::class, 'print_all_assigned']
         )->name('locations.print_all_assigned');
 
-
     });
 
     Route::resource('locations', LocationsController::class, [
@@ -131,8 +123,6 @@ Route::group(['middleware' => 'auth'], function () {
     * Departments
     */
     Route::resource('departments', DepartmentsController::class);
-
-
 });
 
 /*
@@ -168,7 +158,6 @@ Route::group(['middleware' => 'auth'], function () {
         [ActionlogController::class, 'getStoredEula']
     )->name('log.storedeula.download');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -484,7 +473,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('notes', [NotesController::class, 'store'])->name('notes.store');
 });
 
-
 Route::group(['prefix' => 'reports', 'middleware' => ['auth']], function () {
 
     Route::get('audit', [ReportsController::class, 'audit'])
@@ -515,7 +503,6 @@ Route::group(['prefix' => 'reports', 'middleware' => ['auth']], function () {
         ->breadcrumbs(fn (Trail $trail) =>
         $trail->parent('home')
             ->push(trans('general.asset_maintenance_report'), route('reports/asset_maintenances')));
-            
 
     // Is this still used?
     Route::get('export/asset_maintenances', [ReportsController::class, 'exportAssetMaintenancesReport'])
@@ -749,6 +736,3 @@ Route::middleware(['auth'])->get(
     ->breadcrumbs(fn (Trail $trail) =>
     $trail->push('Home', route('home'))
     );
-
-Route::get('hardware/print-checkin-select', [App\Http\Controllers\HardwareController::class, 'printCheckinSelect'])->name('hardware.printCheckinSelect');
-Route::post('hardware/print-checkin', [App\Http\Controllers\HardwareController::class, 'printCheckin'])->name('hardware.printCheckin');

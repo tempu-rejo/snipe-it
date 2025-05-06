@@ -1308,6 +1308,7 @@ class SettingsController extends Controller
     public function ajaxTestEmail() : JsonResponse
     {
         try {
+            
             (new User())->forceFill([
                 'name'  => config('mail.from.name'),
                 'email' => config('mail.from.address'),

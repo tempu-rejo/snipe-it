@@ -1,10 +1,12 @@
-@extends('layouts/default')
+@extends('layouts.default')
 
-{{-- Page title --}}
 @section('title')
-{{ trans('general.locations') }}
-@parent
-@stop
+    {{ trans('general.locations') }}
+@endsection
+
+@section('breadcrumb')
+    <li class="active">{{ trans('general.locations') }}</li>
+@endsection
 
 @section('header_right')
   @can('create', \App\Models\Location::class)
@@ -12,7 +14,7 @@
   {{ trans('general.create') }}</a>
   @endcan
 @stop
-{{-- Page content --}}
+
 @section('content')
 <div class="row">
   <div class="col-md-12">
@@ -49,9 +51,9 @@
   </div>
 </div>
 
-@stop
+@endsection
 
 @section('moar_scripts')
 @include ('partials.bootstrap-table', ['exportFile' => 'locations-export', 'search' => true])
 
-@stop
+@endsection

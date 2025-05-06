@@ -45,21 +45,21 @@
 
 <body class="hold-transition login-page">
 
-    @if (($snipeSettings) && ($snipeSettings->logo!=''))
+    <!-- @if (($snipeSettings) && ($snipeSettings->logo!=''))
         <center>
             <a href="{{ config('app.url') }}"><img id="login-logo" src="{{ Storage::disk('public')->url('').e($snipeSettings->logo) }}"></a>
         </center>
-    @endif
+    @endif -->
   <!-- Content -->
   @yield('content')
 
 
 
-    <div class="text-center" style="padding-top: 100px;">
+    <!-- <div class="text-center" style="padding-top: 100px;">
         @if (($snipeSettings) && ($snipeSettings->privacy_policy_link!=''))
         <a target="_blank" rel="noopener" href="{{  $snipeSettings->privacy_policy_link }}" target="_new">{{ trans('admin/settings/general.privacy_policy') }}</a>
     @endif
-    </div>
+    </div> -->
 
     {{-- Javascript files --}}
     <script src="{{ url(mix('js/dist/all.js')) }}" nonce="{{ csrf_token() }}"></script>

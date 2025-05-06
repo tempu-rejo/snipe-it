@@ -14,14 +14,14 @@ dir="{{ Helper::determineLanguageDirection() }}">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
 
-
+    <!-- FavIcon.ico logo -->
     <link rel="apple-touch-icon"
           href="{{ ($snipeSettings) && ($snipeSettings->favicon!='') ?  Storage::disk('public')->url(e($snipeSettings->logo)) :  config('app.url').'/img/snipe-logo-bug.png' }}">
     <link rel="apple-touch-startup-image"
           href="{{ ($snipeSettings) && ($snipeSettings->favicon!='') ?  Storage::disk('public')->url(e($snipeSettings->logo)) :  config('app.url').'/img/snipe-logo-bug.png' }}">
     <link rel="shortcut icon" type="image/ico"
           href="{{ ($snipeSettings) && ($snipeSettings->favicon!='') ?  Storage::disk('public')->url(e($snipeSettings->favicon)) : config('app.url').'/favicon.ico' }} ">
-
+ 
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="language" content="{{ Helper::mapBackToLegacyLocale(app()->getLocale()) }}">
@@ -919,18 +919,19 @@ dir="{{ Helper::determineLanguageDirection() }}">
 
                 <div class="1hidden-xs pull-left">
                     <div class="pull-left" >
-                        <a target="_blank" href="https://snipeitapp.com" rel="noopener">Snipe-IT</a> is open source software, made with <x-icon type="heart" style="color: #a94442; font-size: 10px" />
-                            <span class="sr-only">love</span> by <a href="https://bsky.app/profile/snipeitapp.com" rel="noopener">@snipeitapp</a>.
+                        <a target="_blank" href="" rel="noopener">UI-Assets</a> is IT Asset Management Software. For further support, please contact <!--<x-icon type="heart" style="color: #a94442; font-size: 10px" />
+                            <span class="sr-only">love</span>--><a href="mailto:idhelp@universalleaf.com" rel="noopener">ID IT </a>.
                     </div>
                     <div class="pull-right">
-                    @if ($snipeSettings->version_footer!='off')
+                 <!--    @if ($snipeSettings->version_footer!='off')
                         @if (($snipeSettings->version_footer=='on') || (($snipeSettings->version_footer=='admin') && (Auth::user()->isSuperUser()=='1')))
                             &nbsp; <strong>Version</strong> {{ config('version.app_version') }} -
                             build {{ config('version.build_version') }} ({{ config('version.branch') }})
                         @endif
-                    @endif
+                    @endif -->
+                    <a target="_blank" href="" rel="noopener">Version 0.8</a>
 
-                    @if ($snipeSettings->support_footer!='off')
+                   <!--  @if ($snipeSettings->support_footer!='off')
                         @if (($snipeSettings->support_footer=='on') || (($snipeSettings->support_footer=='admin') && (Auth::user()->isSuperUser()=='1')))
                             <a target="_blank" class="btn btn-default btn-xs"
                                href="https://snipe-it.readme.io/docs/overview"
@@ -938,7 +939,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                             <a target="_blank" class="btn btn-default btn-xs" href="https://snipeitapp.com/support/"
                                rel="noopener">{{ trans('general.bug_report') }}</a>
                         @endif
-                    @endif
+                    @endif 
 
                     @if ($snipeSettings->privacy_policy_link!='')
                         <a target="_blank" class="btn btn-default btn-xs" rel="noopener"
@@ -1206,3 +1207,4 @@ dir="{{ Helper::determineLanguageDirection() }}">
 
         </body>
 </html>
+

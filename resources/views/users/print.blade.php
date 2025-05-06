@@ -68,14 +68,16 @@
             @if ($snipeSettings->logo!='')
                 <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}">
             @endif
-            {{ $snipeSettings->site_name }}
+                IT Asset Accountability Form 
+            <!-- {{ $snipeSettings->site_name }} -->
         </h2>
     @elseif ($snipeSettings->brand == '2')
         @if ($snipeSettings->logo!='')
             <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}">
         @endif
     @else
-        <h2>{{ $snipeSettings->site_name }}</h2>
+        <h2>IT Asset Accountability Form</h2>
+        <!-- <h2>{{ $snipeSettings->site_name }}</h2> -->
     @endif
 @endif
 
@@ -398,26 +400,51 @@
         </tr>
         @endif
         <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">{{ trans('general.signed_off_by') }}:</td>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Received/Acknowledged By: <!--{{ trans('general.signed_off_by') }}:--></td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td>_____________</td>
         </tr>
         <tr style="height: 80px;">
             <td></td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }}</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }} / Position</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
         </tr>
         <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">{{ trans('admin/users/table.manager') }}:</td>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Issued/ Installed By: <!--{{ trans('admin/users/table.manager') }}:--></td>
+            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
+            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
+            <td>_____________</td>
+        </tr>
+        <tr style="height: 80px;">
+            <td></td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }} / Position</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Noted by: <!--{{ trans('general.signed_off_by') }}:--></td>
+            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
+            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
+            <td>_____________</td>
+        </tr>
+        <tr style="height: 80px;">
+            <td></td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }} / Position</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
+        </tr>
+        <tr>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Filed By: <!--{{ trans('admin/users/table.manager') }}:--></td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td>_____________</td>
         </tr>
         <tr>
             <td></td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }}</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }} / Position</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
             <td></td>
