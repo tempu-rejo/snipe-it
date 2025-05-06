@@ -127,7 +127,7 @@
             </tbody>
         </table>
     @else
-        <div style="text-align:center; margin:40px 0; font-size:1.2em;">No checked-in assets found.</div>
+        <div style="text-align:center; margin:40px 0; font-size:1.2em;">No checked-in assets found which {{ trans('general.assigned_to', ['name' => $show_user->present()->fullName()]) }}</div>
     @endif
 
     @php

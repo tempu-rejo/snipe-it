@@ -39,6 +39,7 @@ return [
     'asset_deleted_warning'     => 'This Inventory has been deleted. You must restore it before you can assign it to someone.',
     'assigned_date'         => 'Date Assigned',
     'assigned_to'           => 'Assigned to :name',
+    'returned_to'           => 'Returned from :name',
     'assignee'              => 'Assigned to',
     'avatar_delete'         => 'Delete Avatar',
     'avatar_upload'         => 'Upload Avatar',
@@ -63,6 +64,7 @@ return [
     'checkin'  				=> 'Checkin',
     'checkin_from'  		=> 'Checkin from',
     'checkout'  			=> 'Checkout',
+    'checkin_date'          => 'CheckIN Date',
     'checkouts_count'       => 'Checkouts',
     'checkins_count'        => 'Checkins',
     'checkin_and_delete'  	=> 'Checkin and Delete',
@@ -268,6 +270,7 @@ return [
     'requested_assets_menu' => 'Requested Inventorys',
     'request_canceled'      => 'Request Canceled',
     'request_item'          => 'Request this item',
+    'return_from'          => 'Return from',
     'external_link_tooltip' => 'External link to',
     'save'  				=> 'Save',
     'select_var'            => 'Select :thing... ', // this will eventually replace all of our other selects

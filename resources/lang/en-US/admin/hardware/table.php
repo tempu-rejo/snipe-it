@@ -2,12 +2,13 @@
 
 return [
 
-    'asset_tag'   	=> 'Asset Tag',
+    'asset_tag'   	=> 'Inv. Tag',
     'asset_model'       => 'Model',
     'assigned_to'   => 'Assigned To',
     'book_value'  	=> 'Current Value',
     'change' 		=> 'In/Out',
     'checkout_date' => 'Checkout Date',
+    'checkin_date' => 'CheckIN Date',
     'checkoutto' 	=> 'Checked Out',
     'components_cost' => 'Total Components Cost',
     'current_value' => 'Current Value',

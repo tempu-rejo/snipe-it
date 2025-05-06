@@ -17,10 +17,11 @@ class AssetHistController extends Controller
             abort(404, 'User not found');
         }
         $this->authorize('view', $user);
-        // Ambil hanya asset dengan status checkin
-        $assets = $user->assets()->whereHas('assets', function($q) {
-            $q->where('name', 'checkin');
-        })->get();
+
+        $assets = \App\Models\Asset::where('assigned_to', $user->userid)
+            ->whereNotNull('last_checkin')
+            ->get();
+
         $users = [$user];
         $snipeSettings = \App\Models\Setting::getSettings();
         return view('users.printHist', compact('users', 'assets', 'snipeSettings'));

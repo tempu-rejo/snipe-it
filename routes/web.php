@@ -50,7 +50,7 @@ Route::group(['middleware' => 'auth'], function () {
     ->name('maintenances.print');
 
     //History print
-    Route::get('users/printHist/{userId}', [\App\Http\Controllers\AssetHistController::class, 'printHist'])
+    Route::get('users/{userId}/printHist/', [\App\Http\Controllers\AssetHistController::class, 'printHist'])
     ->name('users.printHist');
     /*
     * Labels

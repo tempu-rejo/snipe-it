@@ -969,7 +969,7 @@
         <div class="tab-pane" id="history">
           <div class="table-responsive">
             <a href="{{ route('users.printHist', $user->id) }}" class="btn btn-primary" target="_blank">
-              <i class="fa fa-print"></i> Print
+              <i class="fa fa-print"></i> Print All Check IN
             </a>
             <table
                     data-click-to-select="true"

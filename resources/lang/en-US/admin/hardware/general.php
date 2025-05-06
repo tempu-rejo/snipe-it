@@ -19,6 +19,7 @@ return [
     'model_invalid_fix'         => 'The asset must be updated use a valid asset model before attempting to check it in or out, or to audit it.',
     'requestable'               => 'Requestable',
     'requested'				    => 'Requested',
+    'return_from'			     => 'Return from',
     'not_requestable'           => 'Not Requestable',
     'requestable_status_warning' => 'Do not change requestable status',
     'restore'  					=> 'Restore Asset',
