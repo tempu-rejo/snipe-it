@@ -95,7 +95,12 @@
         </div>
     </div>
     <p></p>
-    @if (isset($assets) && $assets->count() > 0)
+    @php
+        $userAssets = $assets->filter(function($asset) use ($show_user) {
+            return $asset->assigned_to == $show_user->userid && !empty($asset->last_checkin);
+        });
+    @endphp
+    @if ($userAssets->count() > 0)
         @php $counter = 1; @endphp
         <table class="snipe-table table table-striped inventory" style="margin-top:30px;">
             <thead>
@@ -111,7 +116,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($assets as $asset)
+                @foreach ($userAssets as $asset)
                     <tr>
                         <td>{{ $counter }}</td>
                         <td>{{ $asset->asset_tag }}</td>
@@ -143,13 +148,21 @@
         </div>
     @endif
     <p></p>
-    <p style="text-align: center; vertical-align: top; font-weight: bold;">
-                    ACCEPTANCE OF RETURN 
+    <p style="text-align: center; vertical-align: top; font-weight: bold; text-decoration: underline;">
+        DECLARATION
+       
     </p>
     <p></p>
     <p style="text-align: center; vertical-align: top;">
-                    By affixing my signature below, attest that I have made assessment and counter-checking on the above-mentioned
-                    item(s) and do hereby accept with the following stated condition.</p>
+        I confirm the returned item(s) listed above are complete and accurate to the best of my knowledge.</p>
+    <p></p>
+    <p></p>
+    <p style="text-align: center; vertical-align: top; font-weight: bold; text-decoration: underline;">
+        ACCEPTANCE OF RETURN 
+    </p>
+    <p></p>
+    <p style="text-align: center; vertical-align: top;">
+        By signing below, I acknowledge checking the item(s) and accept them under the stated condition.</p>
     <p></p>
     <table style="margin-top: 80px;">
         @if (!empty($eulas))
@@ -167,57 +180,31 @@
             
     
         <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Received/<p></p>Acknowledged By: <!--{{ trans('general.signed_off_by') }}:--></td>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Received By (IT): <!--{{ trans('general.signed_off_by') }}:--></td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td>_____________</td>
         </tr>
         <tr style="height: 80px;">
             <td></td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }} / Position</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }}</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
         </tr>
         <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Issued/ Installed By: <!--{{ trans('admin/users/table.manager') }}:--></td>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Return By (Employee): <!--{{ trans('admin/users/table.manager') }}:--></td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td>_____________</td>
         </tr>
         <tr style="height: 80px;">
             <td></td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }} / Position</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }}</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
             <td></td>
         </tr>
         <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Noted by: <!--{{ trans('general.signed_off_by') }}:--></td>
-            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
-            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
-            <td>_____________</td>
-        </tr>
-        <tr style="height: 80px;">
-            <td></td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }} / Position</td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
-        </tr>
-        <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Filed By: <!--{{ trans('admin/users/table.manager') }}:--></td>
-            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
-            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
-            <td>_____________</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }} / Position</td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
-            <td></td>
-        </tr>
-
-    </table>
 @endforeach
 
 {{-- Javascript files --}}

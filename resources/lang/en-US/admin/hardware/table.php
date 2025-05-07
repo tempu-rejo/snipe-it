@@ -7,7 +7,7 @@ return [
     'assigned_to'   => 'Assigned To',
     'book_value'  	=> 'Current Value',
     'change' 		=> 'In/Out',
-    'checkout_date' => 'Checkout Date',
+    'checkout_date' => 'Assigned On',
     'checkin_date' => 'CheckIN Date',
     'checkoutto' 	=> 'Checked Out',
     'components_cost' => 'Total Components Cost',

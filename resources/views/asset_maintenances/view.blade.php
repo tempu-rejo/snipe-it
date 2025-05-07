@@ -53,7 +53,22 @@ use Carbon\Carbon;
               </div>
             </div> <!-- /row -->
 
-
+            <div class="row">
+              <div class="col-md-3">
+                {{ trans('general.category') }}
+              </div>
+              <div class="col-md-9">
+                {{ optional($assetMaintenance->asset->model->category)->name ?? '-' }}
+              </div>
+            </div> <!-- /row -->
+            <div class="row">
+              <div class="col-md-3">
+                {{ trans('general.manufacturer') }}
+              </div>
+              <div class="col-md-9">
+                {{ optional($assetMaintenance->asset->model->manufacturer)->name ?? '-' }}
+              </div>
+            </div> <!-- /row -->
 
             <div class="row">
               <div class="col-md-3">

@@ -10,7 +10,7 @@ class AssetHistController extends Controller
     /**
      * Show the asset history print view for a given asset.
      */
-    public function printHist($userId)
+    public function printACI($userId)
     {
         $user = \App\Models\User::withTrashed()->find($userId);
         if (!$user) {
@@ -18,12 +18,14 @@ class AssetHistController extends Controller
         }
         $this->authorize('view', $user);
 
-        $assets = \App\Models\Asset::where('assigned_to', $user->userid)
+        $assets = \App\Models\Asset::where('assigned_to', $user)
             ->whereNotNull('last_checkin')
             ->get();
 
         $users = [$user];
         $snipeSettings = \App\Models\Setting::getSettings();
-        return view('users.printHist', compact('users', 'assets', 'snipeSettings'));
+        return view('users.printACI', compact('users', 'assets', 'snipeSettings'));
     }
+
+
 }

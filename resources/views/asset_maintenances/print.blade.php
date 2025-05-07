@@ -72,8 +72,12 @@
             <td>{{ optional($assetMaintenance->asset)->present()->fullName ?? '-' }}</td>
         </tr>
         <tr>
-            <th>{{ trans('admin/asset_maintenances/form.asset_maintenance_type') }}</th>
-            <td>{{ $assetMaintenance->asset_maintenance_type ?? '-' }}</td>
+            <th>{{ trans('general.category') }}</th>
+            <td>{{ optional($assetMaintenance->asset->model->category)->name ?? '-' }}</td>
+        </tr>
+        <tr>
+            <th>{{ trans('general.manufacturer') }}</th>
+            <td>{{ optional($assetMaintenance->asset->model->manufacturer)->name ?? '-' }}</td>
         </tr>
         <tr>
             <th>{{ trans('general.supplier') }}</th>
@@ -105,7 +109,7 @@
 </table>
 <table style="margin-top: 80px;">
     <tr>
-        <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">{{ trans('general.signed_off_by') }}:</td>
+        <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Pengirim:</td>
         <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
         <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
         <td>_____________</td>
@@ -117,7 +121,20 @@
         <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
     </tr>
     <tr>
-        <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">{{ trans('admin/users/table.manager') }}:</td>
+        <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Atasan:</td>
+        <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
+        <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
+        <td>_____________</td>
+    </tr>
+    <tr style="height: 80px;">
+        <td></td>
+        <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }}</td>
+        <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
+        <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Supplier:</td>
         <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
         <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
         <td>_____________</td>
