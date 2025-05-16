@@ -968,9 +968,9 @@
 
         <div class="tab-pane" id="history">
           <div class="table-responsive">
-            <a href="{{ route('users.printACI', $user->id) }}" class="btn btn-primary" target="_blank">
-              <i class="fa fa-print"></i> Print All
-            </a>
+            <button class="btn btn-primary" id="printHistoryButton" >
+              <i class="fa fa-print"></i> Print
+            </button>
             <table
                     data-click-to-select="true"
                    data-show-print="true"
@@ -1093,6 +1093,8 @@
 
 @section('moar_scripts')
   @include ('partials.bootstrap-table', ['simple_view' => true])
+
+  
 <script nonce="{{ csrf_token() }}">
 $(function () {
 
@@ -1191,6 +1193,297 @@ $('#dataConfirmModal').on('show.bs.modal', function (event) {
         $('#optional_info_icon').toggleClass('fa-caret-right fa-caret-down');
         var optional_info_open = $('#optional_info_icon').hasClass('fa-caret-down');
         document.cookie = "optional_info_open="+optional_info_open+'; path=/';
+    });
+    
+    // Handle Print History button click
+    $('#printHistoryButton').on('click', function() {
+        console.log('Print button clicked via jQuery!');
+        
+        // Get the reference to the bootstrap table
+        var $table = $('#usersHistoryTable');
+        var tableData = [];
+        var filters = {};
+        
+        // Get search value
+        var searchValue = '';
+        try {
+            searchValue = $('.search input, .fixed-table-toolbar .search input').val() || '';
+            if (searchValue) filters.search = searchValue;
+        } catch(e) {
+            console.error('Error getting search value:', e);
+        }
+        
+        // Get date filters
+        var dateFrom = $('input[name="date_from"]').val() || '';
+        if (dateFrom) filters.date_from = dateFrom;
+        
+        var dateTo = $('input[name="date_to"]').val() || '';
+        if (dateTo) filters.date_to = dateTo;
+        
+        // Get action type filter
+        var actionType = $('select[name="action_type"]').val() || '';
+        if (actionType) filters.action_type = actionType;
+        
+        console.log('Filters applied:', filters);
+        
+        // Create a print area that will be visible during printing
+        var $printArea = $('<div id="print-area"></div>');
+        
+        // Add header similar to printACI.blade.php
+        var header = '<div style="text-align:center; margin-bottom: 20px;">';
+        
+        @if ($snipeSettings->logo_print_assets=='1')
+            @if ($snipeSettings->brand == '3')
+                @if ($snipeSettings->logo!='')
+                    header += '<img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}"><br>';
+                @endif
+                header += '<span style="font-size:2em; font-weight:bold; display:block; margin-top:10px;">{{ trans('Activity History') }}</span>';
+            @elseif ($snipeSettings->brand == '2')
+                @if ($snipeSettings->logo!='')
+                    header += '<img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}"><br>';
+                @endif
+            @else
+                header += '<span style="font-size:2em; font-weight:bold; display:block; margin-top:10px;">{{ trans('Activity History') }}</span>';
+            @endif
+        @endif
+        
+        header += '</div>';
+        
+        // Add user information
+        header += '<div style="display: flex; justify-content: space-between; align-items: center;">';
+        header += '<div style="text-align: left;"><h2>{{ trans('general.assigned_to', ['name' => $user->present()->fullName()]) }}';
+        header += '{{ ($user->employee_num!='') ? ' (#'.$user->employee_num.') ' : '' }}';
+        header += '{{ ($user->jobtitle!='' ? ' - '.$user->jobtitle : '') }}</h2></div>';
+        header += '<div style="text-align: right;">{{ trans('Printed On: ')}} ' + new Date().toLocaleString() + '</div>';
+        header += '</div>';
+        
+        $printArea.append(header);
+        
+        // Add filter information if any filters are applied
+/*         if (Object.keys(filters).length > 0) {
+            var filterInfo = '<div class="alert alert-info"><strong>Note:</strong> This report shows filtered activity data.';
+            if (filters.search) filterInfo += '<br>Search: "' + filters.search + '"';
+            if (filters.date_from) filterInfo += '<br>From Date: ' + filters.date_from;
+            if (filters.date_to) filterInfo += '<br>To Date: ' + filters.date_to;
+            if (filters.action_type) filterInfo += '<br>Action Type: ' + filters.action_type;
+            filterInfo += '</div>';
+            $printArea.append(filterInfo);
+        } */
+        
+        // Create a simple table similar to the original table
+        var $tableClone = $('<table class="table table-striped" style="width:100%; margin-top:30px; border-collapse: collapse;"></table>');
+        
+        // Create the table header
+        var tableHeader = '<thead><tr>' +
+                        '<th style="border: 1px solid #ddd; padding: 8px;">#</th>' +
+                        '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.date') }}</th>' +
+                        '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.item') }}</th>' +
+                        '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.action') }}</th>' +
+                        '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.target') }}</th>' +
+                        '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.notes') }}</th>' +
+                        '</tr></thead>';
+        
+        $tableClone.append(tableHeader);
+        
+        // First try the Bootstrap Table API
+        var tableRows = [];
+        
+        try {
+            // Check if the Bootstrap Table is initialized and we can get data from it
+            if ($table.length && $.fn.bootstrapTable && $table.bootstrapTable('getOptions')) {
+                tableRows = $table.bootstrapTable('getData');
+                console.log('Got ' + tableRows.length + ' rows from bootstrap table');
+            }
+        } catch(e) {
+            console.error('Error getting bootstrap table data:', e);
+        }
+        
+        // If no data from Bootstrap Table, grab directly from the DOM
+        if (!tableRows || tableRows.length === 0) {
+            console.log('Falling back to DOM extraction');
+            tableRows = [];
+            
+            // Clone the table directly to preserve formatting
+            var $originalTable = $('#usersHistoryTable');
+            var $originalTbody = $originalTable.find('tbody');
+            
+            $originalTbody.find('tr:visible').each(function() {
+                var row = {};
+                var $tds = $(this).find('td');
+                
+                // Use the field names from the header row
+                $originalTable.find('th').each(function(i) {
+                    var field = $(this).data('field');
+                    if (field) {
+                        // For icon/image cells get the HTML
+                        if (field === 'icon' || field.includes('image')) {
+                            row[field] = $tds.eq(i).html();
+                        } else {
+                            row[field] = $tds.eq(i).text().trim();
+                        }
+                    }
+                });
+                
+                if (Object.keys(row).length > 0) {
+                    tableRows.push(row);
+                }
+            });
+            console.log('Extracted ' + tableRows.length + ' rows from DOM');
+        }
+        
+        // If we still don't have data, just download a fresh copy with AJAX
+        if (!tableRows || tableRows.length === 0) {
+            console.log('Attempting to fetch data via AJAX');
+            $.ajax({
+                url: "{{ route('api.activity.index', ['target_id' => $user->id, 'target_type' => 'user']) }}",
+                async: false,
+                dataType: 'json',
+                success: function(data) {
+                    if (data && data.rows) {
+                        tableRows = data.rows;
+                        console.log('Fetched ' + tableRows.length + ' rows via AJAX');
+                    }
+                }
+            });
+        }
+        
+        // Generate the table body with the rows we got
+        if (tableRows && tableRows.length > 0) {
+            var tableBody = '<tbody>';
+            
+            $.each(tableRows, function(index, row) {
+                var counter = index + 1;
+                tableBody += '<tr>';
+                tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + counter + '</td>';
+                
+                // Date field
+                var created_at = row.created_at || '';
+                if (typeof created_at === 'object' && created_at.formatted) {
+                    created_at = created_at.formatted;
+                }
+                tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + created_at + '</td>';
+                
+                // Item field
+                var item = '';
+                if (row.item) {
+                    if (typeof row.item === 'object') {
+                        item = row.item.name || '';
+                    } else {
+                        item = row.item;
+                    }
+                }
+                tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + item + '</td>';
+                
+                // Action type
+                tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + (row.action_type || '') + '</td>';
+                
+                // Target field
+                var target = '';
+                if (row.target) {
+                    if (typeof row.target === 'object') {
+                        target = row.target.name || '';
+                    } else {
+                        target = row.target;
+                    }
+                }
+                tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + target + '</td>';
+                
+                // Notes field
+                tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + (row.note || '') + '</td>';
+                tableBody += '</tr>';
+            });
+            
+            tableBody += '</tbody>';
+            $tableClone.append(tableBody);
+            $printArea.append($tableClone);
+        } else {
+            $printArea.append('<div style="text-align:center; margin:40px 0; font-size:1.2em;">No activity history found that {{ trans('general.assigned_to', ['name' => $user->present()->fullName()]) }}</div>');
+        }
+    
+        //Declaration & acceptance of return section
+        var declarationSection = 
+            '<p></p>' +
+            '<p style="text-align: center; vertical-align: top; font-weight: bold; text-decoration: underline;">' +
+            '    DECLARATION' +
+            '</p>' +
+            '<p></p>' +
+            '<p style="text-align: center; vertical-align: top;">' +
+            '    I confirm the returned item(s) listed above are complete and accurate to the best of my knowledge.</p>' +
+            '<p></p>' +
+            '<p></p>' +
+            '<p style="text-align: center; vertical-align: top; font-weight: bold; text-decoration: underline;">' +
+            '    ACCEPTANCE OF RETURN' +
+            '</p>' +
+            '<p></p>' +
+            '<p style="text-align: center; vertical-align: top;">' +
+            '    By signing below, I acknowledge checking the item(s) and accept them under the stated condition.</p>' +
+            '<p></p>';
+            
+        $printArea.append(declarationSection);
+        <!-- Add vertical space - 80px -->
+        var spacer = '<div style="height: 80px;"></div>';
+        $printArea.append(spacer);
+
+        // Add the signature section
+        var signatureSection = '<table>' +
+        '<tr>' +
+            '<td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Received By (IT): </td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">______________________________________</td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">______________________________________</td>' +
+            '<td>_____________</td>' +
+        '</tr>' +
+        '<tr style="height: 80px;">' +
+            '<td></td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">' + '{{ trans('general.name') }}' + '</td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">' + '{{ trans('general.signature') }}' + '</td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">' + '{{ trans('general.date') }}' + '</td>' +
+        '</tr>' +
+        '<tr>' +
+            '<td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Return By (Employee): </td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">______________________________________</td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">______________________________________</td>' +
+            '<td>_____________</td>' +
+        '</tr>' +
+        '<tr style="height: 80px;">' +
+            '<td></td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">' + '{{ trans('general.name') }}' + '</td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">' + '{{ trans('general.signature') }}' + '</td>' +
+            '<td style="padding-right: 10px; vertical-align: top;">' + '{{ trans('general.date') }}' + '</td>' +
+            '<td></td>' +
+        '</tr>' +
+        '</table>';
+        
+        $printArea.append(signatureSection);
+        // Add print-specific CSS
+        var printCSS = '<style>' +
+                      '@media print {' +
+                      '  html, body { width: 100%; height: 100%; margin: 0; padding: 0; }' +
+                      '  body > :not(#print-area) { display: none !important; }' +
+                      '  #print-area { display: block !important; width: 100%; padding: 20px; }' +
+                      '  .print-logo { max-height: 40px; }' +
+                      '  table { page-break-inside: auto; }' +
+                      '  tr { page-break-inside: avoid; page-break-after: auto; }' +
+                      '  thead { display: table-header-group; }' +
+                      '  tfoot { display: table-footer-group; }' +
+                      '  @page { size: portrait; margin: 0.5cm; }' +
+                      '}' +
+                      '</style>';
+        
+        // Remove any existing print areas
+        $('#print-area, style:contains("@media print")').remove();
+        
+        // Add the print area to the document
+        $('body').append(printCSS).append($printArea);
+        
+        // Print the document after a short delay to ensure styles are applied
+        setTimeout(function() {
+            window.print();
+            
+            // Remove the print area after printing is done or canceled
+            setTimeout(function() {
+                $('#print-area, style:contains("@media print")').remove();
+            }, 1000);
+        }, 500);
     });
 });
 </script>
