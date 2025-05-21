@@ -148,7 +148,7 @@
         <!-- Login Header with Logo -->
         <div class="login-header">
             <img src="{{ asset('img/universal_bottom.png') }}" alt="Universal Leaf Logo" class="login-logo">
-            <h1 class="login-title">UI-Trackin (IT)</h1>
+            <h1 class="login-title">{{ $snipeSettings->site_name ?? config('app.name', 'UI-Trackin (IT)') }}</h1>
         </div>
 
         <!-- Login Form -->
