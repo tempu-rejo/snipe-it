@@ -39,11 +39,9 @@
       <div class="icon" aria-hidden="true">
           <x-icon type="assets" />
       </div>
-      @can('index', \App\Models\Asset::class)
-        <a href="{{ route('hardware.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
-            <x-icon type="arrow-circle-right" />
-        </a>
-      @endcan
+      <a href="{{ route('hardware.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
+          <x-icon type="arrow-circle-right" />
+      </a>
     </div>
       </a>
   </div><!-- ./col -->
@@ -59,11 +57,9 @@
       <div class="icon" aria-hidden="true">
           <x-icon type="licenses" />
       </div>
-        @can('view', \App\Models\License::class)
-          <a href="{{ route('licenses.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
-              <x-icon type="arrow-circle-right" />
-          </a>
-        @endcan
+      <a href="{{ route('licenses.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
+          <x-icon type="arrow-circle-right" />
+      </a>
     </div>
      </a>
   </div><!-- ./col -->
@@ -80,11 +76,9 @@
       <div class="icon" aria-hidden="true">
           <x-icon type="accessories" />
       </div>
-      @can('index', \App\Models\Accessory::class)
-          <a href="{{ route('accessories.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
-              <x-icon type="arrow-circle-right" />
-          </a>
-      @endcan
+      <a href="{{ route('accessories.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
+          <x-icon type="arrow-circle-right" />
+      </a>
     </div>
       </a>
   </div><!-- ./col -->
@@ -101,11 +95,9 @@
       <div class="icon" aria-hidden="true">
           <x-icon type="consumables" />
       </div>
-      @can('index', \App\Models\Consumable::class)
-        <a href="{{ route('consumables.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
-            <x-icon type="arrow-circle-right" />
-        </a>
-      @endcan
+      <a href="{{ route('consumables.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
+          <x-icon type="arrow-circle-right" />
+      </a>
     </div>
   </div><!-- ./col -->
 
@@ -120,11 +112,9 @@
      <div class="icon" aria-hidden="true">
          <x-icon type="components" />
      </div>
-       @can('view', \App\Models\License::class)
-         <a href="{{ route('components.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
-             <x-icon type="arrow-circle-right" />
-         </a>
-       @endcan
+     <a href="{{ route('components.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
+         <x-icon type="arrow-circle-right" />
+     </a>
    </div>
     </a>
  </div><!-- ./col -->
@@ -140,11 +130,9 @@
      <div class="icon" aria-hidden="true">
          <x-icon type="users" />
      </div>
-       @can('view', \App\Models\License::class)
-         <a href="{{ route('users.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
-             <x-icon type="arrow-circle-right" />
-         </a>
-       @endcan
+     <a href="{{ route('users.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
+         <x-icon type="arrow-circle-right" />
+     </a>
    </div>
     </a>
  </div><!-- ./col -->
@@ -380,7 +368,7 @@
 									data-sort-order="desc"
 									data-sort-field="assets_count"
 									id="dashLocationSummary"
-									class="table table-striped snipe-table"
+								 class="table table-striped snipe-table"
 									data-url="{{ route('api.locations.index', ['sort' => 'assets_count', 'order' => 'asc']) }}">
 
 								<thead>

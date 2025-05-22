@@ -242,7 +242,7 @@
         <!-- Login Footer -->
         <div class="login-footer">
             <p>&copy; {{ date('Y') }} Universal Leaf. All rights reserved.</p>
-            <p>IT Asset Management System v0.8</p>
+            <p>{{ $snipeSettings->site_name ?? config('app.name', 'UI-Trackin (IT)') }} v0.8</p>
             <p>Need help? Contact <a href="mailto:idhelp@universalleaf.com">IDHelp</a></p>
         </div>
     </div>
