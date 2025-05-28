@@ -1015,7 +1015,7 @@
                   @if  ($snipeSettings->require_accept_signature=='1')
                       <th data-field="signature_file" data-visible="false"  data-formatter="imageFormatter">{{ trans('general.signature') }}</th>
                   @endif
-                  <th data-field="item.serial" data-visible="false">{{ trans('admin/hardware/table.serial') }}</th>
+                  <th data-field="item.location.name" data-formatter="assetLocationFormatter">{{ trans('general.location') }}</th>
                   <th data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.admin') }}</th>
                   <th data-field="remote_ip" data-visible="false" data-sortable="true">{{ trans('admin/settings/general.login_ip') }}</th>
                   <th data-field="user_agent" data-visible="false" data-sortable="true">{{ trans('admin/settings/general.login_user_agent') }}</th>
@@ -1297,6 +1297,7 @@ $('#dataConfirmModal').on('show.bs.modal', function (event) {
         '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.item') }}</th>' +
         '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.action') }}</th>' +
         '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.target') }}</th>' +
+        '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.location') }}</th>' +
         '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.notes') }}</th>' +
         '</tr></thead>';
       $tableClone.append(tableHeader);
@@ -1336,6 +1337,18 @@ $('#dataConfirmModal').on('show.bs.modal', function (event) {
             }
           }
           tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + target + '</td>';
+          // Kolom lokasi
+          var location = '';
+          if (row.item && row.item.location && row.item.location.name) {
+            location = row.item.location.name;
+          } else if (row.location && row.location.name) {
+            location = row.location.name;
+          } else if (typeof row["item.location.name"] === 'string') {
+            location = row["item.location.name"];
+          } else if (typeof row.location === 'string') {
+            location = row.location;
+          }
+          tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + location + '</td>';
           tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + (row.note || '') + '</td>';
           tableBody += '</tr>';
         });
@@ -1479,5 +1492,21 @@ function polymorphicItemFormatter(value, row, index) {
 
 // Pastikan formatter ini sudah terdaftar di bootstrap-table
 window.polymorphicItemFormatter = polymorphicItemFormatter;
+
+function assetLocationFormatter(value, row, index) {
+    // Cek lokasi di row.item.location.name, fallback ke row.location.name jika tidak ada
+    if (row.item && row.item.location && row.item.location.name) {
+        return row.item.location.name;
+    }
+    if (row.location && row.location.name) {
+        return row.location.name;
+    }
+    // Fallback: jika value adalah string (nama lokasi langsung)
+    if (typeof value === 'string') {
+        return value;
+    }
+    return '';
+}
+window.assetLocationFormatter = assetLocationFormatter;
 </script>
 @stop
