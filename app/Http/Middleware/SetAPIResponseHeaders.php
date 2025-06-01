@@ -12,8 +12,8 @@ class SetAPIResponseHeaders extends ThrottleRequests
     /**
      * Add the rate limit headers to the response.
      *
-     * This extends the original ThrottleRequests middleware to add the 'X-RateLimit-Reset' and 'Retry-After' headers, even
-     * if the rate limit is not exceeded.
+     * This extends the original ThrottleRequests middleware to add the 'X-RateLimit-Reset' and
+     * 'Retry-After' headers, even if the rate limit is not exceeded.
      * @param $maxAttempts
      * @param $remainingAttempts
      * @param $retryAfter
@@ -22,6 +22,7 @@ class SetAPIResponseHeaders extends ThrottleRequests
      */
     protected function getHeaders($maxAttempts,  $remainingAttempts, $retryAfter = null, ?Response $response = null)
     {
+
         if ($response &&
             ! is_null($response->headers->get('X-RateLimit-Remaining')) &&
             (int) $response->headers->get('X-RateLimit-Remaining') <= (int) $remainingAttempts) {
@@ -33,7 +34,7 @@ class SetAPIResponseHeaders extends ThrottleRequests
         }
 
         $headers = [
-            'X-RateLimit-Limit' => $maxAttempts,
+            'X-RateLimit-Limit' => config('app.api_throttle_per_minute'),
             'X-RateLimit-Remaining' => $remainingAttempts,
         ];
 
@@ -58,8 +59,8 @@ class SetAPIResponseHeaders extends ThrottleRequests
     protected function handleRequest($request, Closure $next, array $limits)
     {
         foreach ($limits as $limit) {
-            if ($this->limiter->tooManyAttempts($limit->key, $limit->maxAttempts)) {
-                throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
+            if ($this->limiter->tooManyAttempts($limit->key, config('app.api_throttle_per_minute'))) {
+                throw $this->buildException($request, $limit->key, config('app.api_throttle_per_minute'), $limit->responseCallback);
             }
 
             $this->limiter->hit($limit->key, $limit->decaySeconds);
@@ -70,8 +71,8 @@ class SetAPIResponseHeaders extends ThrottleRequests
         foreach ($limits as $limit) {
             $response = $this->addHeaders(
                 $response,
-                $limit->maxAttempts,
-                $this->calculateRemainingAttempts($limit->key, $limit->maxAttempts),
+                config('app.api_throttle_per_minute'),
+                $this->calculateRemainingAttempts($limit->key, config('app.api_throttle_per_minute')),
                 $this->getTimeUntilNextRetry($limit->key) // this is the only line we changed
             );
         }
