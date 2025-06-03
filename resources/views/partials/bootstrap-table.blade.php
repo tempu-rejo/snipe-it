@@ -373,7 +373,7 @@
                 .replace('%CREATED_BY%', row.created_by.name)
                 .replace('%NOTE%', row.note)
                 .replace('%PANEL_CLASS%', (row.exists_on_disk === true) ? 'default' : 'danger')
-                .replace('%INLINE_IMAGE%', (row.inline === true) ? '<a href="' + row.url + '" data-toggle="lightbox" data-type="image"><img src="' + row.url + '" alt="" class="img-thumbnail"></a>' : '')
+                .replace('%INLINE_IMAGE%', (row.inline === true) ? '<a href="' + row.url + '" data-toggle="lightbox" data-type="image"><img src="' + row.url + '" alt="" class="img-thumbnail" style="max-height: 50px; width: auto;"></a>' : '')
                 .replace('%DOWNLOAD_BUTTON%', (row.exists_on_disk === true) ? '<a href="'+ row.url +'" class="btn btn-sm btn-default"><x-icon type="download" /></a> ' : '<span class="btn btn-sm btn-default disabled" data-tooltip="true" title="{{ trans('general.file_upload_status.file_not_found') }}"><x-icon type="download" /></span>')
                 .replace('%NEW_WINDOW_BUTTON%', (row.exists_on_disk === true) ? '<a href="'+ row.url +'?inline=true" class="btn btn-sm btn-default" target="_blank"><x-icon type="external-link" /></a> ' : '<span class="btn btn-sm btn-default disabled" data-tooltip="true" title="{{ trans('general.file_upload_status.file_not_found') }}" ><x-icon type="external-link"/></span>')
                 .replace('%DELETE_BUTTON%', ((row.exists_on_disk === true) && row.available_actions.delete === true) ? '<a href="'+ row.url +'" class="btn btn-sm btn-danger"><x-icon type="delete" /></a> ' : '<span class="btn btn-sm btn-danger disabled" data-tooltip="true" title="{{ trans('general.file_upload_status.file_not_found') }}" ><x-icon type="delete"/></span>');
