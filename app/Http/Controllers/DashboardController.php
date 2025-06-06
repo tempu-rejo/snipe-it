@@ -27,7 +27,8 @@ class DashboardController extends Controller
     public function index() : View | RedirectResponse
     {
         // Show the page
-        if (!auth()->user()->hasAccess('admin')) {
+        //if (!auth()->user()->hasAccess('admin')) {
+        if (auth()->user()) {
             $asset_stats = null;
 
             $counts['asset'] = \App\Models\Asset::count();
