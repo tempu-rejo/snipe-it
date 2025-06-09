@@ -128,7 +128,14 @@ class AssetsController extends Controller
             }
 
             if (($asset_tags) && (array_key_exists($a, $asset_tags))) {
-                $asset->asset_tag = $asset_tags[$a];
+                if($request->_snipeit_device_type_5 == 'Personal'){
+                    $code_tag = 'P';
+                }else{
+                    $code_tag = 'T';
+                }
+                $asset->asset_tag = 'IT-251-'.$code_tag.'-'.$this->getNoTrans($request->_snipeit_device_type_5);
+                // $asset->asset_tag = $asset_tags[$a];
+
             }
 
             $asset->company_id              = Company::getIdForCurrentUser($request->input('company_id'));
@@ -961,5 +968,33 @@ class AssetsController extends Controller
         $requestedItems = $requestedItems->orderBy('created_at', 'desc')->get();
 
         return view('hardware/requested', compact('requestedItems'));
+    }
+
+    public function getNoTrans($device_type){
+        $query = DB::table('custom_numbering')
+                ->select('order')
+                ->where('name','=',$device_type)
+                ->first();            
+
+        $nomor=$query->order;
+        $nomor ++;
+        $q2=DB::table('custom_numbering')
+            ->where('name','=',$device_type)
+            ->update(array('order' => $nomor)); 
+        return $this->tambahNol($nomor);
+    }
+
+    public function tambahNol($nomor){
+        $res=$nomor;
+        if(strlen($nomor)==1){
+            $res='0000'.$nomor;
+        }elseif(strlen($nomor)==2){
+            $res='000'.$nomor;
+        }elseif(strlen($nomor)==3){
+            $res='00'.$nomor;
+        }elseif(strlen($nomor)==4){
+            $res='0'.$nomor;
+        }
+        return $res;
     }
 }
