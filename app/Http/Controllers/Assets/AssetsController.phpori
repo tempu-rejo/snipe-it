@@ -128,14 +128,14 @@ class AssetsController extends Controller
             }
 
             if (($asset_tags) && (array_key_exists($a, $asset_tags))) {
-                $device_type = $request->input('_snipeit_device_type_5');
-                if (strtolower($device_type) == 'personal') {
+                if($request->_snipeit_device_type_5 == 'Personal'){
                     $code_tag = 'P';
-                } else {
+                }else{
                     $code_tag = 'T';
                 }
                 $year = date('y');
                 // Reset numbering if year changed
+                $device_type = $request->_snipeit_device_type_5;
                 $customNumbering = DB::table('custom_numbering')->where('name', '=', $device_type)->first();
 
                 if ($customNumbering && $customNumbering->year != $year) {
@@ -144,22 +144,7 @@ class AssetsController extends Controller
                         ->update(['order' => 1, 'year' => $year]);
                 }
 
-                if($request->_snipeit_source_10 == 'NEW'){
-                    $Source = '1';
-                }else{  
-                    $Source = '0';
-                }
-
-                // Cek duplikasi asset_tag sebelum assign
-                $generated_tag = 'IT-' . $year . $Source .'-' . $code_tag . '-' . $this->getNoTrans($device_type);
-                $tag_exists = Asset::where('asset_tag', $generated_tag)->exists();
-                $counter = 0;
-                while ($tag_exists && $counter < 1000) { // Hindari infinite loop
-                    $generated_tag = 'IT-' . $year . $Source .'-' . $code_tag . '-' . $this->getNoTrans($device_type);
-                    $tag_exists = Asset::where('asset_tag', $generated_tag)->exists();
-                    $counter++;
-                }
-                $asset->asset_tag = $generated_tag;
+                $asset->asset_tag = 'IT-' . $year . '1-' . $code_tag . '-' . $this->getNoTrans($device_type);
                 // $asset->asset_tag = $asset_tags[$a];
 
             }
@@ -996,28 +981,19 @@ class AssetsController extends Controller
         return view('hardware/requested', compact('requestedItems'));
     }
 
-public function getNoTrans($device_type){
-    $query = DB::table('custom_numbering')
-            ->select('order')
-            ->where('name','=',$device_type)
-            ->first();
+    public function getNoTrans($device_type){
+        $query = DB::table('custom_numbering')
+                ->select('order')
+                ->where('name','=',$device_type)
+                ->first();            
 
-    if (!$query) {
-        // Jika tidak ada, buat record baru dengan order 1
-        DB::table('custom_numbering')->insert([
-            'name' => $device_type,
-            'order' => 1,
-            'year' => date('y')
-        ]);
-        $nomor = 1;
-    } else {
-        $nomor = $query->order + 1;
-        DB::table('custom_numbering')
+        $nomor=$query->order;
+        $nomor ++;
+        $q2=DB::table('custom_numbering')
             ->where('name','=',$device_type)
-            ->update(['order' => $nomor]);
+            ->update(array('order' => $nomor)); 
+        return $this->tambahNol($nomor);
     }
-    return $this->tambahNol($nomor);
-}
 
     public function tambahNol($nomor){
         $res=$nomor;

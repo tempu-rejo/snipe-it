@@ -6,7 +6,7 @@
         'start_date'             => 'Start Date',
         'completion_date'        => 'Completion Date',
         'cost'                   => 'Cost',
-        'is_warranty'            => 'Warranty Improvement',
+        'is_warranty'            => 'Completed',
         'asset_maintenance_time' => 'Asset Maintenance Time (in days)',
         'notes'                  => 'Notes',
         'update'                 => 'Update Asset Maintenance',

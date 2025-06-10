@@ -54,12 +54,7 @@
         </div>
 
 
-        @include ('partials.forms.edit.asset-select', [
-            'translated_name' => trans('general.asset'),
-            'fieldname' => 'asset_id',
-            'required' => 'true',
-            'multiple' => true // enable multi selection
-        ])
+        @include ('partials.forms.edit.asset-select', ['translated_name' => trans('general.asset'), 'fieldname' => 'asset_id', 'required' => 'true'])
         @include ('partials.forms.edit.supplier-select', ['translated_name' => trans('general.supplier'), 'fieldname' => 'supplier_id', 'required' => 'true'])
         @include ('partials.forms.edit.maintenance_type')
 
@@ -95,14 +90,12 @@
           </div>
         </div>
 
-          
-          <!-- Completed -->
-          <div class="form-group">
-            <div class="col-sm-offset-3 col-sm-9">
+        <!-- Warranty -->
+        <div class="form-group">
+          <div class="col-sm-offset-3 col-sm-9">
               <label class="form-control">
                 <input type="checkbox" value="1" name="is_warranty" id="is_warranty" {{ old('is_warranty', $item->is_warranty) == '1' ? ' checked="checked"' : '' }}>
-                <!-- <input type="checkbox" value="1" name="is_completed" id="is_completed" {{ old('is_completed', $item->is_completed) == '1' ? ' checked="checked"' : '' }}> -->
-                {{ "Is Completed" }}
+                {{ trans('admin/asset_maintenances/form.is_warranty') }}
               </label>
           </div>
         </div>

@@ -269,4 +269,27 @@ class AssetMaintenancesController extends Controller
 
         return view('asset_maintenances/view')->with('assetMaintenance', $maintenance);
     }
+
+    /**
+    * Print asset maintenance details by asset ID.
+    *
+    * @param int $assetId
+    * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
+    */
+    public function print($assetMaintenanceId)
+    {
+        $this->authorize('view', Asset::class);
+
+        $maintenance = \App\Models\AssetMaintenance::with(['asset', 'supplier'])->find($assetMaintenanceId);
+
+        if (!$maintenance) {
+            return redirect()->route('maintenances.index')->with('error', 'Asset Maintenance not found');
+        }
+
+        if (!Company::isCurrentUserHasAccess($maintenance->asset)) {
+            return static::getInsufficientPermissionsRedirect();
+        }
+
+        return view('asset_maintenances.print')->with('assetMaintenance', $maintenance);
+    }
 }

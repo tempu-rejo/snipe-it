@@ -49,9 +49,9 @@ class Label implements View
                 ->with('bulkedit', $this->data->get('bulkedit'))
                 ->with('count', $this->data->get('count'));
         }
-
+        
             $template = LabelModel::find($settings->label2_template);
-
+        
         if ($template === null) {
             return redirect()->route('settings.labels.index')->with('error', trans('admin/settings/message.labels.null_template'));
         }
