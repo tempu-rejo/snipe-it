@@ -133,7 +133,18 @@ class AssetsController extends Controller
                 }else{
                     $code_tag = 'T';
                 }
-                $asset->asset_tag = 'IT-251-'.$code_tag.'-'.$this->getNoTrans($request->_snipeit_device_type_5);
+                $year = date('y');
+                // Reset numbering if year changed
+                $device_type = $request->_snipeit_device_type_5;
+                $customNumbering = DB::table('custom_numbering')->where('name', '=', $device_type)->first();
+
+                if ($customNumbering && $customNumbering->year != $year) {
+                    DB::table('custom_numbering')
+                        ->where('name', '=', $device_type)
+                        ->update(['order' => 1, 'year' => $year]);
+                }
+
+                $asset->asset_tag = 'IT-' . $year . '1-' . $code_tag . '-' . $this->getNoTrans($device_type);
                 // $asset->asset_tag = $asset_tags[$a];
 
             }
