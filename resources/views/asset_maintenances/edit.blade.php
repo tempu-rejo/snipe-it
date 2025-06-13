@@ -76,11 +76,14 @@
             'multiple' => !$item->id, // enable multi selection only for new records
             'disabled' => $item->id ? true : false, // disable when editing
             'asset_status_type' => 'undeployable' // only show undeployable assets for maintenance
-        ])@include ('partials.forms.edit.supplier-select', [
+        ])
+
+        @include ('partials.forms.edit.supplier-select', [
             'translated_name' => trans('general.supplier'), 
             'fieldname' => 'supplier_id', 
             'required' => 'true',
-            'disabled' => $item->id ? true : false // disable when editing
+            'disabled' => $item->id ? true : false, // disable when editing
+            'hide_new' => $item->id ? 'true' : 'false' // hide "New supplier" button when editing
         ])
         @include ('partials.forms.edit.maintenance_type', [
             'disabled' => $item->id ? true : false // disable when editing
