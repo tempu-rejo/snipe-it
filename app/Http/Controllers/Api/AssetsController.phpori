@@ -547,6 +547,7 @@ class AssetsController extends Controller
      */
     public function selectlist(Request $request): array
     {
+
         $assets = Asset::select([
             'assets.id',
             'assets.name',
@@ -555,39 +556,10 @@ class AssetsController extends Controller
             'assets.assigned_to',
             'assets.assigned_type',
             'assets.status_id',
-            'assets.serial',
         ])->with('model', 'assetstatus', 'assignedTo')->NotArchived();
 
-        // Handle asset status type filtering for both parameter names
-        $statusType = $request->input('assetStatusType') ?: $request->input('asset_status_type');
-        if ($statusType) {
-            switch (strtolower($statusType)) {
-                case 'rtd':
-                    $assets = $assets->RTD();
-                    break;
-                case 'pending':
-                    $assets = $assets->join('status_labels AS status_alias', function ($join) {
-                        $join->on('status_alias.id', '=', 'assets.status_id')
-                            ->where('status_alias.deployable', '=', 0)
-                            ->where('status_alias.pending', '=', 1)
-                            ->where('status_alias.archived', '=', 0);
-                    });
-                    break;
-                case 'undeployable':
-                    $assets = $assets->Undeployable();
-                    break;
-                case 'deployed':
-                    $assets = $assets->whereNotNull('assets.assigned_to');
-                    break;
-                case 'archived':
-                    $assets = $assets->join('status_labels AS status_alias', function ($join) {
-                        $join->on('status_alias.id', '=', 'assets.status_id')
-                            ->where('status_alias.deployable', '=', 0)
-                            ->where('status_alias.pending', '=', 0)
-                            ->where('status_alias.archived', '=', 1);
-                    });
-                    break;
-            }
+        if ($request->filled('assetStatusType') && $request->input('assetStatusType') === 'RTD') {
+            $assets = $assets->RTD();
         }
 
         if ($request->filled('search')) {
@@ -602,12 +574,8 @@ class AssetsController extends Controller
         // they may not have a ->name value but we want to display something anyway
         foreach ($assets as $asset) {
 
-            $asset->use_text = $asset->present()->fullName;
 
-            // Add serial number to the display text
-            if ($asset->serial) {
-                $asset->use_text .= ' [SN: ' . $asset->serial . ']';
-            }
+            $asset->use_text = $asset->present()->fullName;
 
             if (($asset->checkedOutToUser()) && ($asset->assigned)) {
                 $asset->use_text .= ' → ' . $asset->assigned->getFullNameAttribute();

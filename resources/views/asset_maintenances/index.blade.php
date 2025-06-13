@@ -33,9 +33,13 @@
               data-show-footer="true"
               data-show-export="true"
               data-show-refresh="true"
-              data-click-to-select="true" {{-- Added for row click selection --}}
-              data-maintain-meta-data="true" {{-- Added to maintain selection --}}
-              data-checkbox-header="true" {{-- Added for select all checkbox in header --}}
+              data-click-to-select="true"
+              data-maintain-meta-data="true"
+              data-checkbox-header="true"
+              data-sortable="true"
+              data-filter-control="true"
+              data-filter-show-clear="true"
+              data-filter-control-visible="true" {{-- Force filter row always visible --}}
               id="maintenancesTable"
               class="table table-striped snipe-table"
               data-url="{{route('api.maintenances.index') }}"
@@ -53,7 +57,7 @@
 @stop
 
 @section('moar_scripts')
-@include ('partials.bootstrap-table', ['exportFile' => 'maintenances-export', 'search' => true])
+@include ('partials.bootstrap-table', ['exportFile' => 'maintenances-export', 'search' => true, 'filterControl' => true])
 <script nonce="{{ csrf_token() }}">
     function maintenancesActions(value, row) {
         var actions = '<nobr>';
@@ -67,18 +71,20 @@
             printUrl = printUrl.replace(':MAINTENANCE_ID', row.id);
             actions += '<a href="' + printUrl + '" class="btn btn-sm btn-primary" data-tooltip="true" title="Print"><i class="fas fa-print"></i></a>&nbsp;';
         }
-        actions += '</nobr>'
         if ((row) && (row.available_actions.delete === true)) {
             let deleteUrl = "{{ route('maintenances.destroy', ['maintenance' => ':MAINTENANCE_ID']) }}";
             deleteUrl = deleteUrl.replace(':MAINTENANCE_ID', row.id);
+            // Use JS variables for translations
+            var sureToDelete = @json(trans('general.sure_to_delete'));
+            var deleteTitle = @json(trans('general.delete'));
             actions += '<a href="' + deleteUrl + '" '
                 + ' class="btn btn-danger btn-sm delete-asset"  data-tooltip="true"  '
                 + ' data-toggle="modal" '
-                + ' data-content="{{ trans('general.sure_to_delete') }} ' + row.name + '?" '
-                + ' data-title="{{  trans('general.delete') }}" onClick="return false;">'
-                + '<i class="fas fa-trash"></i></a></nobr>';
+                + ' data-content="' + sureToDelete + ' ' + row.name + '?" '
+                + ' data-title="' + deleteTitle + '" onClick="return false;">'
+                + '<i class="fas fa-trash"></i></a>';
         }
-
+        actions += '</nobr>';
         return actions;
     }
 
@@ -113,12 +119,12 @@
             // Table
             var $tableClone = $('<table class="table table-striped" style="width:100%; margin-top:10px; border-collapse: collapse;"></table>');
             var tableHeader = '<thead><tr>' +
-                '<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">{{ trans('admin/asset_maintenances/table.title') }}</th>' +
-                '<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">{{ trans('general.asset') }}</th>' +
-                '<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">{{ trans('admin/asset_maintenances/form.asset_maintenance_type') }}</th>' +
-                '<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">{{ trans('admin/asset_maintenances/form.start_date') }}</th>' +
-                //'<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">{{ trans('admin/asset_maintenances/form.completion_date') }}</th>' +
-                //'<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold; text-align: right;">{{ trans('admin/asset_maintenances/form.cost') }}</th>' +
+                '<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">' + @json(trans('admin/asset_maintenances/table.title')) + '</th>' +
+                '<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">' + @json(trans('general.asset')) + '</th>' +
+                '<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">' + @json(trans('admin/asset_maintenances/form.asset_maintenance_type')) + '</th>' +
+                '<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">' + @json(trans('admin/asset_maintenances/form.start_date')) + '</th>' +
+                //'<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold;">' + @json(trans('admin/asset_maintenances/form.completion_date')) + '</th>' +
+                //'<th style="border: 1px solid #ddd; padding: 8px; background-color: #f0f0f0; font-weight: bold; text-align: right;">' + @json(trans('admin/asset_maintenances/form.cost')) + '</th>' +
                 '</tr></thead>';
             $tableClone.append(tableHeader);
 
@@ -169,9 +175,9 @@
                     '</tr>' +
                     '<tr style="height: 80px;">' +
                         '<td style="border:none;"></td>' +
-                        '<td style="padding-right: 10px; vertical-align: top; border:none;">{{ trans('general.name') }}</td>' +
-                        '<td style="padding-right: 10px; vertical-align: top; border:none;">{{ trans('general.signature') }}</td>' +
-                        '<td style="padding-right: 10px; vertical-align: top; border:none;">{{ trans('general.date') }}</td>' +
+                        '<td style="padding-right: 10px; vertical-align: top; border:none;">' + @json(trans('general.name')) + '</td>' +
+                        '<td style="padding-right: 10px; vertical-align: top; border:none;">' + @json(trans('general.signature')) + '</td>' +
+                        '<td style="padding-right: 10px; vertical-align: top; border:none;">' + @json(trans('general.date')) + '</td>' +
                     '</tr>' +
                     '<tr>' +
                         '<td style="padding-right: 10px; vertical-align: top; font-weight: bold; border:none;">Atasan:</td>' +
@@ -181,9 +187,9 @@
                     '</tr>' +
                     '<tr style="height: 80px;">' +
                         '<td style="border:none;"></td>' +
-                        '<td style="padding-right: 10px; vertical-align: top; border:none;">{{ trans('general.name') }}</td>' +
-                        '<td style="padding-right: 10px; vertical-align: top; border:none;">{{ trans('general.signature') }}</td>' +
-                        '<td style="padding-right: 10px; vertical-align: top; border:none;">{{ trans('general.date') }}</td>' +
+                        '<td style="padding-right: 10px; vertical-align: top; border:none;">' + @json(trans('general.name')) + '</td>' +
+                        '<td style="padding-right: 10px; vertical-align: top; border:none;">' + @json(trans('general.signature')) + '</td>' +
+                        '<td style="padding-right: 10px; vertical-align: top; border:none;">' + @json(trans('general.date')) + '</td>' +
                         '<td style="border:none;"></td>' +
                     '</tr>' +
                     '<tr>' +
@@ -194,9 +200,9 @@
                     '</tr>' +
                     '<tr>' +
                         '<td style="border:none;"></td>' +
-                        '<td style="padding-right: 10px; vertical-align: top; border:none;">{{ trans('general.name') }}</td>' +
-                        '<td style="padding-right: 10px; vertical-align: top; border:none;">{{ trans('general.signature') }}</td>' +
-                        '<td style="padding-right: 10px; vertical-align: top; border:none;">{{ trans('general.date') }}</td>' +
+                        '<td style="padding-right: 10px; vertical-align: top; border:none;">' + @json(trans('general.name')) + '</td>' +
+                        '<td style="padding-right: 10px; vertical-align: top; border:none;">' + @json(trans('general.signature')) + '</td>' +
+                        '<td style="padding-right: 10px; vertical-align: top; border:none;">' + @json(trans('general.date')) + '</td>' +
                         '<td style="border:none;"></td>' +
                     '</tr>' +
                 '</table>';
@@ -204,7 +210,7 @@
 
                 
             } else {
-                $printArea.append('<div style="text-align:center; margin:40px 0; font-size:1.2em;">{{ trans('general.no_results_found') }}</div>');
+                $printArea.append('<div style="text-align:center; margin:40px 0; font-size:1.2em;">' + @json(trans('general.no_results_found')) + '</div>');
             }
 
             // Print CSS - Adopting styles from print.blade.php

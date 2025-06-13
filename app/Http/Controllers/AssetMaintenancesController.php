@@ -93,10 +93,14 @@ class AssetMaintenancesController extends Controller
         $this->authorize('update', Asset::class);
         $asset_ids = (array) $request->input('asset_id');
         $created = 0;
+        $failed = [];
+        $errorDetails = [];
 
         foreach ($asset_ids as $asset_id) {
             $asset = Asset::find($asset_id);
             if ((! Company::isCurrentUserHasAccess($asset)) && ($asset != null)) {
+                $failed[] = $asset_id;
+                $errorDetails[] = 'Tidak punya akses ke asset ID: '.$asset_id;
                 continue;
             }
 
@@ -123,7 +127,20 @@ class AssetMaintenancesController extends Controller
 
             if ($assetMaintenance->save()) {
                 $created++;
+            } else {
+                $failed[] = $asset_id;
+                $errorDetails[] = 'Gagal menyimpan maintenance untuk asset ID: '.$asset_id.' ('.($asset ? $asset->asset_tag : '-') .')';
             }
+        }
+
+        if ($created > 0 && count($failed) > 0) {
+            $failedAssets = Asset::whereIn('id', $failed)->pluck('asset_tag', 'id')->toArray();
+            $failedList = collect($failedAssets)->map(function($tag, $id) {
+                return $tag ? $tag.' (ID:'.$id.')' : 'ID:'.$id;
+            })->implode(', ');
+            return redirect()->route('maintenances.index')
+                ->with('partial_success', 'Beberapa maintenance berhasil dibuat, namun gagal untuk asset berikut: <b>'.$failedList.'</b>')
+                ->with('partial_error_detail', $errorDetails ?? []);
         }
 
         if ($created > 0) {

@@ -42,38 +42,61 @@
 
       <div class="box-body">
 
-        <!-- Title -->
+        @if (session('partial_success'))
+          <div class="alert alert-warning">
+            {!! session('partial_success') !!}
+          </div>
+        @endif
+        @if (session('partial_error_detail'))
+          <div class="alert alert-danger">
+            <b>Detail error:</b><br>
+            <ul>
+              @foreach (session('partial_error_detail') as $err)
+                <li>{{ $err }}</li>
+              @endforeach
+            </ul>
+          </div>
+        @endif        <!-- Title -->
         <div class="form-group {{ $errors->has('title') ? ' has-error' : '' }}">
           <label for="title" class="col-md-3 control-label">
             {{ trans('admin/asset_maintenances/form.title') }}
           </label>
           <div class="col-md-7">
-            <input class="form-control" type="text" name="title" id="title" value="{{ old('title', $item->title) }}"{{  (Helper::checkIfRequired($item, 'title')) ? ' required' : '' }} />
+            <input class="form-control" type="text" name="title" id="title" value="{{ old('title', $item->title) }}"{{  (Helper::checkIfRequired($item, 'title')) ? ' required' : '' }}{{ $item->id ? ' disabled' : '' }} />
+            @if($item->id && $item->title)
+                <!-- Hidden input to ensure value is submitted when field is disabled -->
+                <input type="hidden" name="title" value="{{ $item->title }}">
+            @endif
             {!! $errors->first('title', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
           </div>
-        </div>
-
-
-        @include ('partials.forms.edit.asset-select', [
+        </div>        @include ('partials.forms.edit.asset-select', [
             'translated_name' => trans('general.asset'),
             'fieldname' => 'asset_id',
             'required' => 'true',
-            'multiple' => true // enable multi selection
+            'multiple' => !$item->id, // enable multi selection only for new records
+            'disabled' => $item->id ? true : false, // disable when editing
+            'asset_status_type' => 'undeployable' // only show undeployable assets for maintenance
+        ])@include ('partials.forms.edit.supplier-select', [
+            'translated_name' => trans('general.supplier'), 
+            'fieldname' => 'supplier_id', 
+            'required' => 'true',
+            'disabled' => $item->id ? true : false // disable when editing
         ])
-        @include ('partials.forms.edit.supplier-select', ['translated_name' => trans('general.supplier'), 'fieldname' => 'supplier_id', 'required' => 'true'])
-        @include ('partials.forms.edit.maintenance_type')
-
-
-
-        <!-- Start Date -->
+        @include ('partials.forms.edit.maintenance_type', [
+            'disabled' => $item->id ? true : false // disable when editing
+        ])        <!-- Start Date -->
         <div class="form-group {{ $errors->has('start_date') ? ' has-error' : '' }}">
           <label for="start_date" class="col-md-3 control-label">{{ trans('admin/asset_maintenances/form.start_date') }}</label>
 
           <div class="input-group col-md-3">
             <div class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm-dd"  data-autoclose="true" data-date-clear-btn="true">
-              <input type="text" class="form-control" placeholder="{{ trans('general.select_date') }}" name="start_date" id="start_date" value="{{ old('start_date', $item->start_date) }}"{{  (Helper::checkIfRequired($item, 'start_date')) ? ' required' : '' }}>
+              <input type="text" class="form-control" placeholder="{{ trans('general.select_date') }}" name="start_date" id="start_date" value="{{ old('start_date', $item->start_date) }}"{{  (Helper::checkIfRequired($item, 'start_date')) ? ' required' : '' }}{{ $item->id ? ' disabled' : '' }}>
               <span class="input-group-addon"><x-icon type="calendar" /></span>
             </div>
+            @if($item->id && $item->start_date)
+                <!-- Hidden input to ensure value is submitted when field is disabled -->
+                <input type="hidden" name="start_date" value="{{ $item->start_date }}">
+            @endif
             {!! $errors->first('start_date', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
           </div>
         </div>
@@ -105,19 +128,13 @@
                 {{ "Is Completed" }}
               </label>
           </div>
-        </div>
-
-        <!-- Asset Maintenance Cost -->
+        </div>        <!-- Asset Maintenance Cost -->
         <div class="form-group {{ $errors->has('cost') ? ' has-error' : '' }}">
           <label for="cost" class="col-md-3 control-label">{{ trans('admin/asset_maintenances/form.cost') }}</label>
           <div class="col-md-2">
             <div class="input-group">
               <span class="input-group-addon">
-                @if (($item->asset) && ($item->asset->location) && ($item->asset->location->currency!=''))
-                  {{ $item->asset->location->currency }}
-                @else
-                  {{ $snipeSettings->default_currency }}
-                @endif
+                IDR
               </span>
               <input class="col-md-2 form-control" type="text" name="cost" id="cost" value="{{ old('cost', Helper::formatCurrencyOutput($item->cost)) }}" />
               {!! $errors->first('cost', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}

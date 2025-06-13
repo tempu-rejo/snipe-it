@@ -8,14 +8,9 @@
                       :options="$assetMaintenanceType"
                       :selected="old('asset_maintenance_type', $item->asset_maintenance_type)"
                       :required="Helper::checkIfRequired($item, 'asset_maintenance_type')"
-                      :disabled="isset($disabled) ? $disabled : false"
                       style="width:100%;"
                       aria-label="asset_maintenance_type"
                   />
-                  @if(isset($disabled) && $disabled && $item->asset_maintenance_type)
-                      <!-- Hidden input to ensure value is submitted when field is disabled -->
-                      <input type="hidden" name="asset_maintenance_type" value="{{ $item->asset_maintenance_type }}">
-                  @endif
                   {!! $errors->first('asset_maintenance_type', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
               </div>
           </div>
