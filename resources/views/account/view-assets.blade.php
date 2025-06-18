@@ -6,6 +6,33 @@
 @parent
 @stop
 
+@section('header_right')
+  {{-- Manager View Dropdown --}}
+  @if (isset($settings) && ($settings->manager_view_enabled==1) && (isset($subordinates) && $subordinates->count() > 1))
+    <div class="row hidden-print" style="margin-bottom: 15px;">
+      <div class="col-md-12">
+        <form method="GET" action="{{ route('view-assets') }}" class="pull-right" role="form">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="user_id" class="control-label" style="margin-right: 10px;">
+              {{ trans('general.select_user') }}:
+            </label>
+            <select name="user_id" id="user_id" class="form-control select2" onchange="this.form.submit()" style="width: 250px; display: inline-block;">
+              @foreach ($subordinates as $subordinate)
+                <option value="{{ $subordinate->id }}" {{ (int)$selectedUserId === (int)$subordinate->id ? ' selected' : '' }}>
+                  {{ $subordinate->present()->fullName() }}
+                  @if ($subordinate->id == auth()->id())
+                    ({{ trans('general.me') }})
+                  @endif
+                </option>
+              @endforeach
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+  @endif
+@stop
+
 {{-- Account page content --}}
 @section('content')
 
@@ -25,30 +52,7 @@
   </div>
 @endif
 
-{{-- Manager View Dropdown --}}
-@if (isset($settings) && $settings->manager_view_enabled && isset($subordinates) && $subordinates->count() > 1)
-  <div class="row hidden-print" style="margin-bottom: 15px;">
-    <div class="col-md-12">
-      <form method="GET" action="{{ route('view-assets') }}" class="pull-right" role="form">
-        <div class="form-group" style="margin-bottom: 0;">
-          <label for="user_id" class="control-label" style="margin-right: 10px;">
-            {{ trans('general.view_user_assets') }}:
-          </label>
-          <select name="user_id" id="user_id" class="form-control select2" onchange="this.form.submit()" style="width: 250px; display: inline-block;">
-            @foreach ($subordinates as $subordinate)
-              <option value="{{ $subordinate->id }}" {{ (int)$selectedUserId === (int)$subordinate->id ? ' selected' : '' }}>
-                {{ $subordinate->present()->fullName() }}
-                @if ($subordinate->id == auth()->id())
-                  ({{ trans('general.me') }})
-                @endif
-              </option>
-            @endforeach
-          </select>
-        </div>
-      </form>
-    </div>
-  </div>
-@endif
+
 
   <div class="row">
     <div class="col-md-12">
@@ -133,44 +137,44 @@
               <div class="col-md-3 col-xs-12 col-sm-push-9">
 
                 <div class="col-md-12 text-center">
-                  <img src="{{ $user->present()->gravatar() }}"  class=" img-thumbnail hidden-print" style="margin-bottom: 20px;" alt="{{ $user->present()->fullName() }}" alt="User avatar">
+                  <img src="{{ $user->present()->gravatar() }}"  class="img-thumbnail hidden-print" style="margin-bottom: 20px;" alt="{{ $user->present()->fullName() }}" alt="User avatar">
                 </div>
-                @can('self.profile')
-                  <div class="col-md-12">
-                    <a href="{{ route('profile') }}" style="width: 100%;" class="btn btn-sm btn-warning btn-social btn-block hidden-print">
-                      <x-icon type="edit" />
-                      {{ trans('general.editprofile') }}
-                    </a>
-                  </div>
-                @endcan
+                @if ((isset($selectedUserId)) && ($selectedUserId == auth()->id()))
+                    @can('self.profile')
+                      <div class="col-md-12">
+                        <a href="{{ route('profile') }}" style="width: 100%;" class="btn btn-sm btn-warning btn-social btn-block hidden-print">
+                          <x-icon type="edit" />
+                          {{ trans('general.editprofile') }}
+                        </a>
+                      </div>
+                    @endcan
 
-                @if ($user->ldap_import!='1')
-                <div class="col-md-12" style="padding-top: 5px;">
-                  <a href="{{ route('account.password.index') }}" style="width: 100%;" class="btn btn-sm btn-primary btn-social btn-block hidden-print" target="_blank" rel="noopener">
-                    <x-icon type="password" class="fa-fw" />
-                    {{ trans('general.changepassword') }}
-                  </a>
-                </div>
+                    @if ($user->ldap_import!='1')
+                    <div class="col-md-12" style="padding-top: 5px;">
+                      <a href="{{ route('account.password.index') }}" style="width: 100%;" class="btn btn-sm btn-primary btn-social btn-block hidden-print" target="_blank" rel="noopener">
+                        <x-icon type="password" class="fa-fw" />
+                        {{ trans('general.changepassword') }}
+                      </a>
+                    </div>
+                    @endif
+
+                    @can('self.api')
+                    <div class="col-md-12" style="padding-top: 5px;">
+                      <a href="{{ route('user.api') }}" style="width: 100%;" class="btn btn-sm btn-primary btn-social btn-block hidden-print" target="_blank" rel="noopener">
+                        <x-icon type="api-key" class="fa-fw" />
+                        {{ trans('general.manage_api_keys') }}
+                      </a>
+                    </div>
+                    @endcan
                 @endif
 
-                @can('self.api')
-                <div class="col-md-12" style="padding-top: 5px;">
-                  <a href="{{ route('user.api') }}" style="width: 100%;" class="btn btn-sm btn-primary btn-social btn-block hidden-print" target="_blank" rel="noopener">
-                    <x-icon type="api-key" class="fa-fw" />
-                    {{ trans('general.manage_api_keys') }}
-                  </a>
-                </div>
-                @endcan
-
-
+                @if ($user->allAssignedCount() > 0)
                   <div class="col-md-12" style="padding-top: 5px;">
-                    <a href="{{ route('profile.print') }}" style="width: 100%;" class="btn btn-sm btn-primary btn-social btn-block hidden-print" target="_blank" rel="noopener">
-                      <x-icon type="print" class="fa-fw" />
-                      {{ trans('admin/users/general.print_assigned') }}
-                    </a>
+                      <a href="{{ route('profile.print') }}" style="width: 100%;" class="btn btn-sm btn-primary btn-social btn-block hidden-print" target="_blank" rel="noopener">
+                        <x-icon type="print" class="fa-fw" />
+                        {{ trans('admin/users/general.print_assigned') }}
+                      </a>
                   </div>
-
-
                   <div class="col-md-12" style="padding-top: 5px;">
                     @if (!empty($user->email))
                       <form action="{{ route('profile.email_assets') }}" method="POST">
@@ -187,8 +191,8 @@
                       </button>
                     @endif
                   </div>
+                @endif
 
-                <br><br>
               </div>
 
               <!-- End button column -->
