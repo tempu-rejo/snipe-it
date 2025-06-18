@@ -58,7 +58,7 @@ class ViewAssetsController extends Controller
         // SuperAdmin sees all users
         if ($authUser->isSuperUser()) {
             return User::select('id', 'first_name', 'last_name', 'username')
-                ->where('activated', 1)
+                ->where('show_in_list', 1)
                 ->orderBy('last_name')
                 ->orderBy('first_name')
                 ->get();
@@ -66,14 +66,14 @@ class ViewAssetsController extends Controller
 
         // Regular manager sees only their subordinates + self
         $managedUsers = $authUser->getAllSubordinates();
-        
+
         // If user has subordinates, show them with self at beginning
         if ($managedUsers->count() > 0) {
             return collect([$authUser])->merge($managedUsers)
                 ->sortBy('last_name')
                 ->sortBy('first_name');
         }
-        
+
         // User has no subordinates, only sees themselves
         return collect([$authUser]);
     }
@@ -94,12 +94,12 @@ class ViewAssetsController extends Controller
         }
 
         $requestedUserId = (int) $request->input('user_id');
-        
+
         // Validate if the requested user is allowed
         if ($subordinates->contains('id', $requestedUserId)) {
             return $requestedUserId;
         }
-        
+
         // If invalid ID or not authorized, return default
         return $defaultUserId;
     }
@@ -115,8 +115,9 @@ class ViewAssetsController extends Controller
         $subordinates = collect();
         $selectedUserId = $authUser->id;
 
+
         // Process manager view if enabled
-        if ($settings->manager_view_enabled) {
+        if ($settings->manager_view_enabled==1) {
             $subordinates = $this->getViewableUsers($authUser);
             $selectedUserId = $this->getSelectedUserId($request, $subordinates, $authUser->id);
         }
