@@ -1,5 +1,5 @@
 {
-    "/js/build/app.js": "/js/build/app.js?id=19253af36b58ed3fb6770c7bb944f079",
+    "/js/build/app.js": "/js/build/app.js?id=eeff00aa3bf3497d4ba36c3fd7ca0c20",
     "/css/dist/skins/skin-black-dark.css": "/css/dist/skins/skin-black-dark.css?id=78bfb1c7b5782df4fb0ac7e36f80f847",
     "/css/dist/skins/_all-skins.css": "/css/dist/skins/_all-skins.css?id=503d0b09e157a22f555e3670d1ec9bb5",
     "/css/build/overrides.css": "/css/build/overrides.css?id=2bfc7b71d951c5ac026dbc034f7373b1",
@@ -111,5 +111,5 @@
     "/css/dist/bootstrap-table.css": "/css/dist/bootstrap-table.css?id=54d676a6ea8677dd48f6c4b3041292cf",
     "/js/build/vendor.js": "/js/build/vendor.js?id=89dffa552c6e3abe3a2aac6c9c7b466b",
     "/js/dist/bootstrap-table.js": "/js/dist/bootstrap-table.js?id=60097b6b56d80cbc76257d4ecf6f57b4",
-    "/js/dist/all.js": "/js/dist/all.js?id=8c6d7286f667eeb62a0a28a09851a6c3"
+    "/js/dist/all.js": "/js/dist/all.js?id=fe4be0933b6c05df1d795f53da658dc7"
 }

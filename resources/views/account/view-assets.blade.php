@@ -8,28 +8,20 @@
 
 @section('header_right')
   {{-- Manager View Dropdown --}}
-  @if (isset($settings) && ($settings->manager_view_enabled==1) && (isset($subordinates) && $subordinates->count() > 1))
-    <div class="row hidden-print" style="margin-bottom: 15px;">
-      <div class="col-md-12">
+  @if (isset($settings) && ($settings->manager_view_enabled==1) && ($subordinates))
+
         <form method="GET" action="{{ route('view-assets') }}" class="pull-right" role="form">
           <div class="form-group" style="margin-bottom: 0;">
             <label for="user_id" class="control-label" style="margin-right: 10px;">
               {{ trans('general.select_user') }}:
             </label>
-            <select name="user_id" id="user_id" class="form-control select2" onchange="this.form.submit()" style="width: 250px; display: inline-block;">
-              @foreach ($subordinates as $subordinate)
-                <option value="{{ $subordinate->id }}" {{ (int)$selectedUserId === (int)$subordinate->id ? ' selected' : '' }}>
-                  {{ $subordinate->present()->fullName() }}
-                  @if ($subordinate->id == auth()->id())
-                    ({{ trans('general.me') }})
-                  @endif
-                </option>
-              @endforeach
+
+            <select class="js-data-ajax form-control select2" data-endpoint="users" data-subordinates="true" data-placeholder="{{ trans('general.select_user') }}" name="user_id" style="width: 450px" id="user_id" aria-label="user_id" onchange="this.form.submit()">
             </select>
+
           </div>
         </form>
-      </div>
-    </div>
+
   @endif
 @stop
 

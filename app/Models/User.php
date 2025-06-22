@@ -971,10 +971,6 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
             ->orWhere('users.employee_num', 'LIKE', '%' . $search . '%')
             ->orWhere('users.username', 'LIKE', '%' . $search . '%')
             ->orwhereRaw('CONCAT(users.first_name," ",users.last_name) LIKE \''.$search.'%\'');
-
-
-
-
     }
 
     /**
@@ -1021,6 +1017,22 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
             }
         }
     }
+
+
+
+
+
+    public function directReports()
+    {
+        return $this->hasMany(User::class, 'manager_id');
+    }
+
+    public function allSubordinates()
+    {
+        return $this->directReports()->with('allSubordinates');
+    }
+
+
 
     /**
      * Check if the current user is a direct or indirect manager of the given user.

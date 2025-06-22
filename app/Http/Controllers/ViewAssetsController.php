@@ -47,62 +47,6 @@ class ViewAssetsController extends Controller
         return array_unique($fieldArray);
     }
 
-    /**
-     * Get list of users viewable by the current user.
-     *
-     * @param User $authUser
-     * @return \Illuminate\Support\Collection
-     */
-    private function getViewableUsers(User $authUser): \Illuminate\Support\Collection
-    {
-        // SuperAdmin sees all users
-        if ($authUser->isSuperUser()) {
-            return User::select('id', 'first_name', 'last_name', 'username')
-                ->where('show_in_list', 1)
-                ->orderBy('last_name')
-                ->orderBy('first_name')
-                ->get();
-        }
-
-        // Regular manager sees only their subordinates + self
-        $managedUsers = $authUser->getAllSubordinates();
-
-        // If user has subordinates, show them with self at beginning
-        if ($managedUsers->count() > 0) {
-            return collect([$authUser])->merge($managedUsers)
-                ->sortBy('last_name')
-                ->sortBy('first_name');
-        }
-
-        // User has no subordinates, only sees themselves
-        return collect([$authUser]);
-    }
-
-    /**
-     * Get the selected user ID from request or default to current user.
-     *
-     * @param Request $request
-     * @param \Illuminate\Support\Collection $subordinates
-     * @param int $defaultUserId
-     * @return int
-     */
-    private function getSelectedUserId(Request $request, \Illuminate\Support\Collection $subordinates, int $defaultUserId): int
-    {
-        // If no subordinates or no user_id in request, return default
-        if ($subordinates->count() <= 1 || !$request->filled('user_id')) {
-            return $defaultUserId;
-        }
-
-        $requestedUserId = (int) $request->input('user_id');
-
-        // Validate if the requested user is allowed
-        if ($subordinates->contains('id', $requestedUserId)) {
-            return $requestedUserId;
-        }
-
-        // If invalid ID or not authorized, return default
-        return $defaultUserId;
-    }
 
     /**
      * Show user's assigned assets with optional manager view functionality.
@@ -110,19 +54,29 @@ class ViewAssetsController extends Controller
      */
     public function getIndex(Request $request) : View | RedirectResponse
     {
-        $authUser = auth()->user();
         $settings = Setting::getSettings();
-        $subordinates = collect();
-        $selectedUserId = $authUser->id;
+        $subordinate_count = 0;
+        $viewingUser = auth()->user();
+        $userToView = auth()->user();
+        $userToViewId = auth()->id();
 
+        // Only do the (heavy) recursive subordinate count if the manager view is enabled AND
+        // the user is trying to view a different user than themselves.
+        if (($settings->manager_view_enabled == 1) || (request()->get('user_id') != auth()->id())) {
+            $subordinate_count = auth()->user()->allSubordinates()->count();
+            if (auth()->user()->allSubordinates()->find($userToViewId)) {
 
-        // Process manager view if enabled
-        if ($settings->manager_view_enabled==1) {
-            $subordinates = $this->getViewableUsers($authUser);
-            $selectedUserId = $this->getSelectedUserId($request, $subordinates, $authUser->id);
+            }
         }
 
-        // Load the data for the user to be viewed (either auth user or selected subordinate)
+
+        \Log::error('Sub count: '.$subordinate_count);
+        \Log::error('$viewingUser '.$viewingUser);
+        \Log::error('$userToView '.$userToView);
+        \Log::error('$userToViewId '.$userToViewId);
+        \Log::error(print_r(auth()->user()->allSubordinates()->get(), true));
+
+
         $userToView = User::with([
             'assets',
             'assets.model',
@@ -130,23 +84,21 @@ class ViewAssetsController extends Controller
             'consumables',
             'accessories',
             'licenses'
-        ])->find($selectedUserId);
+        ])->find($userToViewId);
 
-        // If the user to view couldn't be found (shouldn't happen with proper logic), redirect with error
-        if (!$userToView) {
-            return redirect()->route('view-assets')->with('error', trans('admin/users/message.user_not_found'));
-        }
+
 
         // Process custom fields for the user being viewed
         $fieldArray = $this->extractCustomFields($userToView);
+
 
         // Pass the necessary data to the view
         return view('account/view-assets', [
             'user' => $userToView, // Use 'user' for compatibility with the existing view
             'field_array' => $fieldArray,
             'settings' => $settings,
-            'subordinates' => $subordinates,
-            'selectedUserId' => $selectedUserId
+            'subordinates' => $subordinate_count > 0 ?? false,
+            'selectedUserId' => $userToViewId
         ]);
     }
 

@@ -91302,7 +91302,8 @@ $(function () {
             search: params.term,
             page: params.page || 1,
             assetStatusType: link.data("asset-status-type"),
-            companyId: link.data("company-id")
+            companyId: link.data("company-id"),
+            subordinates: link.data("subordinates")
           };
           return data;
         },

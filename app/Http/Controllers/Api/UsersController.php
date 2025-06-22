@@ -336,6 +336,11 @@ class UsersController extends Controller
             ]
             )->where('show_in_list', '=', '1');
 
+        if (($request->filled('subordinates')) && (!auth()->user()->isSuperUser())) {
+            // Regular manager sees only their subordinates + self
+            $users = auth()->user()->allSubordinates();
+        }
+
         if ($request->filled('search')) {
             $users = $users->where(function ($query) use ($request) {
                 $query->SimpleNameSearch($request->get('search'))
