@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Route;
 use App\View\Label;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\AuditRequest;
 
 
 /**
@@ -1071,32 +1072,24 @@ class AssetsController extends Controller
      * @param int $id
      * @since [v4.0]
      */
-    public function audit(Request $request, Asset $asset): JsonResponse
+    public function audit(AuditRequest $request): JsonResponse
     {
-
-        $this->authorize('audit', Asset::class);
 
         $settings = Setting::getSettings();
         $dt = Carbon::now()->addMonths($settings->audit_interval)->toDateString();
 
-
-        // Allow the asset tag to be passed in the form payload
-        if ($request->filled('asset_tag')) {
-
-            // Check if it's an array or a string
-            if (is_array($request->input('asset_tag'))) {
-                $asset_tag = $request->input('asset_tag');
-                $multi_audit = true;
-                \Log::error('Multi-audit');
-            } else {
-                // If it's a string, make it into an array so we can use it in the whereIn query
-                $asset_tag = [$request->input('asset_tag')];
-                $multi_audit = false;
-                \Log::error('Single audit');
-            }
-
-            $assets = Asset::whereIn('asset_tag', $asset_tag)->get();
+        // Check if it's an array or a string
+        if (is_array($request->input('asset_tag'))) {
+            $asset_tag = $request->input('asset_tag');
+            $multi_audit = true;
+        } else {
+            // If it's a string, make it into an array so we can use it in the whereIn query
+            $asset_tag = [$request->input('asset_tag')];
+            $multi_audit = false;
         }
+
+        $assets = Asset::whereIn('asset_tag', $asset_tag)->get();
+
 
         foreach ($assets as $asset) {
 
@@ -1118,9 +1111,8 @@ class AssetsController extends Controller
 
 
             // Set up the payload for re-display in the API response
-
             if ($multi_audit === true) {
-                $payload = [
+                $payload[] = [
                     'id' => $asset->id,
                     'asset_tag' => $asset->asset_tag,
                     'note' => $request->input('note'),
