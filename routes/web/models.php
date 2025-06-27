@@ -11,6 +11,10 @@ use Tabuna\Breadcrumbs\Trail;
 
 Route::group(['prefix' => 'models', 'middleware' => ['auth']], function () {
 
+    Route::delete('{model}/showfile/{fileId}/delete',
+        [AssetModelsFilesController::class, 'destroy']
+    )->name('delete/modelfile')->withTrashed();
+
     Route::post('{model}/upload',
         [AssetModelsFilesController::class, 'store']
     )->name('upload/models')->withTrashed();
@@ -19,9 +23,7 @@ Route::group(['prefix' => 'models', 'middleware' => ['auth']], function () {
         [AssetModelsFilesController::class, 'show']
     )->name('show/modelfile')->withTrashed();
 
-    Route::delete('{model}/showfile/{fileId}/delete',
-        [AssetModelsFilesController::class, 'destroy']
-    )->name('delete/modelfile')->withTrashed();
+
 
     Route::get(
         '{model}/clone',

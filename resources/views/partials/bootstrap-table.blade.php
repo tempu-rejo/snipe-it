@@ -345,11 +345,16 @@
     }
 
     function deleteUploadFormatter(value, row) {
+
+        var item_type = row.item.type;
+        if (item_type == 'assetmodel') {
+            item_type = 'models'
+        }
         if ((row.available_actions) && (row.available_actions.delete === true)) {
-            return '<a href="{{ config('app.url') }}/' + dest + '/' + row.id + '" '
+            return '<a href="{{ config('app.url') }}/' + item_type + '/' + row.item.id + '/showfile/' + row.id + '/delete" '
                 + ' class="actions btn btn-danger btn-sm delete-asset" data-tooltip="true"  '
                 + ' data-toggle="modal" '
-                + ' data-content="{{ trans('general.file_upload_status.confirm_delete') }} ' + name_for_box + '?" '
+                + ' data-content="{{ trans('general.file_upload_status.confirm_delete') }} ' + row.filename + '?" '
                 + ' data-title="{{  trans('general.delete') }}" onClick="return false;">'
                 + '<x-icon type="delete" /><span class="sr-only">{{ trans('general.delete') }}</span></a>&nbsp;';
         }
@@ -950,6 +955,18 @@
             }
 
         } 
+    }
+
+    function fileUploadDeleteFormatter(row, value) {
+
+        if ((value) && (value.filename) && (value.url)) {
+            if (value.exists_on_disk) {
+                return '<a href="' + value.url + '?inline=true" target="_blank">' + value.filename + '</a>';
+            } else {
+                return '<span data-tooltip="true" title="{{ trans('general.file_does_not_exist') }}"><x-icon type="x" class="text-danger" /> <del>' + value.filename + '</del></span>';
+            }
+
+        }
     }
 
     function linkToUserSectionBasedOnCount (count, id, section) {

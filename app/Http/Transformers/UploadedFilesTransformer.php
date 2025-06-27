@@ -29,14 +29,19 @@ class UploadedFilesTransformer
         $array = [
             'id' => (int) $file->id,
             'icon' => Helper::filetype_icon($file->filename),
+            'name' => e($file->filename),
+            'item' => ($file->item_type) ? [
+                'id' => (int) $file->item_id,
+                'type' => strtolower(class_basename($file->item_type)),
+            ] : null,
             'filename' => e($file->filename),
             'filetype' => StorageHelper::getFiletype($file->uploads_file_path()),
             'url' => $file->uploads_file_url(),
+            'note' =>  ($file->note) ? e($file->note) : null,
             'created_by' => ($file->adminuser) ? [
                 'id' => (int) $file->adminuser->id,
                 'name'=> e($file->adminuser->present()->fullName),
             ] : null,
-            'note' =>  ($file->note) ? e($file->note) : null,
             'created_at' => Helper::getFormattedDateObject($file->created_at, 'datetime'),
             'deleted_at' => Helper::getFormattedDateObject($file->deleted_at, 'datetime'),
             'inline' => StorageHelper::allowSafeInline($file->uploads_file_path()),

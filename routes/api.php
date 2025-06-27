@@ -1076,12 +1076,6 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'throttle:api']], functi
             ]
             )->name('api.users.licenselist');
 
-            Route::post('{user}/upload',
-            [
-                Api\UsersController::class, 
-                'postUpload'
-            ]
-            )->name('api.users.uploads');
 
             Route::post('{user}/restore',
                 [

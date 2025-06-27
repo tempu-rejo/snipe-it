@@ -119,7 +119,6 @@ class UploadedFilesController extends Controller
      */
     public function store(UploadFileRequest $request, $object_type, $id) : JsonResponse
     {
-        \Log::debug('store fired');
 
         $object = self::$map_object_type[$object_type]::find($id);
         $this->authorize('view', $object);
@@ -209,9 +208,10 @@ class UploadedFilesController extends Controller
      */
     public function destroy($object_type, $id, $file_id) : JsonResponse
     {
+        \Log::error('destroy called for '.$object_type.' with id '.$id.' and file_id '.$file_id);
 
         $object = self::$map_object_type[$object_type]::find($id);
-        $this->authorize('update', $file_id);
+        $this->authorize('update', self::$map_object_type[$object_type]);
 
         if (!$object) {
             return response()->json(Helper::formatStandardApiResponse('error', null, trans('general.file_upload_status.invalid_object')));
@@ -219,7 +219,7 @@ class UploadedFilesController extends Controller
 
 
         // Check for the file
-        $log = Actionlog::find($file_id)->where('item_type', AssetModel::class)
+        $log = Actionlog::find($file_id)->where('item_type', self::$map_object_type[$object_type])
             ->where('item_id', $object->id)->first();
 
         if ($log) {

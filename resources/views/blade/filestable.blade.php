@@ -14,7 +14,6 @@
             data-cookie-id-table="{{ str_slug($object->name ?? $object->id) }}UploadsTable"
             data-id-table="{{ str_slug($object->name ?? $object->id) }}UploadsTable"
             id="{{ str_slug($object->name ?? $object->id) }}UploadsTable"
-            data-search="true"
             data-show-custom-view="true"
             data-custom-view="fileGalleryFormatter"
             data-show-custom-view-button="true"
@@ -38,6 +37,7 @@
                     }'>
     </table>
 
+<!-- this is used by the bootstrap-table partial to format the file gallery -->
 <template id="fileGalleryTemplate">
     <div class="col-md-4">
         <div class="panel panel-%PANEL_CLASS%">

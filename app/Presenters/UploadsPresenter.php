@@ -91,7 +91,7 @@ class UploadsPresenter extends Presenter
                 'sortable' => false,
                 'switchable' => false,
                 'title' => trans('table.actions'),
-                'formatter' => $object.'ActionsFormatter',
+                'formatter' => 'deleteUploadFormatter',
             ],
         ];
 
