@@ -919,7 +919,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
 
                 <div class="1hidden-xs pull-left">
                     <div class="pull-left" >
-                        <a target="_blank" href="" rel="noopener">UI-Assets</a> is IT Asset Management Software. For further support, please contact <!--<x-icon type="heart" style="color: #a94442; font-size: 10px" />
+                        <a target="_blank" href="" rel="noopener">{{ $snipeSettings->site_name }}</a> is IT Inventory Management Software. For further support, please contact <!--<x-icon type="heart" style="color: #a94442; font-size: 10px" />
                             <span class="sr-only">love</span>--><a href="mailto:idhelp@universalleaf.com" rel="noopener">ID IT </a>.
                     </div>
                     <div class="pull-right">

@@ -144,7 +144,8 @@ class AssetsController extends Controller
                         ->update(['order' => 1, 'year' => $year]);
                 }
 
-                if($request->_snipeit_source_10 == 'NEW'){
+                $source_value = $request->input('_snipeit_source_10');
+                if(strtoupper($source_value) == 'NEW'){
                     $Source = '1';
                 }else{  
                     $Source = '0';
