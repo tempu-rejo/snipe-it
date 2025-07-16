@@ -121,22 +121,24 @@ class UsersTransformer
      */
     public function transformUserCompact(User $user) : array
     {
-
-        $array = [
-            'id' => (int) $user->id,
-            'image' => e($user->present()->gravatar) ?? null,
-            'type' => 'user',
-            'name' => e($user->getFullNameAttribute()),
-            'first_name' => e($user->first_name),
-            'last_name' => e($user->last_name),
-            'username' => e($user->username),
-            'created_by' => $user->adminuser ? [
-                'id' => (int) $user->adminuser->id,
-                'name'=> e($user->adminuser->present()->fullName),
-            ]: null,
-            'created_at' => Helper::getFormattedDateObject($user->created_at, 'datetime'),
-            'deleted_at' => ($user->deleted_at) ? Helper::getFormattedDateObject($user->deleted_at, 'datetime') : null,
-        ];
+        $array = [];
+        if (Gate::allows('view', $user) && ($user->deleted_at == '')) {
+            $array = [
+                'id' => (int) $user->id,
+                'image' => e($user->present()->gravatar) ?? null,
+                'type' => 'user',
+                'name' => e($user->getFullNameAttribute()),
+                'first_name' => e($user->first_name),
+                'last_name' => e($user->last_name),
+                'username' => e($user->username),
+                'created_by' => $user->adminuser ? [
+                    'id' => (int) $user->adminuser->id,
+                    'name'=> e($user->adminuser->present()->fullName),
+                ]: null,
+                'created_at' => Helper::getFormattedDateObject($user->created_at, 'datetime'),
+                'deleted_at' => ($user->deleted_at) ? Helper::getFormattedDateObject($user->deleted_at, 'datetime') : null,
+            ];
+        }
 
         return $array;
     }
