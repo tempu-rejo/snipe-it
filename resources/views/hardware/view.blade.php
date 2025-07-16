@@ -955,7 +955,7 @@
                                                 </strong>
                                             </div>
                                             <div class="col-md-9">
-                                                @if ($asset->purchase_date)
+                                                @if (($asset->purchase_date) && $asset->depreciated_date()))
                                                     {{ Helper::getFormattedDateObject($asset->depreciated_date()->format('Y-m-d'), 'date', false) }}
                                                     -
                                                     {{ Carbon::parse($asset->depreciated_date())->diffForHumans(['parts' => 2]) }}
