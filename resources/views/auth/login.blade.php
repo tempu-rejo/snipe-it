@@ -66,13 +66,20 @@
         border: none;
     }
 
-    .box-header .box-title {
+    .box-header {
         font-size: 24px;
         font-weight: 300;
         color: #454545;
         margin-bottom: 30px;
     }
-
+    
+    .box-title {
+        font-size: 18px;
+        font-weight: 300;
+        color: #454545;
+        margin-bottom: 30px;
+    }
+    
     .form-group {
         margin-bottom: 20px;
     }
@@ -161,7 +168,7 @@
 
             <div class="box login-box">
                 <div class="box-header with-border">
-                    <h1 class="box-title"> {{ trans('auth/general.login_prompt')  }}</h1>
+                    <h3 class="box-title"> {{ trans('auth/general.login_prompt')  }}</h3>
                 </div>
 
                 <div class="login-box-body">

@@ -116,16 +116,16 @@ dir="{{ Helper::determineLanguageDirection() }}">
                             @if ($snipeSettings->brand == '3')
                                 <a class="logo navbar-brand no-hover" href="{{ config('app.url') }}">
                                     @if ($snipeSettings->logo!='')
-                                        <img class="navbar-brand-img"
-                                             src="{{ Storage::disk('public')->url($snipeSettings->logo) }}"
-                                             alt="{{ $snipeSettings->site_name }} logo">
+                                        <img style="filter: brightness(0) invert(1);" class="navbar-brand-img"
+                                            src="{{ Storage::disk('public')->url($snipeSettings->logo) }}"
+                                            alt="{{ $snipeSettings->site_name }} logo">
                                     @endif
                                     {{ $snipeSettings->site_name }}
                                 </a>
                             @elseif ($snipeSettings->brand == '2')
                                 <a class="logo navbar-brand no-hover" href="{{ config('app.url') }}">
                                     @if ($snipeSettings->logo!='')
-                                        <img class="navbar-brand-img"
+                                        <img style="filter: brightness(0) invert(1);" class="navbar-brand-img"
                                              src="{{ Storage::disk('public')->url($snipeSettings->logo) }}"
                                              alt="{{ $snipeSettings->site_name }} logo">
                                     @endif
