@@ -114,7 +114,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                     <div class="nav navbar-nav navbar-left">
                         <div class="left-navblock">
                             @if ($snipeSettings->brand == '3')
-                                <a class="logo navbar-brand no-hover" href="{{ config('app.url') }}">
+                                <a class="logo navbar-brand no-hover" href="{{ config('app.url') }}" style="filter: brightness(0) invert(1);">
                                     @if ($snipeSettings->logo!='')
                                         <img style="filter: brightness(0) invert(1);" class="navbar-brand-img"
                                             src="{{ Storage::disk('public')->url($snipeSettings->logo) }}"
@@ -123,7 +123,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                     {{ $snipeSettings->site_name }}
                                 </a>
                             @elseif ($snipeSettings->brand == '2')
-                                <a class="logo navbar-brand no-hover" href="{{ config('app.url') }}">
+                                 <a class="logo navbar-brand no-hover" href="{{ config('app.url') }}" style="filter: brightness(0) invert(1);">
                                     @if ($snipeSettings->logo!='')
                                         <img style="filter: brightness(0) invert(1);" class="navbar-brand-img"
                                              src="{{ Storage::disk('public')->url($snipeSettings->logo) }}"
@@ -132,7 +132,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                     <span class="sr-only">{{ $snipeSettings->site_name }}</span>
                                 </a>
                             @else
-                                <a class="logo navbar-brand no-hover" href="{{ config('app.url') }}">
+                                <a class="logo navbar-brand no-hover" href="{{ config('app.url') }}" style="filter: brightness(0) invert(1);">
                                     {{ $snipeSettings->site_name }}
                                 </a>
                             @endif

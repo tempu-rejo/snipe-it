@@ -42,7 +42,6 @@
     }
 
     .login-title {
-        font-size: 18px;
         color: #454545;
         font-weight: 400;
         margin: 10px 0 0;
@@ -66,8 +65,15 @@
         border: none;
     }
 
-    .box-header {
-        font-size: 24px;
+    .box-header .box-title {
+        font-size: 18px;
+>>>>>>> ffba97ebb (style: Adjust font sizes in login page and update logo link styles for better visibility)
+    .box-header .box-title {
+        font-size: 18px;
+=======
+    .box-header .box-title {
+        font-size: 18px;
+>>>>>>> ffba97ebb (style: Adjust font sizes in login page and update logo link styles for better visibility)
         font-weight: 300;
         color: #454545;
         margin-bottom: 30px;
