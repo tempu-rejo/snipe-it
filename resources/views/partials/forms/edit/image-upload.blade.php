@@ -31,9 +31,9 @@
             <input type="file" name="{{ (isset($fieldname) ? $fieldname : 'image') }}" class="js-uploadFile" id="uploadFile" data-maxsize="{{ Helper::file_upload_max_size() }}" accept="image/gif,image/jpeg,image/webp,image/png,image/svg,image/svg+xml,image/avif" style="display:none; max-width: 90%" aria-label="{{ (isset($fieldname) ? $fieldname : 'image') }}" aria-hidden="true">
         </label>
         
-        <button type="button" class="btn btn-info" id="cameraBtn" onclick="openCamera()">
+{{--         <button type="button" class="btn btn-info" id="cameraBtn" onclick="openCamera()">
             <i class="fas fa-camera"></i> {{ trans('button.camera') ?? 'Kamera' }}
-        </button>
+        </button> --}}
         
         <button type="button" class="btn btn-success" onclick="openWindowsCamera()">
             <i class="fas fa-camera-retro"></i> Windows Camera

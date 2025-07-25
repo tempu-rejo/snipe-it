@@ -45,11 +45,11 @@
         color: #454545;
         font-weight: 400;
         margin: 10px 0 0;
-        font-family: 'Colibri';
-        src: url('{{ asset("fonts/colibri.woff2") }}') format('woff2'),
-             url('{{ asset("fonts/colibri.woff") }}') format('woff');
+        font-family: 'Helvetica', sans-serif;
+        /* src: url('{{ asset("fonts/colibri.woff2") }}') format('woff2'),
+             url('{{ asset("fonts/colibri.woff") }}') format('woff'); */
         font-weight: bold;
-        font-size: 24px;
+        font-size: 30px;
 
     }
 
