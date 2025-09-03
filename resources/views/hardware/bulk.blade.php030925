@@ -139,8 +139,8 @@
 
         @include ('partials.forms.edit.model-select', ['translated_name' => trans('admin/hardware/form.model'), 'fieldname' => 'model_id'])
 
-          <!-- Source Location -->
-        @include ('partials.forms.edit.location-select', ['translated_name' => trans('admin/hardware/form.source_location'), 'fieldname' => 'rtd_location_id'])
+          <!-- Default Location -->
+        @include ('partials.forms.edit.location-select', ['translated_name' => trans('admin/hardware/form.default_location'), 'fieldname' => 'rtd_location_id'])
 
         <!-- Update actual location  -->
           <div class="form-group">

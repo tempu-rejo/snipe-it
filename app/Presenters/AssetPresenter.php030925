@@ -109,18 +109,18 @@ class AssetPresenter extends Presenter
                 'visible' => false,
                 'formatter' => 'employeeNumFormatter',
             ], [
-                'field' => 'rtd_location',
-                'searchable' => true,
-                'sortable' => true,
-                'title' => trans('admin/hardware/form.source_location'),
-                'visible' => true,
-                'formatter' => 'deployedLocationFormatter',
-            ], [
                 'field' => 'location',
                 'searchable' => true,
                 'sortable' => true,
-                'title' => trans('admin/hardware/form.current_location'),
+                'title' => trans('admin/hardware/table.location'),
                 'visible' => true,
+                'formatter' => 'deployedLocationFormatter',
+            ], [
+                'field' => 'rtd_location',
+                'searchable' => true,
+                'sortable' => true,
+                'title' => trans('admin/hardware/form.default_location'),
+                'visible' => false,
                 'formatter' => 'deployedLocationFormatter',
             ], [
                 'field' => 'manufacturer',

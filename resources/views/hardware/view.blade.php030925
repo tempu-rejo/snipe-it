@@ -1005,36 +1005,21 @@
                                         </div>
                                     </div>
 
-                                    <!-- Tampilkan Current Location hanya jika berbeda dari Default Location -->
-                                    @if ($asset->location && (!$asset->defaultLoc || $asset->location->id !== $asset->defaultLoc->id))
+                                    @if ($asset->location)
                                         <div class="row">
                                             <div class="col-md-3">
                                                 <strong>
-                                                    <i class="fas fa-location-arrow"></i> 
-                                                    {{ trans('admin/hardware/form.current_location') ?: 'Current Location' }}
+                                                    {{ trans('general.location') }}
                                                 </strong>
                                             </div>
                                             <div class="col-md-9">
                                                 @can('superuser')
                                                     <a href="{{ route('locations.show', ['location' => $asset->location->id]) }}">
-                                                        <i class="fas fa-map-marker"></i> {{ $asset->location->name }}
+                                                        {{ $asset->location->name }}
                                                     </a>
                                                 @else
-                                                    <i class="fas fa-map-marker"></i> {{ $asset->location->name }}
+                                                    {{ $asset->location->name }}
                                                 @endcan
-                                                
-                                                @if ($asset->location->address)
-                                                    <br>
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-map-marker"></i> {{ $asset->location->address }}
-                                                        @if ($asset->location->city)
-                                                            , {{ $asset->location->city }}
-                                                        @endif
-                                                        @if ($asset->location->state)
-                                                            , {{ $asset->location->state }}
-                                                        @endif
-                                                    </small>
-                                                @endif
                                             </div>
                                         </div>
                                     @endif
@@ -1043,35 +1028,17 @@
                                         <div class="row">
                                             <div class="col-md-3">
                                                 <strong>
-                                                    <i class="fas fa-warehouse"></i> 
-                                                    {{ trans('admin/hardware/form.source_location') ?: 'Source Location' }}
+                                                    {{ trans('admin/hardware/form.default_location') }}
                                                 </strong>
                                             </div>
                                             <div class="col-md-9">
                                                 @can('superuser')
                                                     <a href="{{ route('locations.show', ['location' => $asset->defaultLoc->id]) }}">
-                                                        <i class="fas fa-map-marker-alt"></i> {{ $asset->defaultLoc->name }}
+                                                        {{ $asset->defaultLoc->name }}
                                                     </a>
                                                 @else
-                                                    <i class="fas fa-map-marker-alt"></i> {{ $asset->defaultLoc->name }}
+                                                    {{ $asset->defaultLoc->name }}
                                                 @endcan
-                                                
-                                                <!-- Tampilkan alamat lengkap jika ada -->
-                                                @if ($asset->defaultLoc->address)
-                                                    <br>
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-map-marker"></i> {{ $asset->defaultLoc->address }}
-                                                        @if ($asset->defaultLoc->city)
-                                                            , {{ $asset->defaultLoc->city }}
-                                                        @endif
-                                                        @if ($asset->defaultLoc->state)
-                                                            , {{ $asset->defaultLoc->state }}
-                                                        @endif
-                                                        @if ($asset->defaultLoc->zip)
-                                                            {{ $asset->defaultLoc->zip }}
-                                                        @endif
-                                                    </small>
-                                                @endif
                                             </div>
                                         </div>
                                     @endif
