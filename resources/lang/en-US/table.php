@@ -23,7 +23,7 @@ return [
     'purchase_date'	=> 'Purchased',
     'serial'   		=> 'Serial',
     'status'   		=> 'Status',
-    'title'      	=> 'Asset ',
+    'title'      	=> 'Inventory',
     'image'		    => 'Device Image',
     'days_without_acceptance' => 'Days Without Acceptance',
     'monthly_depreciation' => 'Monthly Depreciation',

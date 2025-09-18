@@ -42,6 +42,9 @@ dir="{{ Helper::determineLanguageDirection() }}">
     @endif
     {{-- page level css --}}
     @stack('css')
+    
+    <!-- Asset Images CSS -->
+    <link rel="stylesheet" href="{{ asset('css/asset-images.css') }}"
 
 
 
@@ -929,7 +932,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                             build {{ config('version.build_version') }} ({{ config('version.branch') }})
                         @endif
                     @endif -->
-                    <a target="_blank" href="" rel="noopener">Version 0.8</a>
+                    <a target="_blank" href="" rel="noopener">Version 1.0</a>
 
                    <!--  @if ($snipeSettings->support_footer!='off')
                         @if (($snipeSettings->support_footer=='on') || (($snipeSettings->support_footer=='admin') && (Auth::user()->isSuperUser()=='1')))

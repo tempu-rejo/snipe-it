@@ -110,4 +110,14 @@
 @section('moar_scripts')
 @include('partials.bootstrap-table')
 
+<!-- Category Image Fallback Script -->
+<script src="{{ asset('js/category-image-fallback.js') }}"></script>
+<script src="{{ asset('js/asset-formatters.js') }}"></script>
+
+<script>
+// Set base URL for default images
+window.App = window.App || {};
+window.App.baseUrl = '{{ asset('') }}';
+</script>
+
 @stop

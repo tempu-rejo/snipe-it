@@ -988,6 +988,13 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'throttle:api']], functi
                 ]
             )->name('api.statuslabels.assets.bytype');
 
+            Route::get('assets/hybrid',
+                [
+                    Api\StatuslabelsController::class,
+                    'getAssetCountByHybridStatus'
+                ]
+            )->name('api.statuslabels.assets.byhybrid');
+
             Route::get('{id}/assetlist',
                 [
                     Api\StatuslabelsController::class, 

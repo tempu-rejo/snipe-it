@@ -99,6 +99,8 @@
           <x-icon type="arrow-circle-right" />
       </a>
     </div>
+      </a>
+    </div>
   </div><!-- ./col -->
 
   <div class="col-lg-2 col-xs-6">
@@ -137,7 +139,6 @@
     </a>
  </div><!-- ./col -->
 
-</div>
 </div>
 
 @if ($counts['grand_total'] == 0)
@@ -234,8 +235,6 @@
                     </thead>
                 </table>
 
-
-
             </div><!-- /.responsive -->
           </div><!-- /.col -->
           <div class="text-center col-md-12" style="padding-top: 10px;">
@@ -245,11 +244,13 @@
       </div><!-- ./box-body -->
     </div><!-- /.box -->
   </div>
+  
+  <!-- HYBRID PIE CHART SECTION -->
   <div class="col-md-4">
         <div class="box box-default">
             <div class="box-header with-border">
                 <h2 class="box-title">
-                    {{ trans('general.assets_by_status') }} (Hybrid)
+                    {{ (\App\Models\Setting::getSettings()->dash_chart_type == 'name') ? trans('general.assets_by_status') : trans('general.assets_by_status_type') }}
                 </h2>
                 <div class="box-tools pull-right">
                     <button type="button" class="btn btn-box-tool" data-widget="collapse" aria-hidden="true">
@@ -267,11 +268,27 @@
                         </div> <!-- ./chart-responsive -->
                     </div> <!-- /.col -->
                 </div> <!-- /.row -->
+                
+                <!-- Chart Legend/Info -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="info-box bg-light">
+                            <div class="info-box-content">
+                                <span class="info-box-text">Chart Mode</span>
+                                <span class="info-box-number">
+                                    {{ (\App\Models\Setting::getSettings()->dash_chart_type == 'name') ? 'By Status Name' : 'By Status Type' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div><!-- /.box-body -->
         </div> <!-- /.box -->
   </div>
 
 </div> <!--/row-->
+
+<!-- Second Row: Companies/Locations and Categories -->
 <div class="row">
     <div class="col-md-6">
 
@@ -380,15 +397,12 @@
 										<span class="sr-only">{{ trans('general.asset_count') }}</span>
 									</th>
 									<th class="col-sm-1" data-visible="true" data-field="assigned_assets_count" data-sortable="true">
-										
 										{{ trans('general.assigned') }}
 									</th>
 									<th class="col-sm-1" data-visible="true" data-field="users_count" data-sortable="true">
                                         <x-icon type="users" />
 										<span class="sr-only">{{ trans('general.people') }}</span>
-										
 									</th>
-									
 								</tr>
 								</thead>
 							</table>
@@ -445,7 +459,7 @@
                                     <span class="sr-only">{{ trans('general.asset_count') }}</span>
                                 </th>
                                 <th class="col-sm-1" data-visible="true" data-field="accessories_count" data-sortable="true">
-                                    <x-icon type="licenses" />
+                                    <x-icon type="accessories" />
                                     <span class="sr-only">{{ trans('general.accessories_count') }}</span>
                                 </th>
                                 <th class="col-sm-1" data-visible="true" data-field="consumables_count" data-sortable="true">
@@ -474,9 +488,9 @@
         </div> <!-- /.box -->
     </div>
 
+</div> <!--/row-->
 
 @endif
-
 
 @stop
 
@@ -486,60 +500,116 @@
 
 @push('js')
 
-
-
 <script nonce="{{ csrf_token() }}">
     // ---------------------------
-    // - ASSET STATUS CHART -
+    // - HYBRID ASSET STATUS PIE CHART -
     // ---------------------------
-      var pieChartCanvas = $("#statusPieChart").get(0).getContext("2d");
-      var pieChart = new Chart(pieChartCanvas);
-      var ctx = document.getElementById("statusPieChart");
-      var pieOptions = {
-              legend: {
-                  position: 'top',
-                  responsive: true,
-                  maintainAspectRatio: true,
-              },
-              tooltips: {
-                callbacks: {
-                    label: function(tooltipItem, data) {
-                        counts = data.datasets[0].data;
-                        total = 0;
-                        for(var i in counts) {
-                            total += counts[i];
-                        }
-                        prefix = data.labels[tooltipItem.index] || '';
-                        return prefix+" "+Math.round(counts[tooltipItem.index]/total*100)+"%";
+    
+    // Chart configuration
+    var pieChartCanvas = $("#statusPieChart").get(0).getContext("2d");
+    var pieChart = new Chart(pieChartCanvas);
+    var ctx = document.getElementById("statusPieChart");
+    
+    // Chart options with enhanced tooltips and responsiveness
+    var pieOptions = {
+        legend: {
+            position: 'top',
+            responsive: true,
+            maintainAspectRatio: true,
+            labels: {
+                boxWidth: 12,
+                fontSize: 11,
+                padding: 8
+            }
+        },
+        tooltips: {
+            callbacks: {
+                label: function(tooltipItem, data) {
+                    var counts = data.datasets[0].data;
+                    var total = 0;
+                    
+                    // Calculate total
+                    for(var i in counts) {
+                        total += counts[i];
                     }
+                    
+                    var value = counts[tooltipItem.index];
+                    var percentage = Math.round(value/total*100);
+                    var prefix = data.labels[tooltipItem.index] || '';
+                    
+                    return prefix + ": " + value + " (" + percentage + "%)";
                 }
-              }
-          };
+            }
+        },
+        responsive: true,
+        maintainAspectRatio: false
+    };
 
-      $.ajax({
-          type: 'GET',
-          url: '{{ route('api.statuslabels.assets.byhybrid') }}',
-          headers: {
-              "X-Requested-With": 'XMLHttpRequest',
-              "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
-          },
-          dataType: 'json',
-          success: function (data) {
-              var myPieChart = new Chart(ctx,{
-                  type   : 'pie',
-                  data   : data,
-                  options: pieOptions
-              });
-          },
-          error: function (data) {
-              // window.location.reload(true);
-          },
-      });
-        var last = document.getElementById('statusPieChart').clientWidth;
-        addEventListener('resize', function() {
-        var current = document.getElementById('statusPieChart').clientWidth;
-        if (current != last) location.reload();
-        last = current;
+    // Function to load hybrid chart data
+    function loadHybridChart() {
+        $.ajax({
+            type: 'GET',
+            url: '{{ route('api.statuslabels.assets.byhybrid') }}',
+            headers: {
+                "X-Requested-With": 'XMLHttpRequest',
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log('Hybrid Chart Data:', data); // Debug log
+                
+                // Create the pie chart
+                var myPieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: data,
+                    options: pieOptions
+                });
+                
+                // Update chart title based on data received
+                var chartMode = data.chart_mode || 'unknown';
+                var titleElement = $('.box-title');
+                if (chartMode === 'name') {
+                    titleElement.text('{{ trans('general.assets_by_status') }}');
+                } else if (chartMode === 'type') {
+                    titleElement.text('{{ trans('general.assets_by_status_type') }}');
+                }
+                
+            },
+            error: function (xhr, status, error) {
+                console.error('Error loading hybrid chart:', error);
+                console.error('Response:', xhr.responseText);
+                
+                // Show error message in chart area
+                $('#statusPieChart').parent().html(
+                    '<div class="alert alert-warning">' +
+                    '<i class="fa fa-exclamation-triangle"></i> ' +
+                    'Unable to load chart data. Please refresh the page.' +
+                    '</div>'
+                );
+            }
+        });
+    }
+
+    // Load chart on page ready
+    $(document).ready(function() {
+        loadHybridChart();
     });
+
+    // Handle responsive resizing
+    var lastWidth = document.getElementById('statusPieChart').clientWidth;
+    addEventListener('resize', function() {
+        var currentWidth = document.getElementById('statusPieChart').clientWidth;
+        if (currentWidth != lastWidth) {
+            location.reload();
+        }
+        lastWidth = currentWidth;
+    });
+
+    // Optional: Refresh chart every 5 minutes for live data
+    setInterval(function() {
+        loadHybridChart();
+    }, 300000); // 5 minutes = 300000ms
+
 </script>
+
 @endpush

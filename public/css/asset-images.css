@@ -1,0 +1,34 @@
+/* Asset Image Styles */
+.hw-image {
+    transition: transform 0.2s ease;
+    border: 1px solid #ddd;
+}
+
+.hw-image:hover {
+    transform: scale(1.1);
+    border-color: #007bff;
+}
+
+/* Serial Number Styles */
+.serial-number {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    word-break: break-all;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* Bootstrap Table Image Column Fix */
+.bootstrap-table .fixed-table-body .hw-image {
+    max-width: none;
+    width: 50px;
+    height: 50px;
+}
+
+/* Responsive image for mobile */
+@media (max-width: 768px) {
+    .hw-image {
+        width: 40px;
+        height: 40px;
+    }
+}

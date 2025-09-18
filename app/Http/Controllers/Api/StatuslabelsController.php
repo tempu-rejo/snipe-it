@@ -257,6 +257,78 @@ class StatuslabelsController extends Controller
     }
 
     /**
+     * Show a count of assets by true hybrid status for pie chart
+     * Uses meta status types ONLY for RTD and Deployed, but status label names for all others
+     *
+     * @author [Snipe-IT Team] [<snipe@snipe.net>]
+     * @since [v6.0.11]
+     */
+    public function getAssetCountByHybridStatus() : array
+    {
+        $this->authorize('view', Statuslabel::class);
+
+        $total = [];
+
+        // Add RTD as meta status type (assets that are available for deployment)
+        $rtdCount = Asset::RTD()->count();
+        if ($rtdCount > 0) {
+            $total['rtd']['label'] = trans('general.ready_to_deploy');
+            $total['rtd']['count'] = $rtdCount;
+            $total['rtd']['color'] = '#28a745'; // Green
+        }
+
+        // Add Deployed as meta status type (assets assigned to users)
+        $deployedCount = Asset::Deployed()->count();
+        if ($deployedCount > 0) {
+            $total['deployed']['label'] = trans('general.deployed');
+            $total['deployed']['count'] = $deployedCount;
+            $total['deployed']['color'] = '#007bff'; // Blue
+        }
+
+        // Get all status labels
+        if (Setting::getSettings()->show_archived_in_list == 0 ) {
+            $statuslabels = Statuslabel::withCount('assets')->where('archived','0')->get();
+        } else {
+            $statuslabels = Statuslabel::withCount('assets')->get();
+        }
+
+        // Add ALL status labels by name (except RTD status which is handled above)
+        foreach ($statuslabels as $statuslabel) {
+            // Skip if this status has no assets
+            if ($statuslabel->assets_count == 0) {
+                continue;
+            }
+
+            // Skip RTD status labels since they're handled by RTD meta status
+            if ($statuslabel->deployable == 1 && $statuslabel->pending == 0 && $statuslabel->archived == 0) {
+                continue; // These are handled by RTD meta status above
+            }
+
+            // For all other status labels, show by their actual name
+            // This includes Archived, Pending, Undeployable, and any custom status labels
+            $total[$statuslabel->name]['label'] = $statuslabel->name;
+            $total[$statuslabel->name]['count'] = $statuslabel->assets_count;
+
+            if ($statuslabel->color != '') {
+                $total[$statuslabel->name]['color'] = $statuslabel->color;
+            } else {
+                // Default colors based on status type
+                if ($statuslabel->archived == 1) {
+                    $total[$statuslabel->name]['color'] = '#6c757d'; // Gray for archived
+                } elseif ($statuslabel->pending == 1) {
+                    $total[$statuslabel->name]['color'] = '#ffc107'; // Yellow for pending
+                } elseif ($statuslabel->deployable == 0) {
+                    $total[$statuslabel->name]['color'] = '#dc3545'; // Red for undeployable
+                } else {
+                    $total[$statuslabel->name]['color'] = '#17a2b8'; // Info blue for others
+                }
+            }
+        }
+
+        return (new PieChartTransformer())->transformPieChartDate($total);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
