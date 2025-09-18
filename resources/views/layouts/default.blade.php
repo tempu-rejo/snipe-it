@@ -44,7 +44,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
     @stack('css')
     
     <!-- Asset Images CSS -->
-    <link rel="stylesheet" href="{{ asset('css/asset-images.css') }}"
+    <link rel="stylesheet" href="{{ asset('css/asset-images.css') }}">
 
 
 

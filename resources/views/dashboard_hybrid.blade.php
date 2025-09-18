@@ -576,7 +576,7 @@
                 
             },
             error: function (xhr, status, error) {
-                console.error('Error loading hybrid chart:', error);
+                console.error('Error loading chart:', error);
                 console.error('Response:', xhr.responseText);
                 
                 // Show error message in chart area
