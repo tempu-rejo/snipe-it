@@ -140,8 +140,8 @@
             @if (isset($print_type) && $print_type === 'print_assigned')
                 <h3 style="margin: 10px 0; font-size: 1.3em; font-weight: bold;">IT Asset Accountability Form</h3>
             @else
-                <h3 style="margin: 10px 0; font-size: 1.3em; font-weight: bold;">Annual IT Asset Acknowledgement and Confirmation</h3>
-                <h4 style="margin: 5px 0; font-size: 1.1em; font-weight: bold;">YEAR {{ date('Y') }}</h4>
+                <h3 style="margin: 10px 0; font-size: 1.1em; font-weight: bold;">Annual IT Asset Acknowledgement and Confirmation</h3>
+                <h4 style="margin: 5px 0; font-size: 1.0em; font-weight: bold;">YEAR {{ date('Y') }}</h4>
             @endif
         </div>
 
