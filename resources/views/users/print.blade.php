@@ -14,6 +14,9 @@
 
     {{-- stylesheets --}}
     <link rel="stylesheet" href="{{ url(mix('css/dist/all.css')) }}">
+    
+    {{-- html2pdf library untuk auto-generate PDF --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script nonce="{{ csrf_token() }}">
         window.snipeit = {
@@ -31,10 +34,38 @@
         table.inventory {
             width: 100%;
             border: 1px solid #d3d3d3;
+            table-layout: auto;
+            word-wrap: break-word;
+        }
+        
+        table.inventory th,
+        table.inventory td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 150px;
+        }
+        
+        /* Prevent table from being cut */
+        table {
+            page-break-inside: auto;
+        }
+        
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+        
+        thead {
+            display: table-header-group;
+        }
+        
+        tfoot {
+            display: table-footer-group;
         }
 
         @page {
             size: A4;
+            margin: 10mm;
         }
         
         .print-logo {
@@ -44,6 +75,42 @@
         h4 {
             margin-top: 20px;
             margin-bottom: 10px;
+        }
+        
+        /* Page break between users */
+        .user-section {
+            page-break-after: always;
+        }
+        
+        .user-section:last-child {
+            page-break-after: auto;
+        }
+        
+        /* Repeat header on each page */
+        .page-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        /* Hide all users except the one being printed */
+        @media print {
+            body.print-single-user .user-section {
+                display: none !important;
+            }
+            
+            body.print-single-user .user-section.print-active {
+                display: block !important;
+                page-break-after: auto;
+            }
+            
+            body.print-single-user .print-controls {
+                display: none !important;
+            }
+            
+            /* Hide overlay/tips saat print */
+            #auto-print-overlay {
+                display: none !important;
+            }
         }
 
 
@@ -55,7 +122,7 @@
 
 {{-- If we are rendering multiple users we'll add the ability to show/hide EULAs for all of them at once via this button --}}
 @if (count($users) > 1)
-    <div class="pull-right hidden-print">
+    <div class="pull-right hidden-print print-controls">
         <span>{{ trans('general.show_or_hide_eulas') }}</span>
         <button class="btn btn-default" type="button" data-toggle="collapse" data-target=".eula-row show" aria-expanded="false" aria-controls="eula-row" title="EULAs">
             <i class="fa fa-eye-slash"></i>
@@ -63,26 +130,21 @@
     </div>
 @endif
 
-@if ($snipeSettings->logo_print_assets=='1')
-    <div style="text-align:center; margin-bottom: 20px;">
-        @if ($snipeSettings->brand == '3')
+@foreach ($users as $index => $show_user)
+    <div class="user-section" id="user-section-{{ $index }}" data-user-name="{{ $show_user->present()->fullName() }}">
+        <!-- Header untuk setiap user -->
+        <div class="page-header">
             @if ($snipeSettings->logo!='')
-                <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}"><br>
+                <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}" style="max-height: 60px; margin-bottom: 15px;"><br>
             @endif
-            <span style="font-size:2em; font-weight:bold; display:block; margin-top:10px;">IT Asset Accountability Form</span>
-            <!-- {{ $snipeSettings->site_name }} -->
-        @elseif ($snipeSettings->brand == '2')
-            @if ($snipeSettings->logo!='')
-                <img class="print-logo" src="{{ config('app.url') }}/uploads/{{ $snipeSettings->logo }}"><br>
+            @if (isset($print_type) && $print_type === 'print_assigned')
+                <h3 style="margin: 10px 0; font-size: 1.3em; font-weight: bold;">IT Asset Accountability Form</h3>
+            @else
+                <h3 style="margin: 10px 0; font-size: 1.3em; font-weight: bold;">Annual IT Asset Acknowledgement and Confirmation</h3>
+                <h4 style="margin: 5px 0; font-size: 1.1em; font-weight: bold;">YEAR {{ date('Y') }}</h4>
             @endif
-        @else
-            <span style="font-size:2em; font-weight:bold; display:block; margin-top:10px;">IT Asset Accountability Form</span>
-            <!-- <h2>{{ $snipeSettings->site_name }}</h2> -->
-        @endif
-    </div>
-@endif
+        </div>
 
-@foreach ($users as $show_user)
     <div id="start_of_user_section"> {{-- used for page breaks when printing --}}</div>
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div style="text-align: left;">
@@ -106,27 +168,27 @@
             $counter = 1;
         @endphp
 
-        <div id="assets-toolbar">
+        <div id="assets-toolbar-{{ $index }}">
             <h4>{{ trans_choice('general.countable.assets', $show_user->assets->count(), ['count' => $show_user->assets->count()]) }}
             </h4>
         </div>
 
         <table
             class="snipe-table table table-striped inventory"
-            id="AssetsAssigned"
+            id="AssetsAssigned-{{ $index }}"
             data-pagination="false"
-            data-id-table="AssetsAssigned"
+            data-id-table="AssetsAssigned-{{ $index }}"
             data-search="false"
             data-side-pagination="client"
             data-sortable="true"
-            data-toolbar="#assets-toolbar"
+            data-toolbar="#assets-toolbar-{{ $index }}"
             data-show-columns="true"
-            data-sort-order="desc"
-            data-sort-name="created_at"
+            data-sort-order="asc"
+            data-sort-name="#"
             data-show-columns-toggle-all="true"
             data-cookie-id-table="AssetsAssigned">
             <thead>
-                <th data-field="asset_id" data-sortable="false" data-visible="true" data-switchable="false">#</th>
+                <th data-field="asset_id" data-sortable="True" data-visible="true" data-switchable="false">#</th>
                 <th data-field="asset_image" data-sortable="true" data-visible="false" data-switchable="true">{{ trans('general.image') }}</th>
                 <th data-field="asset_tag" data-sortable="true" data-visible="true" data-switchable="false">{{ trans('admin/hardware/table.asset_tag') }}</th>
                 <th data-field="asset_name" data-sortable="true" data-visible="true">{{ trans('general.name') }}</th>
@@ -206,16 +268,16 @@
     @endif
 
     @if ($show_user->licenses->count() > 0)
-        <div id="licenses-toolbar">
+        <div id="licenses-toolbar-{{ $index }}">
             <h4>{{ trans_choice('general.countable.licenses', $show_user->licenses->count(), ['count' => $show_user->licenses->count()]) }}</h4>
         </div>
 
         <table
             class="snipe-table table table-striped inventory"
-            id="licensessAssigned"
-            data-toolbar="#licenses-toolbar"
+            id="licensessAssigned-{{ $index }}"
+            data-toolbar="#licenses-toolbar-{{ $index }}"
             data-pagination="false"
-            data-id-table="licensessAssigned"
+            data-id-table="licensessAssigned-{{ $index }}"
             data-search="false"
             data-side-pagination="client"
             data-sortable="true"
@@ -261,16 +323,16 @@
 
 
     @if ($show_user->accessories->count() > 0)
-        <div id="accessories-toolbar">
+        <div id="accessories-toolbar-{{ $index }}">
             <h4>{{ trans_choice('general.countable.accessories', $show_user->accessories->count(), ['count' => $show_user->accessories->count()]) }}</h4>
         </div>
 
         <table
             class="snipe-table table table-striped inventory"
-            id="accessoriesAssigned"
-            data-toolbar="#accessories-toolbar"
+            id="accessoriesAssigned-{{ $index }}"
+            data-toolbar="#accessories-toolbar-{{ $index }}"
             data-pagination="false"
-            data-id-table="accessoriesAssigned"
+            data-id-table="accessoriesAssigned-{{ $index }}"
             data-search="false"
             data-side-pagination="client"
             data-sortable="true"
@@ -324,16 +386,16 @@
     @endif
 
     @if ($show_user->consumables->count() > 0)
-        <div id="consumables-toolbar">
+        <div id="consumables-toolbar-{{ $index }}">
             <h4>{{ trans_choice('general.countable.consumables', $show_user->consumables->count(), ['count' => $show_user->consumables->count()]) }}</h4>
         </div>
 
         <table
             class="snipe-table table table-striped inventory"
-            id="consumablesAssigned"
+            id="consumablesAssigned-{{ $index }}"
             data-pagination="false"
-            data-toolbar="#consumables-toolbar"
-            data-id-table="consumablesAssigned"
+            data-toolbar="#consumables-toolbar-{{ $index }}"
+            data-id-table="consumablesAssigned-{{ $index }}"
             data-search="false"
             data-side-pagination="client"
             data-sortable="true"
@@ -417,13 +479,30 @@
         </p>
         <p></p>
         <p style="text-align: center; vertical-align: top;">
-            I acknowledge receipt of the listed items and accept responsibility for their care and proper use. I will use them only for work, return them when required, and may be held liable for any loss or damage unless proven not my fault. 
-            </p>
+            I acknowledge receipt of the listed items and accept responsibility for their care and proper use. I will use them only for work, return them when required, and may be held liable for any loss or damage unless proven not my fault.
+        </p>
+        <p style="text-align: center; vertical-align: top; font-weight: bold; text-decoration: underline; font-size: 1.3em;">
+            IT Asset Policy
+        </p>
             <p style="text-align: center; vertical-align: top;">By signing, I agree to these terms and the company’s IT Asset Policy.</p>
         <p></p>
 
         <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Employee: <!--{{ trans('general.signed_off_by') }}:--></td>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">Employee: </td>
+            <td style="padding-right: 10px; vertical-align: top;border-bottom: 1px solid black; width: 30%;">&#8203;{{ $show_user->present()->fullName() }}</td>
+            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
+            <td>_____________</td>
+        </tr>
+        <tr style="height: 80px;">
+            <td></td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }}</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
+            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
+        </tr>
+        
+        @if (isset($print_type) && $print_type === 'print_assigned')
+        <tr>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">IT Personel:</td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td>_____________</td>
@@ -433,22 +512,10 @@
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }}</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
+            <td></td>
         </tr>
         <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">IT Personel: <!--{{ trans('admin/users/table.manager') }}:--></td>
-            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
-            <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
-            <td>_____________</td>
-        </tr>
-        <tr style="height: 80px;">
-            <td></td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.name') }}</td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
-            <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">IT Manager: <!--{{ trans('general.signed_off_by') }}:--></td>
+            <td style="padding-right: 10px; vertical-align: top; font-weight: bold;">IT Manager: </td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td style="padding-right: 10px; vertical-align: top;">______________________________________</td>
             <td>_____________</td>
@@ -459,9 +526,11 @@
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.signature') }}</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
         </tr>
+        @endif
 
 
     </table>
+    </div> {{-- End user-section --}}
 @endforeach
 
 {{-- Javascript files --}}
@@ -546,6 +615,185 @@
             }
 
         });
+    });
+
+    // Handle individual user print
+    $(document).ready(function() {
+        // Auto print mode - untuk bulk print all users
+        var autoPrintMode = {{ count($users) > 1 ? 'true' : 'false' }};
+        var currentPrintIndex = 0;
+        var totalUsers = {{ count($users) }};
+        var printQueue = [];
+        var isPrinting = false;
+        
+        @if (count($users) > 1)
+            // Populate print queue dengan semua user
+            @foreach ($users as $index => $show_user)
+                printQueue.push({
+                    index: {{ $index }},
+                    name: '{{ $show_user->present()->fullName() }}'
+                });
+            @endforeach
+        @endif
+        
+        // Function untuk auto-generate PDF tanpa dialog
+        function generatePDFAuto(userIndex, userName, isAutoPrint) {
+            if (isPrinting) return;
+            isPrinting = true;
+            
+            var currentYear = new Date().getFullYear();
+            var printType = '{{ $print_type ?? "print_annual" }}';
+            var pdfFileName = '';
+            if (printType === 'print_assigned') {
+                pdfFileName = 'IT_Asset_Accountability_' + userName.replace(/\s+/g, '_') + '_' + currentYear;
+            } else {
+                pdfFileName = 'Annual_IT_Asset_' + userName.replace(/\s+/g, '_') + '_' + currentYear;
+            }
+            
+            // Update progress
+            $('#print-progress').html('Generating PDF for ' + userName + '...<br>(' + (currentPrintIndex + 1) + ' of ' + totalUsers + ')');
+            
+            // Show only current user
+            $('body').addClass('print-single-user');
+            $('.user-section').removeClass('print-active');
+            $('#user-section-' + userIndex).addClass('print-active');
+            
+            // Get the active user section element
+            var element = document.getElementById('user-section-' + userIndex);
+            
+            // PDF options
+            var opt = {
+                margin: [10, 10, 10, 10],
+                filename: pdfFileName + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+            
+            // Generate PDF
+            html2pdf().set(opt).from(element).save().then(function() {
+                // PDF saved successfully
+                setTimeout(function() {
+                    $('body').removeClass('print-single-user');
+                    $('.user-section').removeClass('print-active');
+                    isPrinting = false;
+                    
+                    // Jika auto print mode dan masih ada user lain
+                    if (isAutoPrint && currentPrintIndex < totalUsers - 1) {
+                        currentPrintIndex++;
+                        var nextUser = printQueue[currentPrintIndex];
+                        
+                        // Update progress
+                        $('#print-progress').html('✓ PDF ' + currentPrintIndex + ' completed!<br>Preparing next user...');
+                        
+                        // Delay sebelum generate PDF berikutnya
+                        setTimeout(function() {
+                            generatePDFAuto(nextUser.index, nextUser.name, true);
+                        }, 1500);
+                    } else if (isAutoPrint && currentPrintIndex >= totalUsers - 1) {
+                        // Semua PDF sudah di-generate
+                        $('#auto-print-overlay').html(
+                            '<div style="text-align: center;">' +
+                            '<h2 style="color: #4CAF50;">✓ Completed!</h2>' +
+                            '<p style="font-size: 20px; margin: 20px 0;">Semua ' + totalUsers + ' PDF telah berhasil di-generate dan di-download!</p>' +
+                            '<p>Silakan cek folder Downloads Anda.</p>' +
+                            '<button class="btn btn-primary btn-lg" onclick="window.location.href=\'{{ route("users.index") }}\'" style="margin-top: 20px; padding: 15px 40px; font-size: 16px;">Kembali ke Users List</button>' +
+                            '</div>'
+                        );
+                    }
+                }, 500);
+            }).catch(function(error) {
+                console.error('Error generating PDF:', error);
+                $('#print-progress').html('❌ Error generating PDF for ' + userName + '<br>Skipping to next...');
+                isPrinting = false;
+                
+                // Lanjut ke user berikutnya meskipun error
+                if (isAutoPrint && currentPrintIndex < totalUsers - 1) {
+                    currentPrintIndex++;
+                    var nextUser = printQueue[currentPrintIndex];
+                    setTimeout(function() {
+                        generatePDFAuto(nextUser.index, nextUser.name, true);
+                    }, 2000);
+                }
+            });
+        }
+        
+        // Manual print button handler - masih menggunakan browser print dialog
+        $('.print-user-btn').on('click', function() {
+            var userIndex = $(this).data('user-index');
+            var userName = $(this).data('user-name');
+            
+            // Show only current user
+            $('body').addClass('print-single-user');
+            $('.user-section').removeClass('print-active');
+            $('#user-section-' + userIndex).addClass('print-active');
+            
+            var currentYear = new Date().getFullYear();
+            var printType = '{{ $print_type ?? "print_annual" }}';
+            var pdfFileName = '';
+            if (printType === 'print_assigned') {
+                pdfFileName = 'IT_Asset_Accountability_' + userName.replace(/\s+/g, '_') + '_' + currentYear;
+            } else {
+                pdfFileName = 'Annual_IT_Asset_' + userName.replace(/\s+/g, '_') + '_' + currentYear;
+            }
+            var originalTitle = document.title;
+            document.title = pdfFileName;
+            
+            setTimeout(function() {
+                window.print();
+                setTimeout(function() {
+                    $('body').removeClass('print-single-user');
+                    $('.user-section').removeClass('print-active');
+                    document.title = originalTitle;
+                }, 500);
+            }, 300);
+        });
+        
+        // Auto-trigger PDF generation untuk semua user jika multiple users
+        @if (count($users) > 1)
+            if (autoPrintMode && printQueue.length > 0) {
+                // Tampilkan pesan loading
+                $('body').prepend('<div id="auto-print-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; align-items: center; justify-content: center; color: white;">' +
+                    '<div style="text-align: center; padding: 50px; background: rgba(255,255,255,0.1); border-radius: 15px; min-width: 500px;">' +
+                    '<h2 style="font-size: 28px; margin-bottom: 20px;">🎯 Auto-Generating PDFs</h2>' +
+                    '<div style="margin: 30px 0;">' +
+                    '<div style="width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden;">' +
+                    '<div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.5s;"></div>' +
+                    '</div>' +
+                    '</div>' +
+                    '<p id="print-progress" style="font-size: 18px; margin: 20px 0; min-height: 50px;">Starting...</p>' +
+                    '<p style="font-size: 14px; opacity: 0.8; margin-top: 30px;">⏱️ Proses ini berjalan otomatis<br>File PDF akan langsung terdownload ke folder Downloads</p>' +
+                    '</div>' +
+                    '</div>');
+                
+                // Mulai auto-generate setelah page fully loaded
+                setTimeout(function() {
+                    $('#print-progress').html('Initializing PDF generator...');
+                    // Update progress bar
+                    var progress = ((currentPrintIndex + 1) / totalUsers) * 100;
+                    $('#progress-bar').css('width', progress + '%');
+                    
+                    setTimeout(function() {
+                        generatePDFAuto(printQueue[0].index, printQueue[0].name, true);
+                    }, 1000);
+                }, 2000);
+                
+                // Update progress bar setiap kali index berubah
+                setInterval(function() {
+                    var progress = ((currentPrintIndex + 1) / totalUsers) * 100;
+                    $('#progress-bar').css('width', progress + '%');
+                }, 500);
+            }
+        @endif
     });
 </script>
 

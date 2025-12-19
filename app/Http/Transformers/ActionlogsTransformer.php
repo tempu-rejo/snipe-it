@@ -166,7 +166,8 @@ class ActionlogsTransformer
                 'id' => (int) $actionlog->item->id,
                 'name' => ($actionlog->itemType()=='user') ? e($actionlog->item->getFullNameAttribute()) : e($actionlog->item->getDisplayNameAttribute()),
                 'type' => e($actionlog->itemType()),
-                'serial' =>e($actionlog->item->serial) ? e($actionlog->item->serial) : null
+                'serial' =>e($actionlog->item->serial) ? e($actionlog->item->serial) : null,
+                'category' => self::getItemCategory($actionlog->item, $actionlog->itemType()),
             ] : null,
             'location' => ($actionlog->location) ? [
                 'id' => (int) $actionlog->location->id,
@@ -343,6 +344,34 @@ class ActionlogsTransformer
 
         return $clean_meta;
 
+    }
+
+    /**
+     * Get category information for an item
+     *
+     * @param $item
+     * @param $itemType
+     * @return array|null
+     */
+    private static function getItemCategory($item, $itemType)
+    {
+        // For assets, category is in model
+        if ($itemType === 'asset' && $item && $item->model && $item->model->category) {
+            return [
+                'id' => (int) $item->model->category->id,
+                'name' => e($item->model->category->name),
+            ];
+        }
+        
+        // For accessories, consumables, and licenses, category is direct
+        if (in_array($itemType, ['accessory', 'consumable', 'license', 'component']) && $item && $item->category) {
+            return [
+                'id' => (int) $item->category->id,
+                'name' => e($item->category->name),
+            ];
+        }
+        
+        return null;
     }
 
 

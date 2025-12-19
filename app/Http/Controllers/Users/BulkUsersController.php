@@ -126,9 +126,41 @@ class BulkUsersController extends Controller
 
                 $users->each(fn($user) => $this->authorize('view', $user));
 
+                $printType = $request->input('print_type', 'print_assigned');
+
                 return view('users.print')
                     ->with('users', $users)
-                    ->with('settings', Setting::getSettings());
+                    ->with('settings', Setting::getSettings())
+                    ->with('print_type', $printType);
+
+            } elseif ($request->input('bulk_actions') == 'print_annual') {
+                $users = User::query()
+                    ->with([
+                        'assets.assetlog',
+                        'assets.assignedAssets.assetlog',
+                        'assets.assignedAssets.defaultLoc',
+                        'assets.assignedAssets.location',
+                        'assets.assignedAssets.model.category',
+                        'assets.defaultLoc',
+                        'assets.location',
+                        'assets.model.category',
+                        'accessories.assetlog',
+                        'accessories.category',
+                        'accessories.manufacturer',
+                        'consumables.assetlog',
+                        'consumables.category',
+                        'consumables.manufacturer',
+                        'licenses.category',
+                    ])
+                    ->withTrashed()
+                    ->findMany($request->input('ids'));
+
+                $users->each(fn($user) => $this->authorize('view', $user));
+
+                return view('users.print')
+                    ->with('users', $users)
+                    ->with('settings', Setting::getSettings())
+                    ->with('print_type', 'print_annual');
             }
         }
 

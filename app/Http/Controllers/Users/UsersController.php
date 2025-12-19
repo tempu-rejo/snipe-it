@@ -607,9 +607,12 @@ class UsersController extends Controller
         if ($user) {
             $this->authorize('view', $user);
 
+            $printType = request()->input('print_type', 'print_annual');
+
             return view('users.print')
                 ->with('users', [$user])
-                ->with('settings', Setting::getSettings());
+                ->with('settings', Setting::getSettings())
+                ->with('print_type', $printType);
         }
 
         return redirect()->route('users.index')->with('error', trans('admin/users/message.user_not_found', compact('id')));

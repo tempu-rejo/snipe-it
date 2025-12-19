@@ -17,6 +17,7 @@ return [
     'last_login'        => 'Last Login',
     'ldap_config_text'  => 'LDAP configuration settings can be found Admin > Settings. The (optional) selected location will be set for all imported users.',
     'print_assigned'    => 'Print All Assigned',
+    'print_annual'      => 'Print Annual Acknowledgement',
     'email_assigned'    => 'Email List of All Assigned',
     'user_notified'     => 'User has been emailed a list of their currently assigned items.',
     'users_notified'    => 'The user has been emailed a list of their currently assigned items.|:count users have been emailed a list of their currently assigned items.',

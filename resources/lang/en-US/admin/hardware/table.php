@@ -3,7 +3,7 @@
 return [
 
     'asset_tag'   	=> 'Inv. Tag',
-    'asset_model'       => 'Model',
+    'asset_model'   => 'Model',
     'assigned_to'   => 'Assigned To',
     'book_value'  	=> 'Current Value',
     'change' 		=> 'In/Out',
@@ -18,11 +18,12 @@ return [
     'id'      		=> 'ID',
     'last_checkin_date' => 'Last Checkin Date',
     'location' 		=> 'Location',
+    'current_location' => 'Current Location',
     'purchase_cost'	=> 'Cost',
     'purchase_date'	=> 'Purchased',
     'serial'   		=> 'Serial',
     'status'   		=> 'Status',
-    'title'      	=> 'Asset ',
+    'title'      	=> 'Inventory ',
     'image'		    => 'Device Image',
     'days_without_acceptance' => 'Days Without Acceptance',
     'monthly_depreciation' => 'Monthly Depreciation',

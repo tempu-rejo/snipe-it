@@ -174,7 +174,7 @@
                 @can('view', $user)
                 <div class="col-md-12" style="padding-top: 5px;">
                 @if($user->allAssignedCount() != '0') 
-                  <a href="{{ route('users.print', $user->id) }}" style="width: 100%;" class="btn btn-sm btn-primary btn-social hidden-print" target="_blank" rel="noopener">
+                  <a href="{{ route('users.print', $user->id) }}?print_type=print_assigned" style="width: 100%;" class="btn btn-sm btn-primary btn-social hidden-print" target="_blank" rel="noopener">
                       <x-icon type="print" />
                       {{ trans('admin/users/general.print_assigned') }}
                   </a>
@@ -182,6 +182,21 @@
                   <button style="width: 100%;" class="btn btn-sm btn-primary btn-social hidden-print" rel="noopener" disabled title="{{ trans('admin/users/message.user_has_no_assets_assigned') }}">
                       <x-icon type="print" />
                       {{ trans('admin/users/general.print_assigned') }}</button>
+                @endif
+                </div>
+                @endcan
+
+                @can('view', $user)
+                <div class="col-md-12" style="padding-top: 5px;">
+                @if($user->allAssignedCount() != '0') 
+                  <a href="{{ route('users.print', $user->id) }}?print_type=print_annual" style="width: 100%;" class="btn btn-sm btn-primary btn-social hidden-print" target="_blank" rel="noopener">
+                      <x-icon type="print" />
+                      {{ trans('admin/users/general.print_annual') }}
+                  </a>
+                  @else
+                  <button style="width: 100%;" class="btn btn-sm btn-primary btn-social hidden-print" rel="noopener" disabled title="{{ trans('admin/users/message.user_has_no_assets_assigned') }}">
+                      <x-icon type="print" />
+                      {{ trans('admin/users/general.print_annual') }}</button>
                 @endif
                 </div>
                 @endcan
@@ -1009,6 +1024,8 @@
                   <th data-field="icon" style="width: 40px;" class="hidden-xs" data-formatter="iconFormatter">Icon</th>
                   <th data-field="created_at" data-formatter="dateDisplayFormatter" data-sortable="true">{{ trans('general.date') }}</th>
                   <th data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
+                  <th data-field="item.category.name" data-visible="false">{{ trans('general.category') }}</th>
+                  <th data-field="item.model.category.name" data-visible="false">Category Model</th>
                   <th data-field="action_type">{{ trans('general.action') }}</th>
                   <th data-field="target" data-formatter="polymorphicItemFormatter">{{ trans('general.target') }}</th>
                   <th data-field="note">{{ trans('general.notes') }}</th>
@@ -1295,8 +1312,8 @@ $('#dataConfirmModal').on('show.bs.modal', function (event) {
         '<th style="border: 1px solid #ddd; padding: 8px;">#</th>' +
         '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.date') }}</th>' +
         '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.item') }}</th>' +
-        '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.action') }}</th>' +
-        '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.target') }}</th>' +
+        '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.category') }}</th>' +
+        '<th style="border: 1px solid #ddd; padding: 8px;">' + (printType === 'checkin' ? '{{ trans('general.target_return') }}' : '{{ trans('general.target') }}') + '</th>' +
         '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.location') }}</th>' +
         '<th style="border: 1px solid #ddd; padding: 8px;">{{ trans('general.notes') }}</th>' +
         '</tr></thead>';
@@ -1327,7 +1344,18 @@ $('#dataConfirmModal').on('show.bs.modal', function (event) {
             }
           }
           tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + item + '</td>';
-          tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + (row.action_type || '') + '</td>';
+          
+          // Get category from item.category object
+          var category = '';
+          if (row.item && row.item.category) {
+            if (typeof row.item.category === 'object' && row.item.category.name) {
+              category = row.item.category.name;
+            } else if (typeof row.item.category === 'string') {
+              category = row.item.category;
+            }
+          }
+          
+          tableBody += '<td style="border: 1px solid #ddd; padding: 8px;">' + category + '</td>';
           var target = '';
           if (row.target) {
             if (typeof row.target === 'object') {

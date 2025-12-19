@@ -35,7 +35,7 @@ return [
     'help_checkout'		=> 'If you wish to assign this asset immediately, select "Ready to Deploy" from the status list above. ',
     'mac_address'		=> 'MAC Address',
     'manufacturer'		=> 'Manufacturer',
-    'model'				=> 'Model',
+    'model'				=> 'Type - Brand / Model',
     'months'			=> 'months',
     'name'				=> 'Asset Name',
     'notes'				=> 'Notes',
