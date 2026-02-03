@@ -28,6 +28,7 @@
 
                     <option value="bulkpasswordreset">{{ trans('button.send_password_link') }}</option>
                     <option value="print">{{ trans('admin/users/general.print_assigned') }}</option>
+                    <option value="print_annual">{{ trans('admin/users/general.print_annual') }}</option>
                 </select>
                 <button class="btn btn-primary" id="bulkUserEditButton" disabled>{{ trans('button.go') }}</button>
             </div>

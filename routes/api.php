@@ -1341,5 +1341,4 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'throttle:api']], functi
         ])->name('api.assets.labels');
         // end generate label routes
 
-
 }); // end API routes

@@ -1,0 +1,65 @@
+<VirtualHost *:80>
+        ServerName uitrackin.ultid.com
+        Redirect / https://uitrackin.ultid.com
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+
+<IfModule mpm_event_module>
+        StartServers            8
+        MinSpareThreads         50
+        MaxSpareThreads         150
+        ThreadLimit             128
+        ThreadsPerChild         50
+        MaxRequestWorkers       800
+        ServerLimit             1024
+        MaxConnectionsPerChild  51200
+        #MaxRequestsPerChild     10000
+</IfModule>
+
+        <VirtualHost *:443>
+                ServerName uitrackin.ultid.com
+                DocumentRoot /var/www/html/snipe/public
+
+                <Directory /var/www/html/snipe/public>
+                        Options FollowSymLinks
+                        AllowOverride All
+                        Require all granted
+#                        Include /etc/apache2/conf-available/ip_tor.conf
+                <FilesMatch \.php$>
+                        SetHandler "proxy:unix:/var/run/php/services-fpm.sock|fcgi://localhost/"
+                </FilesMatch>
+                </Directory>
+
+                # Allow public access to scanner-app without authentication
+                <Directory /var/www/html/snipe/public/scanner-app>
+                        Options FollowSymLinks
+                        AllowOverride All
+                        Require all granted
+                        # No authentication required
+                </Directory>
+
+                ErrorLog ${APACHE_LOG_DIR}/snipe_error.log
+                CustomLog ${APACHE_LOG_DIR}/snipe_access.log combined
+
+#                SecRuleEngine On
+
+                SSLEngine on
+                SSLProtocol -all +TLSv1.3
+                SSLCertificateFile /etc/ssl/ultid/fullchain.crt
+                SSLCertificateKeyFile /etc/ssl/ultid/privkey.pem
+#                Include /etc/letsencrypt/options-ssl-apache.conf
+
+#                include /etc/apache2/conf-available/header.conf
+
+                RewriteEngine On
+                #From public/.htaccess
+                RewriteCond %{DOCUMENT_ROOT}%{REQUEST_FILENAME} !-d
+                RewriteCond %{REQUEST_URI} (.+)/$
+                RewriteRule ^ %1 [L,R=301]
+                RewriteCond %{DOCUMENT_ROOT}%{REQUEST_FILENAME} !-d
+                RewriteCond %{DOCUMENT_ROOT}%{REQUEST_FILENAME} !-f
+                RewriteRule ^ /index.php [L]
+
+        </VirtualHost>
+</IfModule>

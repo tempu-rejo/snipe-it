@@ -24,6 +24,8 @@ class RouteServiceProvider extends ServiceProvider
 
             $this->mapWebRoutes();
 
+            $this->mapScannerRoutes();
+
             require base_path('routes/scim.php');
         });
     }
@@ -69,6 +71,22 @@ class RouteServiceProvider extends ServiceProvider
             'prefix' => 'api',
         ], function ($router) {
             require base_path('routes/api.php');
+        });
+    }
+
+    /**
+     * Define the "scanner" routes for the application.
+     *
+     * These routes are for public and authenticated scanner API.
+     *
+     * @return void
+     */
+    protected function mapScannerRoutes()
+    {
+        Route::group([
+            'prefix' => 'api',
+        ], function ($router) {
+            require base_path('routes/scanner.php');
         });
     }
 

@@ -1,0 +1,30 @@
+# Allow public access to scanner app
+# No authentication required for this directory
+
+<IfModule mod_rewrite.c>
+    # Enable rewrite engine
+    RewriteEngine On
+    
+    # Allow access to all files in this directory
+    # No domain authentication required
+    Options +Indexes +FollowSymLinks
+    
+    # Ensure DirectoryIndex is set
+    DirectoryIndex index.html index.htm
+</IfModule>
+
+# Allow access from all origins for testing
+# Remove or modify in production
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+# Allow access without authentication
+Allow from all
+Require all granted
+
+# Disable directory listing for security (optional)
+# Comment out if you want to list files
+Options -Indexes

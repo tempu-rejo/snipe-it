@@ -17,6 +17,7 @@ return [
     'last_login'        => 'Masuk terakhir',
     'ldap_config_text'  => 'Pengaturan konfigurasi LDAP dapat ditemukan di Admin > Pengaturan. Lokasi pilihan (opsional) akan di atur untuk semua pengguna yang diimpor.',
     'print_assigned'    => 'Cetak semua yang ditetapkan',
+    'print_annual'      => 'Cetak Pernyataan Tahunan',
     'email_assigned'    => 'Email List of All Assigned',
     'user_notified'     => 'User has been emailed a list of their currently assigned items.',
     'users_notified'    => 'The user has been emailed a list of their currently assigned items.|:count users have been emailed a list of their currently assigned items.',
