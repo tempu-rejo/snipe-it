@@ -89,7 +89,7 @@ return [
     'created_by'            => 'Created By',
     'record_created' 		=> 'Record Created',
     'updated_at' 			=> 'Updated at',
-    'currency'  			=> '$', // this is deprecated
+    'currency'  			=> 'IDR', // this is deprecated
     'currency_text'  		=> 'Currency', //
     'current'  				=> 'Current',
     'current_password'      => 'Current Password',
@@ -449,8 +449,8 @@ return [
     'set_to_null'           => 'Delete values for this selection|Delete values for all :selection_count selections ',
     'set_users_field_to_null'  => 'Delete :field values for this user|Delete :field values for all :user_count users ',
     'na_no_purchase_date'   => 'N/A - No purchase date provided',
-    'assets_by_status'      => 'Inventorys by Status',
-    'assets_by_status_type'      => 'Inventorys by Status Type',
+    'assets_by_status'      => 'Inventories by Status',
+    'assets_by_status_type'      => 'Inventories by Status Type',
     'pie_chart_type'        => 'Dashboard Pie Chart Type',
     'hello_name'            => 'Hello, :name!',
     'unaccepted_profile_warning'   => 'You have one item requiring acceptance. Click here to accept or decline it | You have :count items requiring acceptance. Click here to accept or decline them',

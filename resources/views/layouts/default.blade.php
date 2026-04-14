@@ -505,13 +505,14 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                             <span class="badge">{{ (isset($total_undeployable_sidebar)) ? $total_undeployable_sidebar : '' }}</span>
                                         </a>
                                     </li>
-                                    <li{!! (Request::query('status') == 'byod' ? ' class="active"' : '') !!}><a
+                                    {{-- BYOD menu item hidden --}}
+                                    {{-- <li{!! (Request::query('status') == 'byod' ? ' class="active"' : '') !!}><a
                                                 href="{{ url('hardware?status=byod') }}">
                                             <x-icon type="x" class="text-red fa-fw" />
                                             {{ trans('general.byod') }}
                                             <span class="badge">{{ (isset($total_byod_sidebar)) ? $total_byod_sidebar : '' }}</span>
                                         </a>
-                                    </li>
+                                    </li> --}}
                                     <li{!! (Request::query('status') == 'Archived' ? ' class="active"' : '') !!}><a
                                                 href="{{ url('hardware?status=Archived') }}">
                                             <x-icon type="x" class="text-red fa-fw" />
@@ -519,12 +520,13 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                             <span class="badge">{{ (isset($total_archived_sidebar)) ? $total_archived_sidebar : '' }}</span>
                                         </a>
                                     </li>
-                                    <li{!! (Request::query('status') == 'Requestable' ? ' class="active"' : '') !!}><a
+                                    {{-- Requestable menu item hidden --}}
+                                    {{-- <li{!! (Request::query('status') == 'Requestable' ? ' class="active"' : '') !!}><a
                                                 href="{{ url('hardware?status=Requestable') }}">
                                             <x-icon type="checkmark" class="text-blue fa-fw" />
                                             {{ trans('admin/hardware/general.requestable') }}
                                         </a>
-                                    </li>
+                                    </li> --}}
 
                                     @can('audit', \App\Models\Asset::class)
                                         <li{!! (Request::is('hardware/audit/due') ? ' class="active"' : '') !!}>
