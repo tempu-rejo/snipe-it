@@ -200,7 +200,7 @@ return [
     'location_name'            => 'Warehouse Name',
     'rtd_location'             => 'Source Location',
     'current_location'         => 'Current Location',
-    'default_location'         => 'Source Location',
+    'default_location'         => 'Location',
     'assigned_location'        => 'Current Location',
     'asset_location'           => 'Inventory Location',
     'logo_size'				=> 'Square logos look best with Logo + Text. Logo maximum display size is 50px high x 500px wide.  ',
