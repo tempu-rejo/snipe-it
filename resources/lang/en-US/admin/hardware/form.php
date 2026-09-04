@@ -24,7 +24,7 @@ return [
     'depreciates_on'	=> 'Depreciates On',
     'default_location'	=> 'Default Location',
     'warehouse_office'  => 'WH / Office',
-    'source_location'   => 'Source Location',
+    'source_location'   => 'Location',
     'current_location'  => 'Current Location',
     'default_location_phone' => 'Default Location Phone',
     'eol_date'			=> 'EOL Date',
