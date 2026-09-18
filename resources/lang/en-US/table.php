@@ -2,6 +2,7 @@
 
 return [
 
+    'actions'   	=> 'Actions',
     'asset_tag'   	=> 'Inv. Tag',
     'asset_model'       => 'Model',
     'assigned_to'   => 'Assigned To',
