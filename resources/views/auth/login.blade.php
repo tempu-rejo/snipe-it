@@ -51,6 +51,10 @@
 
     .login-title {
         color: #fff;
+        font: #0c0c0c;
+        border-radius: 50%;
+        /* background: #0c0c0c;
+        opacity: inherit; */
         font-weight: 400;
         margin: 10px 0 0;
         font-family: 'Helvetica', sans-serif;
@@ -62,6 +66,8 @@
     }
 
     .box.login-box {
+        width: 100%;
+        box-sizing: border-box;
         margin: 0;
         padding: 34px 48px 30px;
         border: 1px solid rgba(255, 255, 255, 0.85);
@@ -80,6 +86,17 @@
     }
 
     .login-box .login-box-body {
+        background: transparent;
+    }
+
+    .login-form-wrapper > form {
+        width: 100%;
+        margin: 0;
+    }
+
+    .login-box .box-footer {
+        padding: 0;
+        border-top: 0;
         background: transparent;
     }
 
@@ -140,7 +157,7 @@
     .login-footer {
         margin-top: 40px;
         text-align: center;
-        color: #fff;
+        color: #fcfcfc;
         font-size: 13px;
         border-top: 1px solid rgba(255, 255, 255, 0.35);
         padding-top: 20px;
@@ -277,7 +294,7 @@
         <!-- Login Footer -->
         <div class="login-footer">
             <p>&copy; {{ date('Y') }} Universal Leaf. All rights reserved.</p>
-            <p>{{ $snipeSettings->site_name ?? config('app.name', 'UI-Trackin (IT)') }} v1.0</p>
+            <p>{{ $snipeSettings->site_name ?? config('app.name', 'UI-Trackin (IT)') }} v1.1</p>
             <p>Need help? Contact <a href="mailto:idhelp@universalleaf.com">IDHelp</a></p>
         </div>
     </div>
