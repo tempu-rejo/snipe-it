@@ -4,34 +4,42 @@
 <style>
     .login-page-wrapper {
         display: flex;
+        width: 100%;
         min-height: 100vh;
-        background: #f5f5f5;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-sizing: border-box;
+        padding: 24px 16px;
     }
     
     .login-background {
-        flex: 2;
+        position: absolute;
+        inset: 0;
         background-image: url('{{ asset("img/background.jpg") }}');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        position: relative;
     }
     
     .login-form-wrapper {
-        width: 400px;
-        background: white;
-        padding: 40px;
+        width: min(100% - 32px, 500px);
+        background: transparent;
+        padding: 0;
         position: relative;
-        box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        margin: 0 auto;
+        top: auto;
+        right: auto;
+        left: auto;
+        transform: none;
+        z-index: 1;
     }
 
     .login-header {
         text-align: center;
-        margin-bottom: 30px;
-        padding: 20px 0;
+        margin: 0 auto 22px;
+        padding: 0;
     }
 
     .login-logo {
@@ -42,7 +50,7 @@
     }
 
     .login-title {
-        color: #454545;
+        color: #fff;
         font-weight: 400;
         margin: 10px 0 0;
         font-family: 'Helvetica', sans-serif;
@@ -54,28 +62,31 @@
     }
 
     .box.login-box {
-        border: none;
-        box-shadow: none;
         margin: 0;
+        padding: 34px 48px 30px;
+        border: 1px solid rgba(255, 255, 255, 0.85);
+        border-radius: 22px;
+        background: rgba(8, 53, 63, 0.42);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
     }
 
     .box-header {
         text-align: left;
         padding: 0;
         border: none;
+        background: transparent;
+    }
+
+    .login-box .login-box-body {
+        background: transparent;
     }
 
     .box-header .box-title {
         font-size: 18px;
->>>>>>> ffba97ebb (style: Adjust font sizes in login page and update logo link styles for better visibility)
-    .box-header .box-title {
-        font-size: 18px;
-=======
-    .box-header .box-title {
-        font-size: 18px;
->>>>>>> ffba97ebb (style: Adjust font sizes in login page and update logo link styles for better visibility)
         font-weight: 300;
-        color: #454545;
+        color: #fff;
         margin-bottom: 30px;
     }
     
@@ -93,14 +104,23 @@
     .form-control {
         height: 44px;
         border-radius: 3px;
-        border: 1px solid #e0e0e0;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+        background: transparent;
         padding: 8px 12px;
         font-size: 14px;
+        color: #fff;
     }
 
     .form-control:focus {
-        border-color: #00a4e4;
-        box-shadow: 0 0 0 2px rgba(0,164,228,0.2);
+        border-color: #fff;
+        box-shadow: none;
+    }
+
+    .login-box label,
+    .login-box .checkbox,
+    .login-box .help-block {
+        color: #fff;
     }
 
     .btn-primary {
@@ -120,9 +140,9 @@
     .login-footer {
         margin-top: 40px;
         text-align: center;
-        color: #666;
+        color: #fff;
         font-size: 13px;
-        border-top: 1px solid #eee;
+        border-top: 1px solid rgba(255, 255, 255, 0.35);
         padding-top: 20px;
     }
 
@@ -147,9 +167,11 @@
         }
         
         .login-form-wrapper {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
+            width: calc(100% - 32px);
+        }
+
+        .box.login-box {
+            padding: 28px 24px 24px;
         }
     }
 </style>
@@ -202,7 +224,7 @@
                                         <x-icon type="user" />
                                         {{ trans('admin/users/table.username')  }}
                                     </label>
-                                    <input class="form-control" placeholder="{{ trans('admin/users/table.username')  }}" name="username" type="text" id="username" autocomplete="{{ (config('auth.login_autocomplete') === true) ? 'on' : 'off'  }}" autofocus>
+                                    <input class="form-control" placeholder="Use Windows Username" name="username" type="text" id="username" autocomplete="{{ (config('auth.login_autocomplete') === true) ? 'on' : 'off'  }}" autofocus>
                                     {!! $errors->first('username', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
                                 </div>
                                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
@@ -210,7 +232,7 @@
                                         <x-icon type="password" />
                                         {{ trans('admin/users/table.password')  }}
                                     </label>
-                                    <input class="form-control" placeholder="{{ trans('admin/users/table.password')  }}" name="password" type="password" id="password" autocomplete="{{ (config('auth.login_autocomplete') === true) ? 'on' : 'off'  }}">
+                                    <input class="form-control" placeholder="Use Windows Password" name="password" type="password" id="password" autocomplete="{{ (config('auth.login_autocomplete') === true) ? 'on' : 'off'  }}">
                                     {!! $errors->first('password', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
                                 </div>
                                 <div class="form-group">

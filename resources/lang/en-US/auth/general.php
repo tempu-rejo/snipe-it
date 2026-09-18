@@ -6,7 +6,7 @@ return [
     'reset_password'			    => 'Reset Password',
     'saml_login'                    => 'Login via SAML',
     'login'                         => 'Login',
-    'login_prompt'                  => 'Please Login with your Windows credentials',
+    'login_prompt'                  => 'Welcome back !!',
     'forgot_password'               => 'I forgot my password',
     'ldap_reset_password'           => 'Please click here to reset your LDAP password',
     'remember_me'                   => 'Remember Me',
