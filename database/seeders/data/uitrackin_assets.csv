@@ -1,0 +1,174 @@
+Category,Name,Model,Manufacturer,Model Number,Serial,Asset Tag,Location,CPU,RAM,Storage,System Type,Device Type,Status,Purchase Date
+Laptop,IDTRN056,G5 5500,Dell Inc.,-,GR921B3,IT-250-P-00001,KALISAT,Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz,16 GB,477 GB,x64-based PC,Personal,Ready to deploy,2021-06-14
+Laptop,IDTRN001,XPS 13 9310,Dell Inc.,-,1TWR693,IT-250-P-00002,KALISAT,11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz,16 GB,1024 GB,x64-based PC,Personal,Ready to deploy,2021-05-06
+Laptop,IDTRN003,81RS,LENOVO,-,PF1YPFWE,IT-250-P-00003,KALISAT,Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz,16 GB,239 GB,x64-based PC,Personal,Ready to deploy,2020-04-20
+Laptop,IDTRN005,HP Laptop 14s-cf1xxx,HP,-,5CG9202CRB,IT-250-P-00004,KALISAT,Intel(R) Core(TM) i7-8565U CPU @ 1.80GHz,16 GB,59 GB,x64-based PC,Personal,Ready to deploy,2019-07-08
+Laptop,IDTRN004,TUF GAMING FX504GE_FX80GE,ASUSTeK COMPUTER INC.,-,J9NRCX04773040A,IT-250-P-00005,KALISAT,Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz,16 GB,932 GB,x64-based PC,Personal,Ready to deploy,2019-02-21
+Handphone,Galaxy A03s,SM-A037F/DS,Samsung,-,R9RRA00MTTR,IT-250-P-00006,KALISAT,,4 GB,64 GB,Android,Personal,Ready to deploy,2021-09-01
+Laptop,IDTRN148,Latitude 3420,Dell Inc.,-,HX59QG3,IT-250-P-00007,KALISAT,11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz,16 GB,477 GB,x64-based PC,Personal,Ready to deploy,2022-02-22
+Laptop,IDTRN002,81Y6,LENOVO,-,PF2L2684,IT-250-P-00008,KALISAT,Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz,16 GB,466 GB,x64-based PC,Personal,Ready to deploy,2021-08-13
+Handphone,Galaxy A24,SM-A24SF/DSN,Samsung,-,RR8WA01N8PH,IT-250-P-00009,KALISAT,,8 GB,128 GB,Android,Personal,Ready to deploy,2023-11-29
+Laptop,IDTRN104,81Y6,LENOVO,-,PF2L1ZMW,IT-250-P-00010,KALISAT,Intel(R) Core(TM) i7-10750H CPU @ 2.60GHz,16 GB,477 GB,x64-based PC,Personal,Ready to deploy,2022-06-27
+Laptop,IDTRN266,HP 240 G7 Notebook PC,HP,-,5CG0114VV9,IT-250-P-00011,HEAD OFFICE,Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz,8 GB,239 GB,x64-based PC,Personal,Ready to deploy,
+Handphone,Galaxy J7 Prime,SM-G610F/DS,Samsung,-,8T0J164,IT-250-P-00012,HEAD OFFICE,,0 GB,0 GB,Android,Personal,Ready to deploy,2019-04-01
+Laptop,IDTRN166,Vostro 3400,Dell Inc.,-,7JYLPH3,IT-250-P-00013,HEAD OFFICE,11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz,8 GB,477 GB,x64-based PC,Personal,Ready to deploy,2021-11-17
+Handphone,Galaxy A22 5G,SM-A226B/DS,Samsung,-,R9CT200DEVL,IT-250-P-00017,HEAD OFFICE,,6 GB,128 GB,Android,Personal,Ready to deploy,2022-08-10
+Handphone,Galaxy A05s,SM-A057F/DS,Samsung,-,R9RWB0399CZ,IT-250-P-00018,HEAD OFFICE,,6 GB,128 GB,Android,Personal,Ready to deploy,2023-12-01
+Handphone,Galaxy A05s,SM-A057F/DS,Samsung,-,R9RWA049KDK,IT-250-P-00020,HEAD OFFICE,,0,0,Android,Personal,Ready to deploy,2023-12-01
+Handphone,Galaxy A14 5G,SM-A146P/DSN,Samsung,-,R9CW502XWGV,IT-250-P-00021,HEAD OFFICE,,6 GB,128 GB,Android,Personal,Ready to deploy,2023-12-01
+Monitor/TV,IDTRHO-2304211,C24F390FHE,Samsung,-,BZSKH4ZN401307V,IT-250-P-00023,HEAD OFFICE,,,,-,Personal,Ready to deploy,2021-08-27
+Handphone,Galaxy A34 5G,SM-A346E/DSN,Samsung,-,RRCWB061SWW,IT-250-P-00025,HEAD OFFICE,,8 GB,128 GB,Android,Personal,Ready to deploy,2021-09-11
+Handphone,Galaxy A16,SM-A165F/DS,Samsung,-,RR8Y100LVNB,IT-250-P-00030,HEAD OFFICE,,8 GB,256 GB,Android,Personal,Ready to deploy,2025-02-28
+PC Desktop,IDTRD051,Vostro 3681,Dell Inc.,-,FTQ2QM3,IT-250-P-00038,PAKUSARI,Intel(R) Core(TM) i5-10400 CPU @ 2.90GHz,8 GB,59 GB,x64-based PC,Personal,Ready to deploy,2023-07-20
+PC Desktop,IDTRD018,Inspiron 3471,Dell Inc.,-,80T9J23,IT-250-P-00039,PAKUSARI,Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz,8 GB,59 GB,x64-based PC,Personal,Ready to deploy,2020-09-24
+PC Desktop,IDTRD038,Vostro 3681,Dell Inc.,-,9X1LQB3,IT-250-P-00040,PAKUSARI,Intel(R) Core(TM) i5-10400 CPU @ 2.90GHz,8 GB,59 GB,x64-based PC,Personal,Ready to deploy,2021-08-20
+PC Desktop,IDTRD022,Vostro 3681,Dell Inc.,-,262LQB3,IT-250-P-00041,PAKUSARI,Intel(R) Core(TM) i5-10400 CPU @ 2.90GHz,8 GB,232 GB,x64-based PC,Personal,Ready to deploy,2021-08-03
+PC Desktop,IDTRD032,Inspiron 3471,Dell Inc.,-,F4HMB03,IT-250-P-00042,PAKUSARI,Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz,8 GB,59 GB,x64-based PC,Personal,Ready to deploy,2020-08-12
+Monitor/TV,IDTRN197,VA2432-H,View Sonic,-,W33232000717,IT-250-P-00049,PAKUSARI,,,,-,Personal,Ready to deploy,2023-10-26
+Monitor/TV,IDTRN196,VA2432-H,View Sonic,-,W33232000786,IT-250-P-00051,PAKUSARI,,,,-,Personal,Ready to deploy,2023-10-26
+PC Desktop,IDTRD036,Inspiron 3471,Dell Inc.,-,3DN4W23,IT-250-P-00056,PAKUSARI,Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz,8 GB,250 GB,x64-based PC,Personal,Ready to deploy,2021-07-21
+Monitor/TV,IDTRN094,VS16218,ViewSonic,-,UEP173620576,IT-250-P-00058,KALISAT,,,,-,Personal,Ready to deploy,2023-09-25
+Handphone,Galaxy A35,SM-A356E/DS,Samsung,-,RRCXA08BZ0P,IT-250-P-00060,HEAD OFFICE,,8 GB,256 GB,Android,Personal,Ready to deploy,2025-03-03
+Tablet,Galaxy Tab S6 Lite,SM-P619,Samsung,-,RR2T600F2HF,IT-250-P-00061,HEAD OFFICE,,4 GB,128 GB,Android,Personal,Ready to deploy,2022-08-10
+Monitor/TV,IDTRHO-11102101,C24F390FHE,Samsung,-,BZSKH4ZT702806E,IT-250-P-00064,HEAD OFFICE,,,,-,Personal,Ready to deploy,2023-01-31
+Monitor/TV,IDTRN119,C24F390FHE,Samsung,-,BZSKH4ZT902518K,IT-250-P-00065,HEAD OFFICE,,,,-,Personal,Ready to deploy,2023-01-31
+Monitor/TV,IDTRN229,C24F390FHE,Samsung,-,BZSKH4ZN100471X,IT-250-P-00066,HEAD OFFICE,,,,-,Personal,Ready to deploy,2023-01-31
+Monitor/TV,IDTRN149,C24F390FHE,Samsung,-,BZSKH4ZNB04774W,IT-250-P-00071,HEAD OFFICE,,,,-,Personal,Ready to deploy,2024-05-14
+Monitor/TV,IDTRN199,VA2432-mh,View Sonic,-,W3Y234300476,IT-250-P-00072,HEAD OFFICE,,,,-,Personal,Ready to deploy,2024-08-08
+Monitor/TV,IDTRN163,S24R350FZE,Samsung,-,4PWJH4TT501148J,IT-250-P-00074,HEAD OFFICE,,,,-,Personal,Ready to deploy,2022-08-05
+Raspberry,BALU-CONTROLLER,Raspberry Pi 4 Model B Rev 1.4,RASPBERRY,-,100000000C946E38,IT-250-P-00075,BALUNG,4,8 GB,128 GB,Ubuntu Server,IT Devices,Ready to deploy,2021-10-24
+PC Desktop,IDTRD070,Inspiron 3471,Dell Inc.,-,F4MJB03,IT-250-P-00079,PAKUSARI,Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz,8 GB,250 GB,x64-based PC,Personal,Ready to deploy,2024-08-07
+PC Desktop,IDTRD016,Vostro 3888,Dell Inc.,-,CJCV6K3,IT-250-P-00107,GUNAGRAHA,Intel(R) Core(TM) i5-10400 CPU @ 2.90GHz,8 GB,59 GB,x64-based PC,Personal,Ready to deploy,2021-12-30
+PC Desktop,IDTRD005,Vostro 3681,Dell Inc.,-,8W1LQB3,IT-250-P-00108,GUNAGRAHA,Intel(R) Core(TM) i5-10400 CPU @ 2.90GHz,8 GB,256GB GB,x64-based PC,Personal,Ready to deploy,
+PC Desktop,IDTRD029,Inspiron 3471,Dell Inc.,-,F53MB03,IT-250-P-00109,GUNAGRAHA,Intel(R) Core(TM) i5-9400 CPU @ 2.90GHz,8 GB,59 GB,x64-based PC,Personal,Ready to deploy,
+Weight Scale,IDTRD015,SGW-3015S,GSC,-,C11571,IT-250-P-00114,GUNAGRAHA,,,,-,IT Devices,Ready to deploy,2024-03-06
+Weight Scale,IDTRD006,SGW-3015S,GSC,-,C10418,IT-250-P-00137,GUNAGRAHA,,,,-,Personal,Ready to deploy,2024-03-06
+Tablet,Galaxy Tab S6 Lite,SM-P615,Samsung,-,RR2N6001BDM,IT-250-P-00169,MAYANG 2,,4 GB,64 GB,Android,Personal,Ready to deploy,2021-07-21
+Tablet,Galaxy Tab S6 Lite,SM-P615,Samsung,-,RR2N500H6WR,IT-250-P-00171,KALISAT,,4 GB,64 GB,Android,Personal,Ready to deploy,2021-07-21
+Printer,Printer Packed Stock Kalisat,Laserjet Enterprise M507,HP,-,PHCRP2R81B,IT-250-P-00186,KALISAT,,,,-,Personal,Ready to deploy,2023-07-06
+Tablet,Galaxy Tab A 8.0 with S Pen,SM-P355,Samsung,-,RR2K100NNKA,IT-250-P-00191,KALISAT,,2 GB,16 GB,Android,Personal,Ready to deploy,2018-03-01
+Weight Scale,IDTRD035,SGW-3015S,GSC,-,-,IT-250-P-00197,KALISAT,,,,-,Personal,Ready to deploy,2024-03-06
+Tablet,Galaxy Tab A7 Lite,SM-T225,Samsung,-,R9RRC052JHR,IT-250-P-00202,KALISAT,,3 GB,32 GB,Android,Personal,Ready to deploy,2022-12-05
+Tablet,Galaxy Tab A 8.0 with S Pen,SM-P355,Samsung,-,RR2K100N60X,IT-250-P-00206,KALISAT,,2 GB,16 GB,Android,Personal,Ready to deploy,2018-03-01
+Printer,Printer Admin,ZD888t,Zebra,-,D5J232303427,IT-250-P-00211,KALISAT,,,,-,Personal,Ready to deploy,2023-08-31
+Printer,Printer HR,HP Deskjet GT 5820,HP,-,CN7174G19406BN,IT-250-P-00218,KALISAT,,,,-,Personal,Ready to deploy,2023-01-04
+Printer,IDTRD052,GT820,ZEBRA,-,11J171502279,IT-250-P-00219,KALISAT,,,,-,Personal,Ready to deploy,2020-03-01
+Tablet,Galaxy Tab A7 Lite,SM-T225,Samsung,-,R9RRC052QRJ,IT-250-P-00222,KALISAT,,3 GB,32 GB,Android,Personal,Ready to deploy,2023-01-25
+Tablet,Galaxy Tab A7 Lite,SM-T225,Samsung,-,R9RRC053TLP,IT-250-P-00236,BALUNG,,3 GB,32 GB,Android,Personal,Ready to deploy,2022-12-05
+Tablet,Galaxy Tab A7 Lite,SM-T225,Samsung,-,R9RRC052JBV,IT-250-P-00260,BUMI SUBUR,,3 GB,32 GB,Android,Personal,Ready to deploy,2022-12-05
+Printer,IDTRD011,L3150,EPSON,-,X5EM094884,IT-250-P-00263,BUMI SUBUR,,,,-,Personal,Ready to deploy,2020-11-04
+Printer,Scanner,Lide 120,Canon,-,K10402,IT-250-P-00271,GIGA AMBULU,,,,-,Personal,Ready to deploy,2023-08-28
+Tablet,Galaxy Tab A9,SM-X115,Samsung,-,352726/19/108403/1,IT-250-P-00272,GIGA AMBULU,,4 GB,64 GB,Android,Personal,Ready to deploy,2024-07-08
+Server,KALINAPS1,ProLiant DL20 Gen10,HPE,-,CN700306YX,IT-250-T-00001,KALISAT,Intel(R) Xeon(R) E-2224 CPU @ 3.40GHz,24 GB,960 GB,-,IT Devices,Ready to deploy,2019-08-01
+Server,KALINAPS2,ProLiant DL20 Gen10,HPE,-,CN70290V15,IT-250-T-00002,KALISAT,Intel(R) Xeon(R) E-2224 CPU @ 3.40GHz,24 GB,960 GB,-,IT Devices,Ready to deploy,2019-08-01
+Server,KALIESX1,ProLiant DL380 Gen10,HPE,-,SGH941VYYS,IT-250-T-00003,KALISAT,Intel(R) Xeon(R) Silver 4114 CPU @ 2.20GHz,192 GB,6TB GB,-,IT Devices,Ready to deploy,2018-11-01
+Server,MAYANAPS1,ProLiant DL20 Gen10,HPE,-,CN700306X3,IT-250-T-00004,MAYANG 1,Intel(R) Xeon(R) E-2224 CPU @ 3.40GHz,64 GB,960 GB,-,IT Devices,Ready to deploy,2019-08-01
+Server,MAYPNAPS1,ProLiant DL20 Gen10,HPE,-,CN70240D1F,IT-250-T-00005,MAYANG 2,Intel(R) Xeon(R) E-2224 CPU @ 3.40GHz,64 GB,960 GB,-,IT Devices,Ready to deploy,2019-08-01
+Server,PAKANAPS1,PowerEdge T30,Dell Inc.,-,FG7HYH2,IT-250-T-00006,PAKUSARI,Intel(R) Xeon(R) CPU E3-1225 v5 @ 3.30GHz,32 GB,960 GB,-,IT Devices,Ready to deploy,2020-11-30
+Server,SUMBNAPS1,ProLiant DL20 Gen10,HPE,-,CN700306XD,IT-250-T-00007,GIGA AMBULU,Intel(R) Xeon(R) E-2224 CPU @ 3.40GHz,24 GB,960 GB,-,IT Devices,Ready to deploy,2019-08-01
+Server,BALUNRDC1,ProLiant DL20 Gen10,HPE,-,CN700306XM,IT-250-T-00008,BALUNG,Intel(R) Xeon(R) E-2224 CPU @ 3.40GHz,64 GB,960 GB,-,IT Devices,Ready to deploy,2019-08-01
+Server,CEPENAPS1,ProLiant DL20 Gen10,HPE,-,CN700306XK,IT-250-T-00009,Klaten Gd Manggala,Intel(R) Xeon(R) E-2224 CPU @ 3.40GHz,64 GB,960 GB,-,IT Devices,Ready to deploy,2019-08-01
+Printer,Printer Procurement,L5190,Epson,-,X5NZ108678,IT-250-T-00010,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2021-11-23
+Printer,Printer Procurement,DCP-L3551CDW series,Brother,-,E79051F9N544626,IT-250-T-00011,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2020-11-26
+Server,GUNANAPS1,ProLiant DL20 Gen10,HPE,-,CN70030GM0,IT-250-T-00012,GUNAGRAHA,Intel(R) Xeon(R) E-2224 CPU @ 3.40GHz,24 GB,960 GB,-,IT Devices,Ready to deploy,2019-08-01
+Printer,Printer Procurement,L3110,Epson,-,X5DX209090,IT-250-T-00013,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2020-08-06
+Access Point,,UAP AC Pro,Ubiquiti,-,E0:63:DA:09:C3:5A,IT-250-T-00014,HEAD OFFICE,0,0,0,-,IT Devices,Ready to deploy,2021-07-21
+Printer,Printer HRGA,Officejet 7110,HP,-,CN99E2R0ZD,IT-250-T-00015,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,
+Mesin Finger,TRHO-Staff,X601,Solution,-,AEYU230960063,IT-250-T-00017,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,
+Access Point,,UAP AC Pro,Ubiquiti,-,24:5A:4C:23:5D:AD,IT-250-T-00023,HEAD OFFICE,0,0,0,-,IT Devices,Ready to deploy,2021-08-03
+Mesin Finger,TRHO-P1,X601,Solution,-,AEYU191160584,IT-250-T-00033,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,
+Switch Managed,TRHO-CORE-C3650,WS-C3650-8X24UQ,CISCO,-,FDO2204V0J5,IT-250-T-00035,HEAD OFFICE,,,,IOS,IT Devices,Ready to deploy,
+Switch Managed,TRHO-CORE-C3650,WS-C3650-8X24UQ,CISCO,-,FDO2113V0E3,IT-250-T-00036,HEAD OFFICE,,,,IOS,IT Devices,Ready to deploy,
+Switch Managed,TRHO-INF-SW1,WS-C2960X-48FPS-L,CISCO,-,FOC1837S5ZV,IT-250-T-00037,HEAD OFFICE,,,,IOS,IT Devices,Ready to deploy,2020-06-01
+Switch Managed,TRHO-INF-SW2,WS-C2960X-48FPS-L,CISCO,-,FCW2308A2KP,IT-250-T-00039,HEAD OFFICE,,,,IOS,IT Devices,Ready to deploy,2020-06-01
+Switch Managed,TRHO-INF-SW3,WS-C2960X-48FPS-L,CISCO,-,FCW2125A0FX,IT-250-T-00040,HEAD OFFICE,,,,IOS,IT Devices,Ready to deploy,2020-06-01
+Weight Scale,IDTRD018,SGW-3015S,GSC,-,C10492,IT-250-T-00041,PAKUSARI,,,,-,IT Devices,Ready to deploy,2021-06-24
+Switch Managed,TRGH-INF-SW1,WS-C3750X-24,CISCO,-,FDO1947F13X,IT-250-T-00042,HEAD OFFICE,,,,IOS,IT Devices,Ready to deploy,2022-06-28
+Switch Managed,TR-PAKA-SW1,WS-C2960X-48FPS-L,CISCO,-,FCW2315A19B,IT-250-T-00044,PAKUSARI,,,,IOS,IT Devices,Ready to deploy,2020-06-01
+Weight Scale,IDTRD022,SGW-3015S,GSC,-,C05465,IT-250-T-00047,PAKUSARI,,,,-,IT Devices,Ready to deploy,2021-06-24
+Switch Managed,TR-GUNA-INF-SW1,WS-C2960X-48FPS-L,CISCO,-,FOC1833S09K,IT-250-T-00048,GUNAGRAHA,,,,IOS,IT Devices,Ready to deploy,2020-06-01
+Switch Managed,TR-GUNA-INF-SW2,WS-C2960X-24PS-L,CISCO,-,FOC2015Y09K,IT-250-T-00049,GUNAGRAHA,,,,IOS,IT Devices,Ready to deploy,2020-06-01
+Weight Scale,IDTRD032,SGW-3015S,GSC,-,C10444,IT-250-T-00050,PAKUSARI,,,,-,IT Devices,Ready to deploy,2021-06-24
+Switch Managed,TR-MAYA-INF-SW1,WS-C2960X-48FPS-L,CISCO,-,FCW2022A0ZJ,IT-250-T-00052,MAYANG 1,,,,IOS,IT Devices,Ready to deploy,2020-06-01
+Mesin Finger,TRPKS-Staff,X601,Solution,-,AEYU230760203,IT-250-T-00055,PAKUSARI,,,,-,IT Devices,Ready to deploy,
+Access Point,,UAP AC Pro,Ubiquiti,-,68:D7:9A:DC:01:AF,IT-250-T-00057,PAKUSARI,0,0,0,-,IT Devices,Ready to deploy,2021-10-04
+Weight Scale,IDTRD036,SGW-3015S,GSC,-,C10515,IT-250-T-00064,PAKUSARI,,,,-,IT Devices,Ready to deploy,2024-03-06
+Weight Scale,IDTRD038,SGW3015S,GSC,-,C14493,IT-250-T-00065,PAKUSARI,,,,-,IT Devices,Ready to deploy,2024-03-06
+Mesin Finger,TRPKS-P1,X601,Solution,-,AEYU230960056,IT-250-T-00072,PAKUSARI,,,,-,IT Devices,Ready to deploy,
+Mesin Finger,TRPKS-P2,X601,Solution,-,AEYU195260309,IT-250-T-00073,PAKUSARI,,,,-,IT Devices,Ready to deploy,
+Mesin Finger,TRPKS-P3,X601,Solution,-,AEYU230760199,IT-250-T-00075,PAKUSARI,,,,-,IT Devices,Ready to deploy,
+Mesin Finger,TRPKS-P4,G3,ZKTeco,-,AEH2193260003,IT-250-T-00076,PAKUSARI,,,,-,IT Devices,Ready to deploy,
+Mesin Finger,TRPKS-P5,X601,Solution,-,AEYU221060001,IT-250-T-00078,PAKUSARI,,,,-,IT Devices,Ready to deploy,
+Access Point,,UAP AC M Pro,Ubiquiti,-,78:45:58:73:10:76,IT-250-T-00081,HEAD OFFICE,0,0,0,-,IT Devices,Ready to deploy,2021-12-13
+Access Point,,UAP AC Pro,Ubiquiti,-,E0:63:DA:B0:CC:3E,IT-250-T-00082,HEAD OFFICE,0,0,0,-,IT Devices,Ready to deploy,2021-07-21
+Access Point,,UAP AC M Pro,Ubiquiti,-,78:45:58:76:2D:6E,IT-250-T-00084,PAKUSARI,0,0,0,-,IT Devices,Ready to deploy,2021-12-13
+Raspberry,KALI-CONTROLLER,Raspberry Pi 4 Model B Rev 1.4,RASPBERRY,-,1.00E+15,IT-250-T-00085,KALISAT,4,8 GB,32 GB,Ubuntu Server,IT Devices,Ready to deploy,2021-10-24
+Access Point,,UAP AC M Pro,Ubiquiti,-,78:45:58:73:12:D6,IT-250-T-00086,HEAD OFFICE,0,0,0,-,IT Devices,Ready to deploy,2024-11-11
+Access Point,,UAP AC Pro,Ubiquiti,-,74:83:C2:20:F5:CE,IT-250-T-00087,HEAD OFFICE,0,0,0,-,IT Devices,Ready to deploy,2021-08-03
+Access Point,,UAP AC Pro,Ubiquiti,-,68:D7:9A:DC:A1:4A,IT-250-T-00088,HEAD OFFICE,0,0,0,-,IT Devices,Ready to deploy,2021-10-04
+Access Point,,UAP AC M,Ubiquiti,-,D8:B3:70:B6:4A:C3,IT-250-T-00089,HEAD OFFICE,0,0,0,-,IT Devices,Ready to deploy,2024-03-19
+Raspberry,RASP-GREATDAY,Raspberry Pi 4 Model B Rev 1.4,RASPBERRY,-,1000000034A8536F,IT-250-T-00093,HEAD OFFICE,4,8 GB,64 GB,Ubuntu Server,IT Devices,Ready to deploy,2023-01-17
+Raspberry,GH-CONTROLLER,Raspberry Pi 4 Model B Rev 1.5,RASPBERRY,-,1.00E+15,IT-250-T-00094,HEAD OFFICE,4,8 GB,64 GB,Ubuntu Server,IT Devices,Ready to deploy,2023-01-17
+Weight Scale,IDTRD051,SGW-3015PS,GSC,-,C09061,IT-250-T-00095,PAKUSARI,,,,-,IT Devices,Ready to deploy,2024-03-06
+DVR,-,DVR-216Q-K2,HiLook,-,DVR-216Q-K21620190801CCWRD46106758WCVU,IT-250-T-00097,PAKUSARI,,0 GB,0 GB,Embedded Linux,IT Devices,Ready to deploy,2024-02-07
+UPS Server,UPS 3KVA,SMT3000IC,APC,-,AS2025163593,IT-250-T-00098,PAKUSARI,,,,-,IT Devices,Ready to deploy,2020-10-28
+Proyektor,Proyektor Epson EB-X500,EB-X500,Epson,-,X8983100271,IT-250-T-00099,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2023-11-20
+Weight Scale,IDTRD070,SGW-3015S,GSC,-,C11484,IT-250-T-00100,PAKUSARI,,,,-,IT Devices,Ready to deploy,2024-03-06
+ViConf,Vicon Group System,V-U0038,Logitech,-,2027LZ550MS8,IT-250-T-00108,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2020-09-02
+Proyektor,Proyektor Epson EB-X450,EB-X450,Epson,-,TR/HO/0214/20,IT-250-T-00109,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2021-05-04
+Raspberry,GUNA-CONTROLLER,Raspberry Pi 4 Model B Rev 1.4,RASPBERRY,-,10000000BF75E595,IT-250-T-00110,GUNAGRAHA,4,8 GB,128 GB,Ubuntu Server,IT Devices,Ready to deploy,2021-10-24
+ViConf,Vicon Group System,V-U0038,Logitech,-,2130LZ502Y08,IT-250-T-00111,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2023-11-21
+Proyektor,Proyektor Sony,0,Sony,-,,IT-250-T-00112,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2021-09-16
+Mesin Finger,TRGG-Staff,X107,Solution,-,A3AG193860436,IT-250-T-00113,GUNAGRAHA,,,,-,IT Devices,Ready to deploy,
+Mesin Finger,TRGG-P1,X601,Solution,-,AEYU203260082,IT-250-T-00114,GUNAGRAHA,,,,-,IT Devices,Ready to deploy,
+Raspberry,MAYA-CONTROLLER,Raspberry Pi 4 Model B Rev 1.4,RASPBERRY,-,100000008D5EC28B,IT-250-T-00126,MAYANG 1,4,8 GB,128 GB,Ubuntu Server,IT Devices,Ready to deploy,2021-10-24
+Raspberry,SUMB-CONTROLLER,Raspberry Pi 4 Model B Rev 1.4,RASPBERRY,-,1000000095684AD8,IT-250-T-00131,GIGA AMBULU,4,8 GB,128 GB,Ubuntu Server,IT Devices,Ready to deploy,2021-10-24
+Raspberry,BUMI-CONTROLLER,Raspberry Pi 4 Model B Rev 1.4,RASPBERRY,-,10000000B83022A9,IT-250-T-00136,BUMI SUBUR,4,8 GB,128 GB,Ubuntu Server,IT Devices,Ready to deploy,2021-10-24
+Raspberry,TRUCUK-CONTROLLER,Raspberry Pi 4 Model B Rev 1.5,RASPBERRY,-,10000000A635269B,IT-250-T-00141,Klaten Gd Manggala,4,8 GB,128 GB,Ubuntu Server,IT Devices,Ready to deploy,2021-10-24
+Raspberry,MAYP-CONTROLLER,Raspberry Pi 4 Model B Rev 1.4,RASPBERRY,-,10000000E4FB52D7,IT-250-T-00142,MAYANG 2,4,8 GB,32 GB,Ubuntu Server,IT Devices,Ready to deploy,2021-10-24
+DVR,-,iDS-7232HQHI-M2 / S,HIKVISION,-,IDS-7232HQHI-M2 / S3220230819CCWRAF1565318WCVU,IT-250-T-00189,HEAD OFFICE,,0 GB,4000 GB,Embedded Linux,IT Devices,Ready to deploy,2024-11-18
+UPS Server,UPS 1 10KVA,SRT10KXLI,APC,-,AS2208174071,IT-250-T-00191,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2022-08-02
+UPS Server,UPS 2 10KVA,SRT10KXLI,APC,-,AS2234270024,IT-250-T-00192,HEAD OFFICE,,,,-,IT Devices,Ready to deploy,2022-07-08
+DVR,-,iDS-7232HQHI-M2 / S,HIKVISION,-,IDS-7232HQHI-M2 / S3220221019CCWRK72228877WCVU,IT-250-T-00228,GUNAGRAHA,,0 GB,4000 GB,Embedded Linux,IT Devices,Ready to deploy,2023-05-23
+UPS Server,UPS 3KVA,SMT3000IC,APC,-,AS2025363534,IT-250-T-00232,GUNAGRAHA,,,,-,IT Devices,Ready to deploy,2020-10-28
+Proyektor,Proyektor BENQ XGA,XGA,BENQ,-,PDH8M01252000,IT-250-T-00236,GUNAGRAHA,,,,-,IT Devices,Ready to deploy,2022-07-20
+Checkpoint,INDO-MAYP-FW1,1550 Appliance,CHECKPOINT,-,00:1C:7F:97:14:7E,IT-250-T-00254,MAYANG 2,4,2 GB,"1,2 GB",OS GAIA,IT Devices,Ready to deploy,2020-06-01
+UPS Server,UPS 3KVA,Smart-UPS 3000,APC,-,AS2025363526,IT-250-T-00262,MAYANG 2,,,,-,IT Devices,Ready to deploy,2020-10-28
+DVR,-,DS-7216HUHI,HIKVISION,-,DS-7216HUHI-K21620210825CCWRG31948802WCVU,IT-250-T-00264,MAYANG 2,,0,0,Embedded Linux,IT Devices,Ready to deploy,2022-03-10
+DVR,-,DS-7216HQHI,HIKVISION,-,DS-7216HQHI-K21620180525CCWRC24749432WCVU,IT-250-T-00267,MAYANG 1,,0,0,Embedded Linux,IT Devices,Ready to deploy,2024-11-18
+UPS Server,UPS 3KVA,Liebert GXT MT+ CX,Vertiv,-,GXT-3000MTPLUSC230,IT-250-T-00269,MAYANG 1,,,,-,IT Devices,Ready to deploy,2024-04-01
+Proyektor,Proyektor Microvision,MX360,Microvision,-,FMX3600130292,IT-250-T-00270,MAYANG 1,,,,-,IT Devices,Ready to deploy,2021-09-16
+Checkpoint,INDO-MAYA-FW1,1550 Appliance,CHECKPOINT,-,00:1C:7F:97:11:3C,IT-250-T-00271,MAYANG 1,4,2 GB,"1,2 GB",OS GAIA,IT Devices,Ready to deploy,2020-06-01
+Checkpoint,INDO-KALI-FW1,1590 Appliance,CHECKPOINT,-,00:1C:7F:97:04:4A,IT-250-T-00273,KALISAT,4,2 GB,12 GB,OS GAIA,IT Devices,Ready to deploy,2020-06-01
+Checkpoint,INDO-BALU-FW1,1590 Appliance,CHECKPOINT,-,00:1C:7F:97:02:91,IT-250-T-00274,BALUNG,4,2 GB,12 GB,OS GAIA,IT Devices,Ready to deploy,2020-06-01
+UPS Server,UPS 3KVA,SMART-UPS 3000,APC,-,AS2025162567,IT-250-T-00293,KALISAT,,,,-,IT Devices,Ready to deploy,2020-09-01
+DVR,-,iDS-7232HQHI-M2 / S,HIKVISION,-,IDS-7232HQHI-M2 / S3220221018CCWRK72219466WCVU,IT-250-T-00294,KALISAT,,0 GB,8000 GB,Embedded Linux,IT Devices,Ready to deploy,2022-12-22
+UPS Server,UPS 3KVA,Smart UPS 3000,APC,-,AS2032163521,IT-250-T-00308,BALUNG,,,,-,IT Devices,Ready to deploy,2020-09-01
+DVR,-,DVR-216Q-K2,Hilook,-,DVR-216Q-K21620190801CCWRD46106760WCVU,IT-250-T-00309,BALUNG,,0 GB,4000 GB,Embedded Linux,IT Devices,Ready to deploy,2024-02-07
+GPS,TRGPS03,GPSMAP 65s,GARMIN,-,6VP018404,IT-250-T-00314,BALUNG,,0,0,-,IT Devices,Ready to deploy,2024-10-29
+GPS,TRGPS08,GPSMAP 65s,GARMIN,-,6VP018291,IT-250-T-00315,BALUNG,,0,0,-,IT Devices,Ready to deploy,2024-10-29
+GPS,TRGPS09,GPSMAP 65s,GARMIN,-,6VP018417,IT-250-T-00316,BALUNG,,0,0,-,IT Devices,Ready to deploy,2024-10-29
+GPS,TRGPS02,GPSMAP 65s,GARMIN,-,6VP018295,IT-250-T-00317,BALUNG,,0,0,-,IT Devices,Ready to deploy,2024-10-29
+GPS,TRGPS04,GPSMAP 65s,GARMIN,-,6VP018341,IT-250-T-00318,BALUNG,,0,0,-,IT Devices,Ready to deploy,2024-10-29
+GPS,TRGPS05,GPSMAP 65s,GARMIN,-,6VP018350,IT-250-T-00319,BALUNG,,0,0,-,IT Devices,Ready to deploy,2024-10-29
+GPS,TRGPS07,GPSMAP 65s,GARMIN,-,6VP018406,IT-250-T-00320,BALUNG,,0,0,-,IT Devices,Ready to deploy,2024-10-29
+GPS,TRGPS06,GPSMAP 65s,GARMIN,-,6VP018290,IT-250-T-00321,BALUNG,,0,0,-,IT Devices,Ready to deploy,2024-10-29
+GPS,TRGPS01,GPSMAP 65s,GARMIN,-,6VP018293,IT-250-T-00322,BALUNG,,0,0,-,IT Devices,Ready to deploy,2024-10-29
+UPS Server,UPS 3KVA,UPS SMART 3000,APC,-,AS2032163511,IT-250-T-00323,BUMI SUBUR,,,,-,IT Devices,Ready to deploy,2020-09-01
+DVR,-,iDS-7232HQHI-M2 / S,HIKVISION,-,IDS-7232HQHI-M2 / S3220230726CCWRAE1242385WCVU,IT-250-T-00330,LANGKAP,,0,8000 GB,Embedded Linux,IT Devices,Ready to deploy,2025-03-19
+UPS Server,UPS 3KVA,Smart-UPS 3000,APC,-,AS20232163519,IT-250-T-00341,GIGA AMBULU,,,,-,IT Devices,Ready to deploy,2020-09-01
+DVR,-,iDS-7232HQHI-M2 / S,HIKVISION,-,IDS-7232HQHI-M2 / S3220231119CCWRAW7638922WCVU,IT-250-T-00342,GIGA AMBULU,,0,8000 GB,Embedded Linux,IT Devices,Ready to deploy,2024-08-14
+Checkpoint,INDO-SUMB-FW1,1550 Appliance,CHECKPOINT,-,00:1C:7F:97:11:42,IT-250-T-00343,GIGA AMBULU,,0 GB,0 GB,OS GAIA,IT Devices,Ready to deploy,2020-06-01
+Proyektor,Proyektor Benq,MX550,Benq,-,PDZ8M02065000,IT-250-T-00355,GIGA AMBULU,,,,-,IT Devices,Ready to deploy,2022-07-20
+ViConf,Vicon Group System,V-U0036,Logitech,-,2334LZ51Q158,IT-250-T-00362,KALISAT,,,,-,IT Devices,Ready to deploy,2024-02-07
+DVR,-,DVR-216G-M1,HiLook,-,DVR-216G-M11620230629CCWRAD2055858WCVU,IT-250-T-00373,BUMI SUBUR,,0,4000 GB,Embedded Linux,IT Devices,Ready to deploy,2024-02-07
+Checkpoint,INDO-BUMI-FW1,1590 Appliance,CHECKPOINT,-,00:1C:7F:97:02:BE,IT-250-T-00380,BUMI SUBUR,,0,0,OS GAIA,IT Devices,Ready to deploy,2020-06-01
+Checkpoint,INDO-LANG-FW1,1550 Appliance,CHECKPOINT,-,00:1C:7F:97:11:92,IT-250-T-00381,LANGKAP,,0,0,OS GAIA,IT Devices,Ready to deploy,2020-06-01
+Checkpoint,INDO-PAKU-FW1,9100 Appliance,CHECKPOINT,-,2415BA1144,IT-250-T-00382,HEAD OFFICE,8,32 GB,32 GB,OS GAIA,IT Devices,Ready to deploy,2024-05-28
+Checkpoint,INDO-PAKU-FW2,9100 Appliance,CHECKPOINT,-,2411BA8532,IT-250-T-00383,HEAD OFFICE,8,32 GB,32 GB,OS GAIA,IT Devices,Ready to deploy,2024-05-28
+Checkpoint,INDO-TRUC-FW1,1550 Appliance,CHECKPOINT,-,00:1C:7F:97:0D:E8,IT-250-T-00384,Klaten Gd Manggala,,0,0,OS GAIA,IT Devices,Ready to deploy,2020-06-01
+Proyektor,Proyektor Epson EB-X500,EB-X500,Epson,-,X89B3100927,IT-250-T-00397,BALUNG,,,,0,IT Devices,Ready to deploy,2023-11-20
+Proyektor,Proyektor Epson EB-X500,EB-X500,Epson,-,,IT-250-T-00398,KALISAT,,,,-,IT Devices,Ready to deploy,2023-03-07
+Proyektor,Proyektor Epson EB-X500,EB-X500,Epson,-,X89B3900853,IT-250-T-00399,KALISAT,,,,-,IT Devices,Ready to deploy,2023-06-06
+Proyektor,Proyektor Epson EB-E01,EB-E01,Epson,-,X88V3X00419,IT-250-T-00400,KALISAT,,,,-,IT Devices,Ready to deploy,2021-05-04
+GPS,TRGPS10,GPSMAP 65s,GARMIN,-,6VP018287,IT-250-T-00402,KALISAT,,0,0,-,IT Devices,Ready to deploy,2024-10-29

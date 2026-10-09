@@ -10,28 +10,28 @@ class StatuslabelSeeder extends Seeder
 {
     public function run()
     {
-        Statuslabel::truncate();
-
         $admin = User::where('permissions->superuser', '1')->first() ?? User::factory()->firstAdmin()->create();
 
-        Statuslabel::factory()->rtd()->create([
-            'name' => 'Ready to Deploy',
-            'created_by' => $admin->id,
-        ]);
+        $statuses = [
+            ['name' => 'Ready to Deploy', 'factory' => 'rtd'],
+            ['name' => 'Pending', 'factory' => 'pending'],
+            ['name' => 'Archived', 'factory' => 'archived'],
+            ['name' => 'Out for Diagnostics', 'factory' => 'outForDiagnostics'],
+            ['name' => 'Out for Repair', 'factory' => 'outForRepair'],
+            ['name' => 'Broken - Not Fixable', 'factory' => 'broken'],
+            ['name' => 'Lost/Stolen', 'factory' => 'lost'],
+        ];
 
-        Statuslabel::factory()->pending()->create([
-            'name' => 'Pending',
-            'created_by' => $admin->id,
-        ]);
+        foreach ($statuses as $status) {
+            if (Statuslabel::query()->where('name', $status['name'])->exists()) {
+                continue;
+            }
 
-        Statuslabel::factory()->archived()->create([
-            'name' => 'Archived',
-            'created_by' => $admin->id,
-        ]);
-
-        Statuslabel::factory()->outForDiagnostics()->create(['created_by' => $admin->id]);
-        Statuslabel::factory()->outForRepair()->create(['created_by' => $admin->id]);
-        Statuslabel::factory()->broken()->create(['created_by' => $admin->id]);
-        Statuslabel::factory()->lost()->create(['created_by' => $admin->id]);
+            $factory = Statuslabel::factory();
+            $factory->{$status['factory']}()->create([
+                'name' => $status['name'],
+                'created_by' => $admin->id,
+            ]);
+        }
     }
 }
