@@ -112,14 +112,14 @@ class AssetPresenter extends Presenter
                 'field' => 'rtd_location',
                 'searchable' => true,
                 'sortable' => true,
-                'title' => trans('admin/hardware/form.source_location'),
-                'visible' => true,
+                'title' => trans('admin/hardware/form.default_location'),
+                'visible' => false,
                 'formatter' => 'deployedLocationFormatter',
             ], [
                 'field' => 'location',
                 'searchable' => true,
                 'sortable' => true,
-                'title' => trans('admin/hardware/form.current_location'),
+                'title' => trans('admin/hardware/table.location'),
                 'visible' => true,
                 'formatter' => 'deployedLocationFormatter',
             ], [
@@ -445,20 +445,7 @@ class AssetPresenter extends Presenter
      */
     public function imageUrl()
     {
-        $imagePath = '';
-        if ($this->image && ! empty($this->image)) {
-            $imagePath = $this->image;
-            $imageAlt = $this->name;
-        } elseif ($this->model && ! empty($this->model->image)) {
-            $imagePath = $this->model->image;
-            $imageAlt = $this->model->name;
-        }
-        $url = config('app.url');
-        if (! empty($imagePath)) {
-            $imagePath = '<img src="'.$url.'/uploads/assets/'.$imagePath.' height="50" width="50" alt="'.$imageAlt.'">';
-        }
-
-        return $imagePath;
+        return '<img src="'.e($this->getImageUrl()).'" height="50" width="50" alt="'.e($this->name).'">';
     }
 
     /**
@@ -467,17 +454,7 @@ class AssetPresenter extends Presenter
      */
     public function imageSrc()
     {
-        $imagePath = '';
-        if ($this->image && ! empty($this->image)) {
-            $imagePath = $this->image;
-        } elseif ($this->model && ! empty($this->model->image)) {
-            $imagePath = $this->model->image;
-        }
-        if (! empty($imagePath)) {
-            return config('app.url').'/uploads/assets/'.$imagePath;
-        }
-
-        return $imagePath;
+        return $this->getImageUrl();
     }
 
     /**

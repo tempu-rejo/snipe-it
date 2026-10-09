@@ -12,7 +12,7 @@
     </div>
     <div class="form-group">
         <div class="col-md-9 col-md-offset-3">
-            <img src="{{ Storage::disk('public')->url($image_path.e($item->{($fieldname ?? 'image')})) }}" class="img-responsive">
+            <img src="{{ str_starts_with($item->{($fieldname ?? 'image')}, 'img/') ? asset($item->{($fieldname ?? 'image')}) : Storage::disk('public')->url($image_path.e($item->{($fieldname ?? 'image')})) }}" class="img-responsive">
             {!! $errors->first('image_delete', '<span class="alert-msg">:message</span>') !!}
         </div>
     </div>
@@ -35,9 +35,10 @@
             <i class="fas fa-camera"></i> {{ trans('button.camera') ?? 'Kamera' }}
         </button> --}}
         
-        <button type="button" class="btn btn-success" onclick="openWindowsCamera()">
-            <i class="fas fa-camera-retro"></i> Windows Camera
+        <button type="button" class="btn btn-success" onclick="openCamera()">
+            <i class="fas fa-camera-retro"></i> Browser Camera
         </button>
+        <input type="hidden" name="camera_capture" id="camera_capture" value="0">
         
         <!-- <button type="button" class="btn btn-primary" onclick="showCameraAlternatives()">
             <i class="fas fa-mobile-alt"></i> Alternatif Kamera
@@ -541,6 +542,10 @@
 let stream = null;
 let capturedImageBlob = null;
 
+document.querySelector('.js-uploadFile')?.addEventListener('change', function () {
+    document.getElementById('camera_capture').value = '0';
+});
+
 // Variable untuk test camera stream
 let testStream = null;
 
@@ -921,6 +926,7 @@ document.getElementById('usePhotoBtn').addEventListener('click', function() {
         // Set the file to the file input
         const fileInput = document.getElementById('uploadFile');
         fileInput.files = dataTransfer.files;
+        document.getElementById('camera_capture').value = '1';
         
         // Trigger change event to update preview
         const event = new Event('change', { bubbles: true });
@@ -1609,79 +1615,21 @@ function hideQRCode() {
 function generateQRCode() {
     const canvas = document.getElementById('qrCanvas');
     
-    // Create a mobile upload URL (you would need to implement the actual endpoint)
     const currentUrl = window.location.href;
     const mobileUploadUrl = currentUrl.replace(/\/[^\/]*$/, '') + '/mobile-upload?session=' + Date.now();
-    
-    // Check if QRCode library is loaded
-    if (typeof QRCode !== 'undefined') {
-        QRCode.toCanvas(canvas, mobileUploadUrl, {
-            width: 256,
-            margin: 2,
-            color: {
-                dark: '#000000',
-                light: '#FFFFFF'
-            }
-        }, function (error) {
-            if (error) {
-                console.error('QR Code generation failed:', error);
-                // Fallback to placeholder
-                generatePlaceholderQRCode();
-            } else {
-                console.log('Real QR Code generated successfully');
-                console.log('Mobile upload URL:', mobileUploadUrl);
-            }
-        });
-    } else {
-        console.warn('QRCode library not loaded, using placeholder');
-        generatePlaceholderQRCode();
-    }
-}
+    const qrImage = new Image();
+    const qrEndpoint = @json(route('qr-code'));
 
-// Fallback QR code placeholder
-function generatePlaceholderQRCode() {
-    const canvas = document.getElementById('qrCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    // Clear canvas
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, 256, 256);
-    
-    // Draw simple QR pattern placeholder
-    ctx.fillStyle = '#000000';
-    
-    // Corner markers
-    drawQRCorner(ctx, 20, 20);
-    drawQRCorner(ctx, 180, 20);
-    drawQRCorner(ctx, 20, 180);
-    
-    // Random pattern for demo
-    for (let i = 60; i < 196; i += 8) {
-        for (let j = 60; j < 196; j += 8) {
-            if (Math.random() > 0.5) {
-                ctx.fillRect(i, j, 8, 8);
-            }
-        }
-    }
-    
-    // Add text overlay
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.fillRect(80, 115, 96, 26);
-    ctx.fillStyle = '#FF0000';
-    ctx.font = 'bold 12px Arial';
-    ctx.fillText('DEMO QR', 110, 132);
-    
-    console.log('QR Code placeholder generated');
-}
-
-// Helper function to draw QR corner markers
-function drawQRCorner(ctx, x, y) {
-    // Outer border
-    ctx.fillRect(x, y, 56, 56);
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(x + 8, y + 8, 40, 40);
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(x + 16, y + 16, 24, 24);
+    qrImage.onload = function () {
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(qrImage, 0, 0, canvas.width, canvas.height);
+    };
+    qrImage.onerror = function () {
+        console.error('QR Code generation failed.');
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    };
+    qrImage.src = qrEndpoint + '?data=' + encodeURIComponent(mobileUploadUrl);
 }
 
 // Fungsi untuk membuka aplikasi kamera eksternal
@@ -2632,4 +2580,3 @@ function autoFixCameraIssues() {
     });
 }
 </script>
-

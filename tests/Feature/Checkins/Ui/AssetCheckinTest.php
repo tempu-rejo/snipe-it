@@ -53,7 +53,7 @@ class AssetCheckinTest extends TestCase
 
         $user = User::factory()->create();
         $location = Location::factory()->create();
-        $status = Statuslabel::first() ?? Statuslabel::factory()->create();
+        $status = Statuslabel::factory()->create(['name' => 'Check-in selected status']);
         $asset = Asset::factory()->assignedToUser($user)->create([
             'expected_checkin' => now()->addDay(),
             'last_checkin' => null,

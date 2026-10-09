@@ -648,13 +648,23 @@ class Asset extends Depreciable
      */
     public function getImageUrl()
     {
-        if ($this->image && ! empty($this->image)) {
-            return Storage::disk('public')->url(app('assets_upload_path').e($this->image));
-        } elseif ($this->model && ! empty($this->model->image)) {
+        if (! empty($this->image)) {
+            if (str_starts_with($this->image, 'img/')) {
+                if (is_file(public_path($this->image))) {
+                    return asset($this->image);
+                }
+            } elseif (Storage::disk('public')->exists(app('assets_upload_path').$this->image)) {
+                return Storage::disk('public')->url(app('assets_upload_path').e($this->image));
+            }
+        }
+
+        if ($this->model && ! empty($this->model->image)
+            && Storage::disk('public')->exists(app('models_upload_path').$this->model->image)
+        ) {
             return Storage::disk('public')->url(app('models_upload_path').e($this->model->image));
         }
 
-        return false;
+        return asset('img/asset-no-image.svg');
     }
 
 

@@ -16,16 +16,19 @@
 
                                 <table
                                         data-columns="{{ \App\Presenters\AssetPresenter::dataTableLayout() }}"
-                                        data-cookie-id-table="assetsListingTable"
+                                        data-cookie-id-table="assetsListingTable-status-standard-v3-{{ $statuslabel->id }}"
                                         data-pagination="true"
-                                        data-id-table="assetsListingTable"
+                                        data-id-table="assetsListingTable-status-standard-v3-{{ $statuslabel->id }}"
+                                        data-advanced-search="true"
                                         data-search="true"
                                         data-side-pagination="server"
                                         data-show-columns="true"
+                                        data-show-footer="true"
                                         data-show-fullscreen="true"
                                         data-show-export="true"
                                         data-show-refresh="true"
                                         data-sort-order="asc"
+                                        data-sort-name="name"
                                         data-toolbar="#assetsBulkEditToolbar"
                                         data-bulk-button-id="#bulkAssetEditButton"
                                         data-bulk-form-id="#assetsBulkForm"
@@ -47,6 +50,14 @@
 @stop
 
 @section('moar_scripts')
+    <script src="{{ asset('js/category-image-fallback.js') }}"></script>
+    <script src="{{ asset('js/asset-formatters.js') }}"></script>
+
+    <script>
+        window.App = window.App || {};
+        window.App.baseUrl = '{{ asset('') }}';
+    </script>
+
     @include ('partials.bootstrap-table', [
         'exportFile' => 'assets-export',
         'search' => true,

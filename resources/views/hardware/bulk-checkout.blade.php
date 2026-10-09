@@ -24,7 +24,7 @@
         <h2 class="box-title"> {{ trans('admin/hardware/form.tag') }} </h2>
       </div>
       <div class="box-body">
-        <form class="form-horizontal" method="post" action="" autocomplete="off">
+        <form class="form-horizontal" method="post" action="" enctype="multipart/form-data" autocomplete="off">
           {{ csrf_field() }}
 
             @include ('partials.forms.edit.asset-select', [
@@ -84,6 +84,14 @@
             <div class="col-md-8">
               <textarea class="col-md-6 form-control" id="note" name="note">{{ old('note') }}</textarea>
               {!! $errors->first('note', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
+            </div>
+
+            <div class="form-group {{ $errors->has('file.*') ? 'has-error' : '' }}">
+              <label for="file" class="col-sm-3 control-label">Files</label>
+              <div class="col-md-8">
+                <input type="file" name="file[]" id="file" multiple class="form-control">
+                {!! $errors->first('file.*', '<span class="alert-msg">:message</span>') !!}
+              </div>
             </div>
           </div>
 

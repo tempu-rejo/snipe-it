@@ -5,9 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\AssetMaintenance;
 use App\Models\Company;
+use App\Models\Statuslabel;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Helpers\Helper;
+use App\Http\Traits\HandlesTransactionUploads;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use \Illuminate\Contracts\View\View;
 use \Illuminate\Http\RedirectResponse;
 
@@ -19,6 +25,28 @@ use \Illuminate\Http\RedirectResponse;
  */
 class AssetMaintenancesController extends Controller
 {
+    use HandlesTransactionUploads;
+
+    private const REPAIR_STATUS_NAMES = [
+        'in repair – it',
+        'in repair – vendor',
+    ];
+
+    private function repairStatusLabels(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Statuslabel::query()
+            ->whereRaw('LOWER(name) IN (?, ?)', self::REPAIR_STATUS_NAMES)
+            ->orderBy('name')
+            ->get();
+    }
+
+    private function maintenanceTypeOptions(): array
+    {
+        return $this->repairStatusLabels()
+            ->mapWithKeys(fn (Statuslabel $status) => [$status->name => $status->name])
+            ->all();
+    }
+
     /**
     * Checks for permissions for this action.
     *
@@ -71,7 +99,7 @@ class AssetMaintenancesController extends Controller
         // Prepare Asset Maintenance Type List
         $assetMaintenanceType = [
                                     '' => 'Select an asset maintenance type',
-                                ] + AssetMaintenance::getImprovementOptions();
+                                ] + $this->maintenanceTypeOptions();
         // Mark the selected asset, if it came in
 
         return view('asset_maintenances/edit')
@@ -91,6 +119,15 @@ class AssetMaintenancesController extends Controller
     public function store(Request $request) : RedirectResponse
     {
         $this->authorize('update', Asset::class);
+        $maintenanceTypeOptions = array_values($this->maintenanceTypeOptions());
+        $request->validate([
+            'asset_maintenance_type' => ['required', 'string', Rule::in($maintenanceTypeOptions)],
+            'file.*' => 'required|mimes:png,gif,jpg,svg,jpeg,doc,docx,pdf,txt,zip,rar,xls,xlsx,lic,xml,rtf,json,webp,avif|max:'.Helper::file_upload_max_size(),
+        ]);
+        $selectedMaintenanceType = mb_strtolower($request->input('asset_maintenance_type'));
+        $repairStatus = $this->repairStatusLabels()->first(
+            fn (Statuslabel $status) => mb_strtolower($status->name) === $selectedMaintenanceType
+        );
         $asset_ids = (array) $request->input('asset_id');
         $created = 0;
         $failed = [];
@@ -98,7 +135,13 @@ class AssetMaintenancesController extends Controller
 
         foreach ($asset_ids as $asset_id) {
             $asset = Asset::find($asset_id);
-            if ((! Company::isCurrentUserHasAccess($asset)) && ($asset != null)) {
+            if ($asset === null) {
+                $failed[] = $asset_id;
+                $errorDetails[] = 'Asset tidak ditemukan untuk ID: '.$asset_id;
+                continue;
+            }
+
+            if (! Company::isCurrentUserHasAccess($asset)) {
                 $failed[] = $asset_id;
                 $errorDetails[] = 'Tidak punya akses ke asset ID: '.$asset_id;
                 continue;
@@ -125,7 +168,23 @@ class AssetMaintenancesController extends Controller
                 $assetMaintenance->asset_maintenance_time = (int) $completionDate->diffInDays($startDate, true);
             }
 
-            if ($assetMaintenance->save()) {
+            $saved = DB::transaction(function () use ($assetMaintenance, $asset, $repairStatus) {
+                if (! $assetMaintenance->save()) {
+                    return false;
+                }
+
+                if ($repairStatus !== null) {
+                    $asset->status_id = $repairStatus->id;
+                    if (! $asset->save()) {
+                        throw ValidationException::withMessages($asset->getErrors()->toArray());
+                    }
+                }
+
+                return true;
+            });
+
+            if ($saved) {
+                $this->uploadTransactionFiles($asset, $request, 'Maintenance: '.$assetMaintenance->title);
                 $created++;
             } else {
                 $failed[] = $asset_id;
@@ -170,7 +229,7 @@ class AssetMaintenancesController extends Controller
         }
 
         // Prepare Improvement Type List
-        $assetMaintenanceType = ['' => 'Select an improvement type'] + AssetMaintenance::getImprovementOptions();
+        $assetMaintenanceType = ['' => 'Select an improvement type'] + $this->maintenanceTypeOptions();
 
         return view('asset_maintenances/edit')
                    ->with('selectedAsset', null)
@@ -191,6 +250,9 @@ class AssetMaintenancesController extends Controller
     public function update(Request $request, AssetMaintenance $maintenance) : View | RedirectResponse
     {
         $this->authorize('update', Asset::class);
+        $request->validate([
+            'file.*' => 'required|mimes:png,gif,jpg,svg,jpeg,doc,docx,pdf,txt,zip,rar,xls,xlsx,lic,xml,rtf,json,webp,avif|max:'.Helper::file_upload_max_size(),
+        ]);
 
        if ((!$maintenance->asset) || ($maintenance->asset->deleted_at!='')) {
                 return redirect()->route('maintenances.index')->with('error', 'asset does not exist');
@@ -236,6 +298,7 @@ class AssetMaintenancesController extends Controller
 
       // Was the asset maintenance created?
         if ($maintenance->save()) {
+            $this->uploadTransactionFiles($maintenance->asset, $request, 'Maintenance: '.$maintenance->title);
 
             // Redirect to the new asset maintenance page
             return redirect()->route('maintenances.index')

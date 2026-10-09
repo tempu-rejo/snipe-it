@@ -19,7 +19,7 @@
 
 
     <div class="row">
-    <form method="POST" action="{{ route('hardware/quickscancheckin') }}" accept-charset="UTF-8" class="form-horizontal" role="form" id="checkin-form">
+    <form method="POST" action="{{ route('hardware/quickscancheckin') }}" enctype="multipart/form-data" accept-charset="UTF-8" class="form-horizontal" role="form" id="checkin-form">
         <!-- left column -->
         <div class="col-md-6">
             <div class="box box-default">
@@ -51,6 +51,7 @@
                                 name="status_id"
                                 id="status_id"
                                 :options="$statusLabel_list"
+                                :selected="old('status_id')"
                                 style="width:100%"
                                 aria-label="status_id"
                             />
@@ -68,6 +69,14 @@
                                 <textarea class="col-md-6 form-control" id="note" name="note">{{ old('note') }}</textarea>
                                 {!! $errors->first('note', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
                             </div>
+
+                    <div class="form-group {{ $errors->has('file.*') ? 'has-error' : '' }}">
+                            <label for="file" class="col-md-3 control-label">Files</label>
+                            <div class="col-md-8">
+                                <input type="file" name="file[]" id="file" multiple class="form-control">
+                                {!! $errors->first('file.*', '<span class="alert-msg">:message</span>') !!}
+                            </div>
+                    </div>
                         </div>
 
 
@@ -132,7 +141,7 @@
             event.preventDefault();
 
             var form = $("#checkin-form").get(0);
-            var formData = $('#checkin-form').serializeArray();
+            var formData = new FormData(form);
 
             $.ajax({
                 url: "{{ route('api.asset.checkinbytag') }}",
@@ -143,6 +152,8 @@
                 },
                 dataType : 'json',
                 data : formData,
+                processData: false,
+                contentType: false,
                 success : function (data) {
                     if (data.status == 'success') {
                         $('#checkedin tbody').prepend("<tr class='success'><td>" + data.payload.asset_tag + "</td><td>" + data.payload.model + "</td><td>" + data.payload.model_number + "</td><td>" + data.messages + "</td><td><i class='fas fa-check text-success'></i></td></tr>");

@@ -420,6 +420,18 @@ class StatuslabelsController extends Controller
             $statuslabels->use_text = $statuslabel->name;
         }
 
-        return (new SelectlistTransformer)->transformSelectlist($statuslabels);
+        // Add virtual "Deployed" status option at the beginning
+        $result = (new SelectlistTransformer)->transformSelectlist($statuslabels);
+        
+        // Prepend Deployed option to the results array
+        if (isset($result['results']) && is_array($result['results'])) {
+            array_unshift($result['results'], [
+                'id' => 'deployed',
+                'text' => 'Deployed'
+            ]);
+            $result['total_count']++;
+        }
+
+        return $result;
     }
 }

@@ -25,10 +25,13 @@ use App\Http\Controllers\StatuslabelsController;
 use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\ViewAssetsController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\QrCodeController;
 use App\Livewire\Importer;
 use App\Models\ReportTemplate;
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
+
+Route::get('qr-code', QrCodeController::class)->name('qr-code');
 
 Route::group(['middleware' => 'auth'], function () {
     /*
@@ -750,5 +753,4 @@ Route::middleware(['auth'])->get(
     ->breadcrumbs(fn (Trail $trail) =>
     $trail->push('Home', route('home'))
     );
-
 

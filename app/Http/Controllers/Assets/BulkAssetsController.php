@@ -20,10 +20,12 @@ use App\Http\Requests\AssetCheckoutRequest;
 use App\Models\CustomField;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use App\Http\Traits\HandlesTransactionUploads;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BulkAssetsController extends Controller
 {
+    use HandlesTransactionUploads;
     use CheckInOutRequest;
 
     /**
@@ -621,6 +623,8 @@ class BulkAssetsController extends Controller
 
                     if (!$checkout_success) {
                         $errors = array_merge_recursive($errors, $asset->getErrors()->toArray());
+                    } else {
+                        $this->uploadTransactionFiles($asset, $request, 'Bulk checkout: '.$request->input('note', ''));
                     }
                 }
             });

@@ -37,6 +37,7 @@ class AssetCheckoutRequest extends Request
                 'nullable',
                 'date'
             ],
+            'file.*' => 'required|mimes:png,gif,jpg,svg,jpeg,doc,docx,pdf,txt,zip,rar,xls,xlsx,lic,xml,rtf,json,webp,avif|max:'.\App\Helpers\Helper::file_upload_max_size(),
             ];
 
             if($settings->require_checkinout_notes) {

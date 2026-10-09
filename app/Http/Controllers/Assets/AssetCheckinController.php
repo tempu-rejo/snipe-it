@@ -7,6 +7,7 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssetCheckinRequest;
 use App\Http\Traits\MigratesLegacyAssetLocations;
+use App\Http\Traits\HandlesTransactionUploads;
 use App\Models\Asset;
 use App\Models\CheckoutAcceptance;
 use App\Models\LicenseSeat;
@@ -18,6 +19,7 @@ use \Illuminate\Http\RedirectResponse;
 class AssetCheckinController extends Controller
 {
     use MigratesLegacyAssetLocations;
+    use HandlesTransactionUploads;
 
     /**
      * Returns a view that presents a form to check an asset back into inventory.
@@ -86,7 +88,7 @@ class AssetCheckinController extends Controller
         $asset->name = $request->get('name');
 
         if ($request->filled('status_id')) {
-            $asset->status_id = e($request->get('status_id'));
+            $asset->status_id = $request->input('status_id');
         }
 
         // Add any custom fields that should be included in the checkout
@@ -135,6 +137,7 @@ class AssetCheckinController extends Controller
         if ($asset->save()) {
 
             event(new CheckoutableCheckedIn($asset, $target, auth()->user(), $request->input('note'), $checkin_at, $originalValues));
+            $this->uploadTransactionFiles($asset, $request, 'Check-in: '.$request->input('note', ''));
             return redirect()->to(Helper::getRedirectOption($request, $asset->id, 'Assets'))->with('success', trans('admin/hardware/message.checkin.success'));
         }
         // Redirect to the asset management page with error

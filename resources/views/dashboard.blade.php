@@ -9,6 +9,40 @@
 {{-- Page content --}}
 @section('content')
 
+<style>
+    .dashboard-tile-row {
+        display: flex;
+        gap: 15px;
+    }
+
+    .dashboard-tile-row > .dashboard-tile {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 0;
+    }
+
+    .dashboard-tile-row .small-box {
+        margin-bottom: 0;
+        min-height: 110px;
+    }
+
+    @media (max-width: 991px) {
+        .dashboard-tile-row {
+            flex-wrap: wrap;
+        }
+
+        .dashboard-tile-row > .dashboard-tile {
+            flex: 1 1 calc(50% - 8px);
+        }
+    }
+
+    @media (max-width: 575px) {
+        .dashboard-tile-row > .dashboard-tile {
+            flex-basis: 100%;
+        }
+    }
+</style>
+
 @if ($snipeSettings->dashboard_message!='')
 <div class="row">
     <div class="col-md-12">
@@ -26,9 +60,9 @@
 </div>
 @endif
 
-<div class="row">
+<div class="dashboard-tile-row">
   <!-- panel -->
-  <div class="col-lg-2 col-xs-6">
+  <div class="dashboard-tile">
       <a href="{{ route('hardware.index') }}">
     <!-- small box -->
     <div class="dashboard small-box bg-teal">
@@ -46,26 +80,7 @@
       </a>
   </div><!-- ./col -->
 
-  <div class="col-lg-2 col-xs-6">
-     <a href="{{ route('licenses.index') }}">
-    <!-- small box -->
-    <div class="dashboard small-box bg-maroon">
-      <div class="inner">
-        <h3>{{ number_format($counts['license']) }}</h3>
-        <p>{{ trans('general.licenses') }}</p>
-      </div>
-      <div class="icon" aria-hidden="true">
-          <x-icon type="licenses" />
-      </div>
-      <a href="{{ route('licenses.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
-          <x-icon type="arrow-circle-right" />
-      </a>
-    </div>
-     </a>
-  </div><!-- ./col -->
-
-
-  <div class="col-lg-2 col-xs-6">
+  <div class="dashboard-tile">
     <!-- small box -->
       <a href="{{ route('accessories.index') }}">
     <div class="dashboard small-box bg-orange">
@@ -83,7 +98,7 @@
       </a>
   </div><!-- ./col -->
 
-  <div class="col-lg-2 col-xs-6">
+  <div class="dashboard-tile">
     <!-- small box -->
 
       <a href="{{ route('consumables.index') }}">
@@ -101,7 +116,7 @@
     </div>
   </div><!-- ./col -->
 
-  <div class="col-lg-2 col-xs-6">
+  <div class="dashboard-tile">
     <a href="{{ route('components.index') }}">
    <!-- small box -->
    <div class="dashboard small-box bg-yellow">
@@ -119,7 +134,7 @@
     </a>
  </div><!-- ./col -->
 
- <div class="col-lg-2 col-xs-6">
+ <div class="dashboard-tile">
     <a href="{{ route('users.index') }}">
    <!-- small box -->
    <div class="dashboard small-box bg-light-blue">

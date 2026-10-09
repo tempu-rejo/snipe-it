@@ -6,6 +6,7 @@ use App\Events\CheckoutableCheckedIn;
 use App\Http\Requests\StoreAssetRequest;
 use App\Http\Requests\UpdateAssetRequest;
 use App\Http\Traits\MigratesLegacyAssetLocations;
+use App\Http\Traits\HandlesTransactionUploads;
 use App\Models\AccessoryCheckout;
 use App\Models\CheckoutAcceptance;
 use App\Models\LicenseSeat;
@@ -26,6 +27,7 @@ use App\Models\CustomField;
 use App\Models\License;
 use App\Models\Location;
 use App\Models\Setting;
+use App\Models\Statuslabel;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +47,8 @@ use Illuminate\Support\Facades\Storage;
  */
 class AssetsController extends Controller
 {
+    use HandlesTransactionUploads;
+
     use MigratesLegacyAssetLocations;
 
     /**
@@ -419,10 +423,16 @@ class AssetsController extends Controller
 
 
         // Make sure the offset and limit are actually integers and do not exceed system limits
-        $offset = ($request->input('offset') > $assets->count()) ? $assets->count() : app('api_offset_value');
         $limit = app('api_limit_value');
-
         $total = $assets->count();
+        $offset = app('api_offset_value');
+
+        // A persisted Bootstrap Table page can be outside a filtered result set.
+        // Start at the first page instead of returning an empty table.
+        if ($total === 0 || $offset >= $total) {
+            $offset = 0;
+        }
+
         $assets = $assets->skip($offset)->take($limit)->get();
 
 
@@ -972,6 +982,11 @@ class AssetsController extends Controller
      */
     public function checkin(Request $request, $asset_id): JsonResponse
     {
+        $request->validate([
+            'status_id' => 'nullable|integer|exists:status_labels,id',
+            'file.*' => 'required|mimes:png,gif,jpg,svg,jpeg,doc,docx,pdf,txt,zip,rar,xls,xlsx,lic,xml,rtf,json,webp,avif|max:'.Helper::file_upload_max_size(),
+        ]);
+
         $asset = Asset::with('model')->findOrFail($asset_id);
         $this->authorize('checkin', $asset);
 
@@ -1037,6 +1052,7 @@ class AssetsController extends Controller
 
         if ($asset->save()) {
             event(new CheckoutableCheckedIn($asset, $target, auth()->user(), $request->input('note'), $checkin_at, $originalValues));
+            $this->uploadTransactionFiles($asset, $request, 'Quickscan check-in: '.$request->input('note', ''));
 
             return response()->json(Helper::formatStandardApiResponse('success', [
                 'asset_tag' => e($asset->asset_tag),

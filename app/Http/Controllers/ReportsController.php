@@ -144,6 +144,7 @@ class ReportsController extends Controller
             trans('admin/hardware/table.serial'),
             trans('admin/hardware/table.checkoutto'),
             trans('admin/hardware/table.location'),
+            trans('admin/hardware/table.current_location'),
             trans('admin/hardware/table.purchase_date'),
             trans('admin/hardware/table.purchase_cost'),
             trans('admin/hardware/table.book_value'),
@@ -684,7 +685,29 @@ class ReportsController extends Controller
             }
 
             if ($request->filled('by_status_id')) {
-                $assets->whereIn('assets.status_id', $request->input('by_status_id'));
+                $status_ids = $request->input('by_status_id');
+                
+                // Check if 'deployed' is in the array
+                $has_deployed = in_array('deployed', $status_ids);
+                
+                if ($has_deployed) {
+                    // Remove 'deployed' from the array
+                    $status_ids = array_diff($status_ids, ['deployed']);
+                    
+                    // Apply filter using closure to properly group OR conditions
+                    $assets->where(function($query) use ($status_ids) {
+                        // Assets that are checked out (deployed)
+                        $query->whereNotNull('assets.assigned_to');
+                        
+                        // If there are other status IDs, include them with OR
+                        if (!empty($status_ids)) {
+                            $query->orWhereIn('assets.status_id', $status_ids);
+                        }
+                    });
+                } else {
+                    // Regular status filter - no deployed
+                    $assets->whereIn('assets.status_id', $status_ids);
+                }
             }
 
             if (($request->filled('purchase_start')) && ($request->filled('purchase_end'))) {
