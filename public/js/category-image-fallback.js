@@ -3,56 +3,15 @@
  * Handles default images for hardware categories when image fails to load
  */
 
-// Category default images mapping
-const categoryDefaultImages = {
-    'Harddisk': 'https://uitrackin.ultid.com/uploads/accessories/accessory-image--Ki5TZDyrwS.jpg',
-    'Storage Disk': 'https://uitrackin.ultid.com/uploads/accessories/accessory-image--Ki5TZDyrwS.jpg',
-    'ViConf': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1741668846.jpg',
-    'GPS': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1747119928.jpg',
-    'Raspberry': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1742530358.jpg',
-    'Checkpoint': 'https://uitrackin.ultid.com/uploads/assets/asset-image--3WtuuExFmD.jpg',
-    'UPS Server': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1745820756.jpg',
-    'Proyektor': 'https://uitrackin.ultid.com/uploads/assets/asset-image-4623-VF9Vn6ef1R.jpg',
-    'DVR': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1742530956.jpg',
-    'Server': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1742536188.png',
-    'Weight Scale': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1742528190.jpg',
-    'Switch Managed': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1742961430.jpg',
-    'Handphone': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1741576949.jpg',
-    'Tablet': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1742438431.jpg',
-    'Mesin Finger': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1741593252.jpg',
-    'Access Point': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1741837676.jpg',
-    'Monitor/TV': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1741594391.jpg',
-    'PC Desktop': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1742960723.jpg',
-    'Printer': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1741668586.jpg',
-    'Laptop': 'https://uitrackin.ultid.com/uploads/assets/device_image_upload1741658688.jpg'
-};
+const imageBaseUrl = () => (window.App && window.App.baseUrl) || window.location.origin;
 
 /**
- * Get default image URL for category
- * @param {string} categoryName 
+ * Get the shared default image URL.
+ * @param {string} categoryName
  * @returns {string}
  */
 function getDefaultImageForCategory(categoryName) {
-    if (!categoryName) {
-        return window.App.baseUrl + '/uploads/assets/default.png';
-    }
-    
-    // Exact match first
-    if (categoryDefaultImages[categoryName]) {
-        return categoryDefaultImages[categoryName];
-    }
-    
-    // Partial match (case-insensitive)
-    const categoryLower = categoryName.toLowerCase();
-    for (const [category, imageUrl] of Object.entries(categoryDefaultImages)) {
-        if (categoryLower.includes(category.toLowerCase()) || 
-            category.toLowerCase().includes(categoryLower)) {
-            return imageUrl;
-        }
-    }
-    
-    // Fallback to default
-    return window.App.baseUrl + '/uploads/assets/default.png';
+    return imageBaseUrl().replace(/\/+$/, '') + '/img/asset-no-image.svg';
 }
 
 /**
@@ -91,18 +50,16 @@ function handleImageError(img, categoryName) {
         return;
     }
     
-    // Jangan replace jika ini sudah gambar default
     const currentSrc = img.src;
-    const isAlreadyDefault = currentSrc.includes('/uploads/assets/default.png') ||
-                           Object.values(categoryDefaultImages).some(url => currentSrc === url);
-    
+    const isAlreadyDefault = currentSrc.includes('/img/asset-no-image.svg');
+
     if (!isAlreadyDefault) {
         img.dataset.fallbackApplied = 'true';
         img.src = getDefaultImageForCategory(categoryName);
         img.alt = 'Default image for ' + (categoryName || 'unknown category');
         img.dataset.isDefaultImage = 'true';
-        
-        console.log(`Image error for ${img.dataset.originalValue || 'unknown'}, falling back to category default: ${categoryName}`);
+    } else {
+        img.onerror = null;
     }
 }
 
@@ -190,8 +147,7 @@ window.isValidImageUrl = isValidImageUrl;
  */
 window.isDefaultImage = function(img) {
     const currentSrc = img.src;
-    return currentSrc.includes('/uploads/assets/default.png') ||
-           Object.values(categoryDefaultImages).some(url => currentSrc === url) ||
+    return currentSrc.includes('/img/asset-no-image.svg') ||
            img.dataset.isDefaultImage === 'true';
 };
 

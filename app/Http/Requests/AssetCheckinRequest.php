@@ -25,10 +25,15 @@ class AssetCheckinRequest extends Request
 
         $rules = [];
 
+            $rules['status_id'] = 'nullable|integer|exists:status_labels,id';
+
             if($settings->require_checkinout_notes) {
             $rules['note'] = 'string|required';
         }
-        return $rules;
+
+            $rules['file.*'] = 'required|mimes:png,gif,jpg,svg,jpeg,doc,docx,pdf,txt,zip,rar,xls,xlsx,lic,xml,rtf,json,webp,avif|max:'.\App\Helpers\Helper::file_upload_max_size();
+
+            return $rules;
     }
 
     public function response(array $errors)

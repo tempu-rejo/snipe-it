@@ -76,6 +76,23 @@ class AssetCheckinTest extends TestCase
         }, 1);
     }
 
+    public function testAssetCanBeCheckedInByTagWithSelectedStatus()
+    {
+        $user = User::factory()->create();
+        $status = Statuslabel::factory()->create();
+        $asset = Asset::factory()->assignedToUser($user)->create();
+
+        $this->actingAsForApi(User::factory()->checkinAssets()->create())
+            ->postJson(route('api.asset.checkinbytag'), [
+                'asset_tag' => $asset->asset_tag,
+                'status_id' => $status->id,
+            ])
+            ->assertOk()
+            ->assertStatusMessageIs('success');
+
+        $this->assertSame($status->id, $asset->fresh()->status_id);
+    }
+
     public function testLocationIsSetToRTDLocationByDefaultUponCheckin()
     {
         $rtdLocation = Location::factory()->create();

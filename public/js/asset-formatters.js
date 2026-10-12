@@ -11,6 +11,8 @@
  * @returns {string} HTML img tag
  */
 function assetImageFormatter(value, row, index) {
+    row = row || {};
+
     // Ambil kategori dari model.category.name atau fallback
     let categoryName = '';
     if (row.model && row.model.category && row.model.category.name) {
@@ -21,6 +23,14 @@ function assetImageFormatter(value, row, index) {
     
     let imageUrl = value;
     let isDefaultImage = false;
+
+    function escapeAttribute(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
     
     // Fungsi untuk check apakah URL gambar valid
     function isValidImageValue(val) {
@@ -46,14 +56,17 @@ function assetImageFormatter(value, row, index) {
     }
     
     // Generate img tag dengan data-category untuk fallback handler
-    return `<img src="${imageUrl}" 
+    const encodedCategory = encodeURIComponent(categoryName);
+    const originalValue = escapeAttribute(value || '');
+
+    return `<img src="${escapeAttribute(imageUrl)}" 
                  alt="Asset Image" 
                  class="hw-image" 
                  style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" 
-                 data-category="${categoryName}"
+                 data-category="${escapeAttribute(categoryName)}"
                  data-is-default-image="${isDefaultImage}"
-                 data-original-value="${value || ''}"
-                 onerror="handleImageError(this, '${categoryName}')"
+                 data-original-value="${originalValue}"
+                 onerror="handleImageError(this, decodeURIComponent('${encodedCategory}'))"
                  />`;
 }
 

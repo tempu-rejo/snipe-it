@@ -153,14 +153,14 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                     </a>
                                 </li>
                             @endcan
-                            @can('view', \App\Models\License::class)
+                            {{-- @can('view', \App\Models\License::class)
                                 <li aria-hidden="true"{!! (Request::is('licenses*') ? ' class="active"' : '') !!}>
                                     <a href="{{ route('licenses.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=2" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.licenses') }}">
                                         <x-icon type="licenses" class="fa-fw" />
                                         <span class="sr-only">{{ trans('general.licenses') }}</span>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
                             @can('index', \App\Models\Accessory::class)
                                 <li aria-hidden="true"{!! (Request::is('accessories*') ? ' class="active"' : '') !!}>
                                     <a href="{{ route('accessories.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=3" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.accessories') }}">
@@ -224,14 +224,14 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                                 </a>
                                             </li>
                                         @endcan
-                                        @can('create', \App\Models\License::class)
+                                        {{-- @can('create', \App\Models\License::class)
                                             <li{!! (Request::is('licenses/create') ? ' class="active"' : '') !!}>
                                                 <a href="{{ route('licenses.create') }}" tabindex="-1">
                                                     <x-icon type="licenses" />
                                                     {{ trans('general.license') }}
                                                 </a>
                                             </li>
-                                        @endcan
+                                        @endcan --}}
                                         @can('create', \App\Models\Accessory::class)
                                             <li {!! (Request::is('accessories/create') ? 'class="active"' : '') !!}>
                                                 <a href="{{ route('accessories.create') }}" tabindex="-1">
@@ -465,7 +465,41 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         </a>
                                     </li>
 
-                                    <?php $status_navs = \App\Models\Statuslabel::where('show_in_nav', '=', 1)->withCount('assets as asset_count')->get(); ?>
+                                    <li{!! (Request::query('status') == 'RTD' ? ' class="active"' : '') !!}>
+                                        <a href="{{ url('hardware?status=RTD') }}">
+                                            <x-icon type="circle" class="text-green fa-fw" />
+                                            {{ trans('general.ready_to_deploy') }}
+                                            <span class="badge">{{ (isset($total_rtd_sidebar)) ? $total_rtd_sidebar : '' }}</span>
+                                        </a>
+                                    </li>
+                                    <li{!! (Request::query('status') == 'Deployed' ? ' class="active"' : '') !!}>
+                                        <a href="{{ url('hardware?status=Deployed') }}">
+                                            <x-icon type="circle" class="text-blue fa-fw" />
+                                            {{ trans('general.deployed') }}
+                                            <span class="badge">{{ (isset($total_deployed_sidebar)) ? $total_deployed_sidebar : '' }}</span>
+                                        </a>
+                                    </li>
+
+                                    <?php
+                                    $status_navs = \App\Models\Statuslabel::where('show_in_nav', '=', 1)
+                                        ->whereRaw("LOWER(name) NOT IN ('ready to deploy', 'deployed')")
+                                        ->withCount('assets as asset_count')
+                                        ->orderByRaw("CASE LOWER(name)
+                                            WHEN 'new' THEN 1
+                                            WHEN 'staging' THEN 2
+                                            WHEN 'in checking' THEN 3
+                                            WHEN 'in repair – it' THEN 4
+                                            WHEN 'in repair – vendor' THEN 5
+                                            WHEN 'irreparable' THEN 6
+                                            WHEN 'obsolete' THEN 7
+                                            WHEN 'in disposal' THEN 8
+                                            WHEN 'disposed' THEN 9
+                                            WHEN 'lost/stolen' THEN 10
+                                            ELSE 100
+                                        END")
+                                        ->orderBy('name')
+                                        ->get();
+                                    ?>
                                     @if (count($status_navs) > 0)
                                         @foreach ($status_navs as $status_nav)
                                             <li{!! (Request::is('statuslabels/'.$status_nav->id) ? ' class="active"' : '') !!}>
@@ -478,33 +512,19 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                     @endif
 
 
-                                    <li{!! (Request::query('status') == 'Deployed' ? ' class="active"' : '') !!}>
-                                        <a href="{{ url('hardware?status=Deployed') }}">
-                                            <x-icon type="circle" class="text-blue fa-fw" />
-                                            {{ trans('general.deployed') }}
-                                            <span class="badge">{{ (isset($total_deployed_sidebar)) ? $total_deployed_sidebar : '' }}</span>
-                                        </a>
-                                    </li>
-                                    <li{!! (Request::query('status') == 'RTD' ? ' class="active"' : '') !!}>
-                                        <a href="{{ url('hardware?status=RTD') }}">
-                                            <x-icon type="circle" class="text-green fa-fw" />
-                                            {{ trans('general.ready_to_deploy') }}
-                                            <span class="badge">{{ (isset($total_rtd_sidebar)) ? $total_rtd_sidebar : '' }}</span>
-                                        </a>
-                                    </li>
-                                    <li{!! (Request::query('status') == 'Pending' ? ' class="active"' : '') !!}><a href="{{ url('hardware?status=Pending') }}">
+                                    {{-- <li{!! (Request::query('status') == 'Pending' ? ' class="active"' : '') !!}><a href="{{ url('hardware?status=Pending') }}">
                                             <x-icon type="circle" class="text-orange fa-fw" />
                                             {{ trans('general.pending') }}
                                             <span class="badge">{{ (isset($total_pending_sidebar)) ? $total_pending_sidebar : '' }}</span>
                                         </a>
-                                    </li>
-                                    <li{!! (Request::query('status') == 'Undeployable' ? ' class="active"' : '') !!} ><a
+                                    </li> --}}
+                                    {{-- <li{!! (Request::query('status') == 'Undeployable' ? ' class="active"' : '') !!} ><a
                                                 href="{{ url('hardware?status=Undeployable') }}">
                                             <x-icon type="x" class="text-red fa-fw" />
                                             {{ trans('general.undeployable') }}
                                             <span class="badge">{{ (isset($total_undeployable_sidebar)) ? $total_undeployable_sidebar : '' }}</span>
                                         </a>
-                                    </li>
+                                    </li> --}}
                                     {{-- BYOD menu item hidden --}}
                                     {{-- <li{!! (Request::query('status') == 'byod' ? ' class="active"' : '') !!}><a
                                                 href="{{ url('hardware?status=byod') }}">
@@ -513,13 +533,13 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                             <span class="badge">{{ (isset($total_byod_sidebar)) ? $total_byod_sidebar : '' }}</span>
                                         </a>
                                     </li> --}}
-                                    <li{!! (Request::query('status') == 'Archived' ? ' class="active"' : '') !!}><a
+                                    {{-- <li{!! (Request::query('status') == 'Archived' ? ' class="active"' : '') !!}><a
                                                 href="{{ url('hardware?status=Archived') }}">
                                             <x-icon type="x" class="text-red fa-fw" />
                                             {{ trans('admin/hardware/general.archived') }}
                                             <span class="badge">{{ (isset($total_archived_sidebar)) ? $total_archived_sidebar : '' }}</span>
                                         </a>
-                                    </li>
+                                    </li> --}}
                                     {{-- Requestable menu item hidden --}}
                                     {{-- <li{!! (Request::query('status') == 'Requestable' ? ' class="active"' : '') !!}><a
                                                 href="{{ url('hardware?status=Requestable') }}">
@@ -528,7 +548,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         </a>
                                     </li> --}}
 
-                                    @can('audit', \App\Models\Asset::class)
+                                    {{-- @can('audit', \App\Models\Asset::class)
                                         <li{!! (Request::is('hardware/audit/due') ? ' class="active"' : '') !!}>
                                             <a href="{{ route('assets.audit.due') }}">
                                                 <x-icon type="due" class="text-yellow fa-fw"/>
@@ -546,7 +566,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                             <span class="badge">{{ (isset($total_due_and_overdue_for_checkin)) ? $total_due_and_overdue_for_checkin : '' }}</span>
                                         </a>
                                     </li>
-                                    @endcan
+                                    @endcan --}}
 
                                     <li class="divider">&nbsp;</li>
                                     @can('checkin', \App\Models\Asset::class)
@@ -563,10 +583,10 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                                 {{ trans('general.bulk_checkout') }}
                                             </a>
                                         </li>
-                                        <li{!! (Request::is('hardware/requested') ? ' class="active"' : '') !!}>
+                                        {{-- <li{!! (Request::is('hardware/requested') ? ' class="active"' : '') !!}>
                                             <a href="{{ route('assets.requested') }}">
                                                 {{ trans('general.requested') }}</a>
-                                        </li>
+                                        </li> --}}
                                     @endcan
 
                                     @can('create', \App\Models\Asset::class)
@@ -598,14 +618,14 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                 </ul>
                             </li>
                         @endcan
-                        @can('view', \App\Models\License::class)
+                        {{-- @can('view', \App\Models\License::class)
                             <li{!! (Request::is('licenses*') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('licenses.index') }}">
                                     <x-icon type="licenses" class="fa-fw"/>
                                     <span>{{ trans('general.licenses') }}</span>
                                 </a>
                             </li>
-                        @endcan
+                        @endcan --}}
                         @can('index', \App\Models\Accessory::class)
                             <li{!! (Request::is('accessories*') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('accessories.index') }}">
@@ -738,11 +758,11 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                     @endcan
 
                                     @can('view', \App\Models\Depreciation::class)
-                                        <li>
+                                        {{-- <li>
                                             <a href="{{ route('depreciations.index') }}" {{ (Request::is('/depreciations') ? ' class="active"' : '') }}>
                                                 {{ trans('general.depreciation') }}
                                             </a>
-                                        </li>
+                                        </li> --}}
                                     @endcan
                                 </ul>
                             </li>
@@ -771,22 +791,22 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         <a href="{{ route('reports.audit') }}" {{ (Request::is('reports.audit') ? ' class="active"' : '') }}>
                                             {{ trans('general.audit_report') }}</a>
                                     </li>
-                                    <li>
+                                    {{-- <li>
                                         <a href="{{ url('reports/depreciation') }}" {{ (Request::is('reports/depreciation') ? ' class="active"' : '') }}>
                                             {{ trans('general.depreciation_report') }}
                                         </a>
-                                    </li>
+                                    </li> 
                                     <li>
                                         <a href="{{ url('reports/licenses') }}" {{ (Request::is('reports/licenses') ? ' class="active"' : '') }}>
                                             {{ trans('general.license_report') }}
                                         </a>
-                                    </li>
+                                    </li>--}}
                                     <li>
                                         <a href="{{ url('reports/asset_maintenances') }}" {{ (Request::is('reports/asset_maintenances') ? ' class="active"' : '') }}>
                                             {{ trans('general.asset_maintenance_report') }}
                                         </a>
                                     </li>
-                                    <li>
+                                    {{-- <li>
                                         <a href="{{ url('reports/unaccepted_assets') }}" {{ (Request::is('reports/unaccepted_assets') ? ' class="active"' : '') }}>
                                             {{ trans('general.unaccepted_asset_report') }}
                                         </a>
@@ -795,19 +815,19 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         <a href="{{ url('reports/accessories') }}" {{ (Request::is('reports/accessories') ? ' class="active"' : '') }}>
                                             {{ trans('general.accessory_report') }}
                                         </a>
-                                    </li>
+                                    </li> --}}
                                 </ul>
                             </li>
                         @endcan
 
-                        @can('viewRequestable', \App\Models\Asset::class)
+                        {{-- @can('viewRequestable', \App\Models\Asset::class)
                             <li{!! (Request::is('account/requestable-assets') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('requestable-assets') }}">
                                     <x-icon type="requestable" class="fa-fw" />
                                     <span>{{ trans('general.requestable_items') }}</span>
                                 </a>
                             </li>
-                        @endcan
+                        @endcan --}}
 
 
                     </ul>
@@ -1212,4 +1232,3 @@ dir="{{ Helper::determineLanguageDirection() }}">
 
         </body>
 </html>
-

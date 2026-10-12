@@ -97,6 +97,26 @@ class ImageUploadRequest extends Request
 
                 $ext = $image->guessExtension();
                 $file_name = $type.'-'.$form_fieldname.'-'.$item->id.'-'.str_random(10).'.'.$ext;
+
+                if ($type === 'asset' && $this->boolean('camera_capture')) {
+                    $directory = public_path('img');
+                    if (! is_dir($directory)) {
+                        mkdir($directory, 0755, true);
+                    }
+
+                    if ($item->{$db_fieldname} && str_starts_with($item->{$db_fieldname}, 'img/')) {
+                        $oldImage = public_path($item->{$db_fieldname});
+                        if (is_file($oldImage)) {
+                            unlink($oldImage);
+                        }
+                    }
+
+                    $file_name = 'asset-camera-'.$item->id.'-'.str_random(10).'.'.$ext;
+                    $image->move($directory, $file_name);
+                    $item->{$db_fieldname} = 'img/'.$file_name;
+
+                    return $item;
+                }
                 
                 if (($image->getMimeType() == 'image/vnd.microsoft.icon') || ($image->getMimeType() == 'image/x-icon') || ($image->getMimeType() == 'image/avif') || ($image->getMimeType() == 'image/webp')) {
                     // If the file is an icon, webp or avif, we need to just move it since gd doesn't support resizing
@@ -153,7 +173,14 @@ class ImageUploadRequest extends Request
 
         if ($item->{$db_fieldname}!='') {
             try {
-                Storage::disk('public')->delete($path.'/'.$item->{$db_fieldname});
+                if (str_starts_with($item->{$db_fieldname}, 'img/')) {
+                    $file = public_path($item->{$db_fieldname});
+                    if (is_file($file)) {
+                        unlink($file);
+                    }
+                } else {
+                    Storage::disk('public')->delete($path.'/'.$item->{$db_fieldname});
+                }
                 $item->{$db_fieldname} = null;
             } catch (\Exception $e) {
                 Log::debug($e);

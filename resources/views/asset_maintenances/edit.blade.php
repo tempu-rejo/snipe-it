@@ -23,10 +23,10 @@
 <div class="row">
   <div class="col-md-9">
     @if ($item->id)
-      <form class="form-horizontal" method="post" action="{{ route('maintenances.update', $item->id) }}" autocomplete="off">
+      <form class="form-horizontal" method="post" enctype="multipart/form-data" action="{{ route('maintenances.update', $item->id) }}" autocomplete="off">
       {{ method_field('PUT') }}
     @else
-      <form class="form-horizontal" method="post" action="{{ route('maintenances.store') }}" autocomplete="off">
+      <form class="form-horizontal" method="post" enctype="multipart/form-data" action="{{ route('maintenances.store') }}" autocomplete="off">
     @endif
     <!-- CSRF Token -->
     {{ csrf_field() }}
@@ -151,6 +151,14 @@
           <div class="col-md-7">
             <textarea class="col-md-6 form-control" id="notes" name="notes">{{ old('notes', $item->notes) }}</textarea>
             {!! $errors->first('notes', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
+          </div>
+
+          <div class="form-group {{ $errors->has('file.*') ? 'has-error' : '' }}">
+            <label for="file" class="col-md-3 control-label">Files</label>
+            <div class="col-md-7">
+              <input type="file" name="file[]" id="file" multiple class="form-control">
+              {!! $errors->first('file.*', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"></i> :message</span>') !!}
+            </div>
           </div>
         </div>
       </div> <!-- .box-body -->

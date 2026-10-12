@@ -7,11 +7,11 @@
         width: 100%;
         min-height: 100vh;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-end;
         position: relative;
         overflow: hidden;
         box-sizing: border-box;
-        padding: 24px 16px;
+        padding: 24px clamp(24px, 8vw, 140px) 24px 16px;
     }
     
     .login-background {
@@ -28,7 +28,7 @@
         background: transparent;
         padding: 0;
         position: relative;
-        margin: 0 auto;
+        margin: 0;
         top: auto;
         right: auto;
         left: auto;
@@ -49,20 +49,29 @@
         display: block;
     }
 
+    .IDIT-logo {
+        max-width: 100px;
+        height: auto;
+        margin: 0 auto 15px;
+        display: block;
+    }
+
     .login-title {
         color: #fff;
-        font: #0c0c0c;
         border-radius: 50%;
-        /* background: #0c0c0c;
-        opacity: inherit; */
         font-weight: 400;
         margin: 10px 0 0;
         font-family: 'Helvetica', sans-serif;
         /* src: url('{{ asset("fonts/colibri.woff2") }}') format('woff2'),
-             url('{{ asset("fonts/colibri.woff") }}') format('woff'); */
+        url('{{ asset("fonts/colibri.woff") }}') format('woff'); */
         font-weight: bold;
         font-size: 30px;
-
+        -webkit-text-stroke: 1px black;
+        /* text-shadow:
+        2px  2px 0 #000,
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px  2px 0 #000; */
     }
 
     .box.login-box {
@@ -161,6 +170,7 @@
         font-size: 13px;
         border-top: 1px solid rgba(255, 255, 255, 0.35);
         padding-top: 20px;
+
     }
 
     .login-footer a {
@@ -179,12 +189,18 @@
     }
 
     @media (max-width: 768px) {
+        .login-page-wrapper {
+            justify-content: center;
+            padding: 24px 16px;
+        }
+
         .login-background {
             display: none;
         }
         
         .login-form-wrapper {
-            width: calc(100% - 32px);
+            width: 100%;
+            margin: 0 auto;
         }
 
         .box.login-box {
@@ -294,8 +310,9 @@
         <!-- Login Footer -->
         <div class="login-footer">
             <p>&copy; {{ date('Y') }} Universal Leaf. All rights reserved.</p>
-            <p>{{ $snipeSettings->site_name ?? config('app.name', 'UI-Trackin (IT)') }} v1.1</p>
+            <p>{{ $snipeSettings->site_name ?? config('app.name', 'UI-Trackin (IT)') }} v1.0</p>
             <p>Need help? Contact <a href="mailto:idhelp@universalleaf.com">IDHelp</a></p>
+            <img src="{{ asset('img/IDIT.png') }}" alt="IDIT Logo" class="IDIT-logo">
         </div>
     </div>
 </div>

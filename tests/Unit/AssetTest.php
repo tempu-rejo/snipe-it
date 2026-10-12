@@ -7,9 +7,20 @@ use App\Models\Category;
 use Carbon\Carbon;
 use Tests\TestCase;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Storage;
 
 class AssetTest extends TestCase
 {
+    public function testAssetWithoutAnAvailableImageUsesTheDefaultImage()
+    {
+        $asset = Asset::make();
+
+        $this->assertSame(
+            Storage::disk('public')->url('default.png'),
+            $asset->getImageUrl()
+        );
+    }
+
     public function testAutoIncrement()
     {
         $this->settings->enableAutoIncrement();
