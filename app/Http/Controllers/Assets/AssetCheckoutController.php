@@ -9,6 +9,7 @@ use App\Http\Traits\HandlesTransactionUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssetCheckoutRequest;
 use App\Models\Asset;
+use App\Models\CustomField;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Session;
 use \Illuminate\Contracts\View\View;
@@ -42,7 +43,10 @@ class AssetCheckoutController extends Controller
             return view('hardware/checkout', compact('asset'))
                 ->with('statusLabel_list', Helper::deployableStatusLabelList())
                 ->with('table_name', 'Assets')
-                ->with('item', $asset);
+                ->with('item', $asset)
+                ->with('checkoutCustomFields', CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])
+                    ->get()
+                    ->keyBy('name'));
         }
 
         return redirect()->route('hardware.index')
@@ -76,6 +80,14 @@ class AssetCheckoutController extends Controller
             $target = $this->determineCheckoutTarget();
 
             $asset = $this->updateAssetLocation($asset, $target);
+
+            if ($request->input('checkout_to_type') === 'user') {
+                foreach (CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])->get() as $field) {
+                    if ($request->has($field->db_column_name())) {
+                        $asset->{$field->db_column_name()} = $request->input($field->db_column_name());
+                    }
+                }
+            }
 
             $checkout_at = date('Y-m-d H:i:s');
             if (($request->filled('checkout_at')) && ($request->get('checkout_at') != date('Y-m-d'))) {
@@ -115,7 +127,11 @@ class AssetCheckoutController extends Controller
 
             session()->put(['redirect_option' => $request->get('redirect_option'), 'checkout_to_type' => $request->get('checkout_to_type')]);
 
-            if ($asset->checkOut($target, $admin, $checkout_at, $expected_checkin, $request->get('note'), $request->get('name'))) {
+            $checkoutLocationId = $request->input('checkout_to_type') === 'user'
+                ? $request->input('checkout_location_id')
+                : null;
+
+            if ($asset->checkOut($target, $admin, $checkout_at, $expected_checkin, $request->get('note'), $request->get('name'), $checkoutLocationId)) {
                 $this->uploadTransactionFiles($asset, $request, 'Checkout: '.$request->input('note', ''));
                 return redirect()->to(Helper::getRedirectOption($request, $asset->id, 'Assets'))
                     ->with('success', trans('admin/hardware/message.checkout.success'));

@@ -28,6 +28,7 @@ class CustomFieldSeeder extends Seeder
 
         CustomFieldset::factory()->count(1)->mobile()->create();
         CustomFieldset::factory()->count(1)->computer()->create();
+        $assetDetailFieldset = CustomFieldset::factory()->create(['name' => 'Asset Detail']);
         CustomField::factory()->count(1)->imei()->create();
         CustomField::factory()->count(1)->phone()->create();
         CustomField::factory()->count(1)->ram()->create();
@@ -111,5 +112,50 @@ class CustomFieldSeeder extends Seeder
             ],
 
         ]);
+
+        $assetDetailFields = [
+            ['name' => 'CPU'],
+            ['name' => 'RAM (GB)'],
+            ['name' => 'HDD (GB)'],
+            ['name' => 'System Type'],
+            [
+                'name' => 'Device Type',
+                'element' => 'listbox',
+                'field_values' => "Personal\r\nIT Devices",
+                'show_in_listview' => true,
+            ],
+            [
+                'name' => 'FA Asset',
+                'element' => 'listbox',
+                'field_values' => "YA\r\nTidak",
+                'show_in_listview' => true,
+            ],
+            ['name' => 'On Behalf'],
+            ['name' => 'Loc. Detail'],
+            ['name' => 'Deployment Date', 'format' => 'DATE'],
+            [
+                'name' => 'Source',
+                'element' => 'listbox',
+                'field_values' => "New\r\nExisting",
+            ],
+        ];
+
+        foreach ($assetDetailFields as $order => $attributes) {
+            $field = CustomField::factory()->create(array_merge([
+                'format' => 'ANY',
+                'element' => 'text',
+                'is_unique' => false,
+                'field_encrypted' => false,
+                'show_in_email' => false,
+                'display_in_user_view' => false,
+                'show_in_listview' => false,
+                'show_in_requestable_list' => false,
+            ], $attributes));
+
+            $assetDetailFieldset->fields()->attach($field->id, [
+                'order' => $order,
+                'required' => false,
+            ]);
+        }
     }
 }

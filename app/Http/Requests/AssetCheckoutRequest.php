@@ -33,12 +33,20 @@ class AssetCheckoutRequest extends Request
                 'nullable',
                 'date',
             ],
+            'checkout_location_id' => [
+                'nullable',
+                'exists:locations,id',
+            ],
             'expected_checkin' => [
                 'nullable',
                 'date'
             ],
             'file.*' => 'required|mimes:png,gif,jpg,svg,jpeg,doc,docx,pdf,txt,zip,rar,xls,xlsx,lic,xml,rtf,json,webp,avif|max:'.\App\Helpers\Helper::file_upload_max_size(),
             ];
+
+            foreach (\App\Models\CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])->get() as $field) {
+                $rules[$field->db_column_name()] = 'nullable|string';
+            }
 
             if($settings->require_checkinout_notes) {
                 $rules['note'] = 'required|string';

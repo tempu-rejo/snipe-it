@@ -7,6 +7,7 @@ use App\Events\CheckoutableCheckedOut;
 use App\Models\Accessory;
 use App\Models\Asset;
 use App\Models\Company;
+use App\Models\CustomField;
 use App\Models\LicenseSeat;
 use App\Models\Location;
 use App\Models\Statuslabel;
@@ -124,6 +125,41 @@ class AssetCheckoutTest extends TestCase
             ->get(route('hardware.checkout.create', Asset::factory()->create()))
             ->assertOk();
     }
+
+    public function testCheckingOutToUserSavesCheckoutLocationAndCustomFields()
+    {
+        $locDetail = CustomField::factory()->create(['name' => 'Loc. Detail']);
+        $onBehalf = CustomField::factory()->create(['name' => 'On Behalf']);
+        $userLocation = Location::factory()->create();
+        $checkoutLocation = Location::factory()->create();
+        $user = User::factory()->for($userLocation)->create();
+        $asset = Asset::factory()->create();
+
+        $this->actingAs(User::factory()->checkoutAssets()->create())
+            ->get(route('hardware.checkout.create', $asset))
+            ->assertOk()
+            ->assertSee('checkout-user-details')
+            ->assertSee('Loc. Detail')
+            ->assertSee('On Behalf')
+            ->assertSee('checkout_location_id');
+
+        $this->actingAs(User::factory()->checkoutAssets()->create())
+            ->post(route('hardware.checkout.store', $asset), [
+                'checkout_to_type' => 'user',
+                'assigned_user' => $user->id,
+                'checkout_location_id' => $checkoutLocation->id,
+                $locDetail->db_column_name() => 'Building A',
+                $onBehalf->db_column_name() => 'Jane Doe',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $asset->refresh();
+
+        $this->assertSame($checkoutLocation->id, $asset->location_id);
+        $this->assertSame('Building A', $asset->{$locDetail->db_column_name()});
+        $this->assertSame('Jane Doe', $asset->{$onBehalf->db_column_name()});
+    }
+
     /**
      * This data provider contains checkout targets along with the
      * asset's expected location after the checkout process.

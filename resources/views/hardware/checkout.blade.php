@@ -102,6 +102,34 @@
 
                         @include ('partials.forms.edit.location-select', ['translated_name' => trans('admin/hardware/form.current_location'), 'fieldname' => 'assigned_location', 'style' => 'display:none;'])
 
+                        <div id="checkout-user-details">
+                            @include ('partials.forms.edit.location-select', [
+                                'translated_name' => trans('general.location'),
+                                'fieldname' => 'checkout_location_id',
+                                'item' => null
+                            ])
+
+                            @foreach (['Loc. Detail', 'On Behalf'] as $fieldName)
+                                @if ($field = $checkoutCustomFields->get($fieldName))
+                                    <div class="form-group{{ $errors->has($field->db_column_name()) ? ' has-error' : '' }}">
+                                        <label for="{{ $field->db_column_name() }}" class="col-md-3 control-label">
+                                            {{ $field->name }}
+                                        </label>
+                                        <div class="col-md-7 col-sm-12">
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                id="{{ $field->db_column_name() }}"
+                                                name="{{ $field->db_column_name() }}"
+                                                value="{{ old($field->db_column_name(), $asset->{$field->db_column_name()}) }}"
+                                            >
+                                            {!! $errors->first($field->db_column_name(), '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+
 
 
                         <!-- Checkout/Checkin Date -->
@@ -232,6 +260,30 @@
     @include('partials/assets-assigned')
 
     <script>
+        $(function () {
+            const syncCheckoutUserDetails = function () {
+                $('#checkout-user-details').toggle($('input[name="checkout_to_type"]:checked').val() === 'user');
+            };
+
+            $('input[name="checkout_to_type"]').on('change', syncCheckoutUserDetails);
+            syncCheckoutUserDetails();
+
+            $('#assigned_user_select').on('select2:select', function (event) {
+                const location = event.params.data.location;
+                const $location = $('#checkout_location_id_location_select');
+
+                $location.empty();
+                if (location && location.id && location.name) {
+                    $location.append(new Option(location.name, location.id, true, true));
+                }
+                $location.trigger('change');
+            });
+
+            $('#assigned_user_select').on('select2:clear', function () {
+                $('#checkout_location_id_location_select').val(null).trigger('change');
+            });
+        });
+
         //        $('#checkout_at').datepicker({
         //            clearBtn: true,
         //            todayHighlight: true,
