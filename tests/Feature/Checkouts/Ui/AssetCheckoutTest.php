@@ -160,6 +160,39 @@ class AssetCheckoutTest extends TestCase
         $this->assertSame('Jane Doe', $asset->{$onBehalf->db_column_name()});
     }
 
+    public function testBulkCheckoutToUserSavesCheckoutLocationAndCustomFields()
+    {
+        $locDetail = CustomField::factory()->create(['name' => 'Loc. Detail']);
+        $onBehalf = CustomField::factory()->create(['name' => 'On Behalf']);
+        $user = User::factory()->for(Location::factory()->create())->create();
+        $checkoutLocation = Location::factory()->create();
+        $asset = Asset::factory()->create();
+
+        $this->actingAs(User::factory()->checkoutAssets()->create())
+            ->get(route('hardware.bulkcheckout.show'))
+            ->assertOk()
+            ->assertSee('checkout-user-details')
+            ->assertSee('Loc. Detail')
+            ->assertSee('On Behalf');
+
+        $this->actingAs(User::factory()->checkoutAssets()->create())
+            ->post(route('hardware.bulkcheckout.store'), [
+                'selected_assets' => [$asset->id],
+                'checkout_to_type' => 'user',
+                'assigned_user' => $user->id,
+                'checkout_location_id' => $checkoutLocation->id,
+                $locDetail->db_column_name() => 'Building B',
+                $onBehalf->db_column_name() => 'John Doe',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $asset->refresh();
+
+        $this->assertSame($checkoutLocation->id, $asset->location_id);
+        $this->assertSame('Building B', $asset->{$locDetail->db_column_name()});
+        $this->assertSame('John Doe', $asset->{$onBehalf->db_column_name()});
+    }
+
     /**
      * This data provider contains checkout targets along with the
      * asset's expected location after the checkout process.

@@ -564,7 +564,11 @@ class BulkAssetsController extends Controller
     public function showCheckout() : View
     {
         $this->authorize('checkout', Asset::class);
-        return view('hardware/bulk-checkout');
+        $checkoutCustomFields = CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])
+            ->get()
+            ->keyBy('name');
+
+        return view('hardware/bulk-checkout', compact('checkoutCustomFields'));
     }
 
     /**
@@ -579,6 +583,12 @@ class BulkAssetsController extends Controller
             $admin = auth()->user();
 
             $target = $this->determineCheckoutTarget();
+            $checkoutLocationId = $request->input('checkout_to_type') === 'user'
+                ? $request->input('checkout_location_id')
+                : null;
+            $checkoutCustomFields = $request->input('checkout_to_type') === 'user'
+                ? CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])->get()
+                : collect();
 
             if (! is_array($request->get('selected_assets'))) {
                 return redirect()->route('hardware.bulkcheckout.show')->withInput()->with('error', trans('admin/hardware/message.checkout.no_assets_selected'));
@@ -605,15 +615,21 @@ class BulkAssetsController extends Controller
             }
 
             $errors = [];
-            DB::transaction(function () use ($target, $admin, $checkout_at, $expected_checkin, &$errors, $asset_ids, $request) { //NOTE: $errors is passsed by reference!
+            DB::transaction(function () use ($target, $admin, $checkout_at, $expected_checkin, &$errors, $asset_ids, $request, $checkoutLocationId, $checkoutCustomFields) { //NOTE: $errors is passsed by reference!
                 foreach ($asset_ids as $asset_id) {
                     $asset = Asset::findOrFail($asset_id);
                     $this->authorize('checkout', $asset);
 
-                    $checkout_success = $asset->checkOut($target, $admin, $checkout_at, $expected_checkin, e($request->get('note')), $asset->name, null);
+                    foreach ($checkoutCustomFields as $field) {
+                        if ($request->has($field->db_column_name())) {
+                            $asset->{$field->db_column_name()} = $request->input($field->db_column_name());
+                        }
+                    }
+
+                    $checkout_success = $asset->checkOut($target, $admin, $checkout_at, $expected_checkin, e($request->get('note')), $asset->name, $checkoutLocationId);
 
                     //TODO - I think this logic is duplicated in the checkOut method?
-                    if ($target->location_id != '') {
+                    if (! $checkoutLocationId && ($target->location_id != '')) {
                         $asset->location_id = $target->location_id;
                         // TODO - I don't know why this is being saved without events
                         $asset::withoutEvents(function () use ($asset) {
