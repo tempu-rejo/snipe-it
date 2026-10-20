@@ -1614,22 +1614,23 @@ function hideQRCode() {
 // Fungsi untuk generate QR Code (real implementation with qrcode.js)
 function generateQRCode() {
     const canvas = document.getElementById('qrCanvas');
-    
-    const currentUrl = window.location.href;
-    const mobileUploadUrl = currentUrl.replace(/\/[^\/]*$/, '') + '/mobile-upload?session=' + Date.now();
-    const qrImage = new Image();
-    const qrEndpoint = @json(route('qr-code'));
+    const mobileUploadUrl = new URL(window.location.href);
+    mobileUploadUrl.pathname = mobileUploadUrl.pathname.replace(/\/[^/]*$/, '/mobile-upload');
+    mobileUploadUrl.search = '';
+    mobileUploadUrl.searchParams.set('session', Date.now().toString());
 
-    qrImage.onload = function () {
-        const context = canvas.getContext('2d');
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(qrImage, 0, 0, canvas.width, canvas.height);
-    };
-    qrImage.onerror = function () {
-        console.error('QR Code generation failed.');
+    if (!window.QRCode || typeof window.QRCode.toCanvas !== 'function') {
+        console.error('QR Code generation failed: QRCode library is unavailable.');
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-    };
-    qrImage.src = qrEndpoint + '?data=' + encodeURIComponent(mobileUploadUrl);
+        return;
+    }
+
+    window.QRCode.toCanvas(canvas, mobileUploadUrl.toString(), { width: canvas.width, margin: 2 }, function (error) {
+        if (error) {
+            console.error('QR Code generation failed.', error);
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        }
+    });
 }
 
 // Fungsi untuk membuka aplikasi kamera eksternal

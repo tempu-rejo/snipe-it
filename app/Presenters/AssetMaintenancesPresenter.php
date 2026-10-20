@@ -31,6 +31,13 @@ class AssetMaintenancesPresenter extends Presenter
                 'title' => trans('general.id'),
                 'visible' => false,
             ], [
+                'field' => 'document_number',
+                'searchable' => true,
+                'sortable' => true,
+                'switchable' => true,
+                'title' => trans('admin/asset_maintenances/table.document_number'),
+                'visible' => true,
+            ], [
                 'field' => 'title',
                 'searchable' => true,
                 'sortable' => true,

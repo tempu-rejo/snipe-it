@@ -5,15 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\AssetMaintenance;
 use App\Models\Company;
-use App\Models\Statuslabel;
+use App\Models\ToolTransaction;
+use App\Models\ToolTransactionItem;
+use App\Models\StatusLabel;
+use App\Models\EventChecklist;
+use App\Services\EventChecklistService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Helpers\Helper;
-use App\Http\Traits\HandlesTransactionUploads;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use \Illuminate\Contracts\View\View;
 use \Illuminate\Http\RedirectResponse;
 
@@ -25,28 +25,6 @@ use \Illuminate\Http\RedirectResponse;
  */
 class AssetMaintenancesController extends Controller
 {
-    use HandlesTransactionUploads;
-
-    private const REPAIR_STATUS_NAMES = [
-        'in repair – it',
-        'in repair – vendor',
-    ];
-
-    private function repairStatusLabels(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Statuslabel::query()
-            ->whereRaw('LOWER(name) IN (?, ?)', self::REPAIR_STATUS_NAMES)
-            ->orderBy('name')
-            ->get();
-    }
-
-    private function maintenanceTypeOptions(): array
-    {
-        return $this->repairStatusLabels()
-            ->mapWithKeys(fn (Statuslabel $status) => [$status->name => $status->name])
-            ->all();
-    }
-
     /**
     * Checks for permissions for this action.
     *
@@ -99,12 +77,16 @@ class AssetMaintenancesController extends Controller
         // Prepare Asset Maintenance Type List
         $assetMaintenanceType = [
                                     '' => 'Select an asset maintenance type',
-                                ] + $this->maintenanceTypeOptions();
+                                ] + AssetMaintenance::getImprovementOptions();
         // Mark the selected asset, if it came in
 
         return view('asset_maintenances/edit')
                    ->with('asset', $asset)
                    ->with('assetMaintenanceType', $assetMaintenanceType)
+                   ->with('eventChecklists', EventChecklist::with('template')->whereIn(
+                       'to_status_id',
+                       StatusLabel::whereIn('name', ['IN Repair - IT', 'IN Repair - Vendor'])->pluck('id')
+                   )->whereNull('category_id')->get())
                    ->with('item', new AssetMaintenance);
     }
 
@@ -119,35 +101,61 @@ class AssetMaintenancesController extends Controller
     public function store(Request $request) : RedirectResponse
     {
         $this->authorize('update', Asset::class);
-        $maintenanceTypeOptions = array_values($this->maintenanceTypeOptions());
-        $request->validate([
-            'asset_maintenance_type' => ['required', 'string', Rule::in($maintenanceTypeOptions)],
-            'file.*' => 'required|mimes:png,gif,jpg,svg,jpeg,doc,docx,pdf,txt,zip,rar,xls,xlsx,lic,xml,rtf,json,webp,avif|max:'.Helper::file_upload_max_size(),
-        ]);
-        $selectedMaintenanceType = mb_strtolower($request->input('asset_maintenance_type'));
-        $repairStatus = $this->repairStatusLabels()->first(
-            fn (Statuslabel $status) => mb_strtolower($status->name) === $selectedMaintenanceType
-        );
         $asset_ids = (array) $request->input('asset_id');
+        $request->validate([
+            'asset_id' => ['required'],
+            'asset_maintenance_type' => ['required', 'string'],
+        ]);
+
+        $maintenanceStatus = StatusLabel::where('name', $request->input('asset_maintenance_type'))->first();
+        if (!$maintenanceStatus) {
+            return redirect()->back()->withInput()->with('error', 'The selected maintenance status is not configured.');
+        }
+
+        $checklistService = app(EventChecklistService::class);
+        $checklistsByAsset = [];
+        foreach ($asset_ids as $assetId) {
+            $assetForChecklist = Asset::find($assetId);
+            if (!$assetForChecklist) {
+                return redirect()->back()->withInput()->with('error', 'A selected asset could not be found.');
+            }
+            $checklist = $checklistService->forStatus($assetForChecklist, $maintenanceStatus->id);
+            $checklistsByAsset[$assetId] = $checklist;
+
+            if ($checklist && $checklistService->hasResponses(
+                $checklist,
+                $request->input('event_checklist_rows'),
+                $request->file('event_checklist_files')
+            )) {
+                $checklistErrors = $checklistService->validate(
+                    $checklist,
+                    $request->input('event_checklist_rows'),
+                    $request->file('event_checklist_files'),
+                    false
+                );
+                if ($checklistErrors->isNotEmpty()) {
+                    return redirect()->back()->withInput()->withErrors($checklistErrors);
+                }
+            }
+        }
+
         $created = 0;
         $failed = [];
         $errorDetails = [];
 
+        // Generate one document number for all assets with same vendor
+        $documentNumber = AssetMaintenance::generateDocumentNumber();
+
         foreach ($asset_ids as $asset_id) {
             $asset = Asset::find($asset_id);
-            if ($asset === null) {
-                $failed[] = $asset_id;
-                $errorDetails[] = 'Asset tidak ditemukan untuk ID: '.$asset_id;
-                continue;
-            }
-
-            if (! Company::isCurrentUserHasAccess($asset)) {
+            if ((! Company::isCurrentUserHasAccess($asset)) && ($asset != null)) {
                 $failed[] = $asset_id;
                 $errorDetails[] = 'Tidak punya akses ke asset ID: '.$asset_id;
                 continue;
             }
 
             $assetMaintenance = new AssetMaintenance();
+            $assetMaintenance->document_number = $documentNumber; // Use generated document number
             $assetMaintenance->asset_id = $asset_id;
             $assetMaintenance->supplier_id = $request->input('supplier_id');
             $assetMaintenance->is_warranty = $request->input('is_warranty');
@@ -157,7 +165,20 @@ class AssetMaintenancesController extends Controller
             $assetMaintenance->title = $request->input('title');
             $assetMaintenance->start_date = $request->input('start_date');
             $assetMaintenance->completion_date = $request->input('completion_date');
-            $assetMaintenance->created_by = auth()->id();
+            $assetMaintenance->created_by = Auth::id();
+            $oldStatusId = (int) $asset->status_id;
+            $checklist = $checklistsByAsset[$asset_id] ?? null;
+
+            // Update asset status based on maintenance type
+            if ($asset && $request->input('asset_maintenance_type')) {
+                $maintenanceType = $request->input('asset_maintenance_type');
+                $statusLabel = StatusLabel::where('name', $maintenanceType)->first();
+                
+                if ($statusLabel) {
+                    $asset->status_id = $statusLabel->id;
+                    $asset->save();
+                }
+            }
 
             if (($assetMaintenance->completion_date !== null)
                 && ($assetMaintenance->start_date !== '')
@@ -168,23 +189,34 @@ class AssetMaintenancesController extends Controller
                 $assetMaintenance->asset_maintenance_time = (int) $completionDate->diffInDays($startDate, true);
             }
 
-            $saved = DB::transaction(function () use ($assetMaintenance, $asset, $repairStatus) {
-                if (! $assetMaintenance->save()) {
-                    return false;
-                }
-
-                if ($repairStatus !== null) {
-                    $asset->status_id = $repairStatus->id;
-                    if (! $asset->save()) {
-                        throw ValidationException::withMessages($asset->getErrors()->toArray());
+            if ($assetMaintenance->save()) {
+                
+                // If maintenance is marked as completed (using is_warranty as completed flag), update asset status to in-checking
+                if ($assetMaintenance->is_warranty && $assetMaintenance->completion_date && $asset) {
+                    $inCheckingStatus = $this->inCheckingStatus();
+                    
+                    if ($inCheckingStatus) {
+                        $asset->status_id = $inCheckingStatus->id;
+                        $asset->save();
                     }
                 }
 
-                return true;
-            });
-
-            if ($saved) {
-                $this->uploadTransactionFiles($asset, $request, 'Maintenance: '.$assetMaintenance->title);
+                if ($checklist && $checklistService->hasResponses(
+                    $checklist,
+                    $request->input('event_checklist_rows'),
+                    $request->file('event_checklist_files')
+                )) {
+                    $checklistService->record(
+                        $checklist,
+                        $asset,
+                        $oldStatusId,
+                        (int) $maintenanceStatus->id,
+                        $request->input('event_checklist_rows'),
+                        Auth::id(),
+                        $request->file('event_checklist_files')
+                    );
+                }
+                
                 $created++;
             } else {
                 $failed[] = $asset_id;
@@ -197,14 +229,18 @@ class AssetMaintenancesController extends Controller
             $failedList = collect($failedAssets)->map(function($tag, $id) {
                 return $tag ? $tag.' (ID:'.$id.')' : 'ID:'.$id;
             })->implode(', ');
+            
+            $successMessage = 'Beberapa maintenance berhasil dibuat dengan nomor dokumen: <b>' . $documentNumber . '</b>, namun gagal untuk asset berikut: <b>'.$failedList.'</b>';
+            
             return redirect()->route('maintenances.index')
-                ->with('partial_success', 'Beberapa maintenance berhasil dibuat, namun gagal untuk asset berikut: <b>'.$failedList.'</b>')
+                ->with('partial_success', $successMessage)
                 ->with('partial_error_detail', $errorDetails ?? []);
         }
 
         if ($created > 0) {
+            $successMessage = trans('admin/asset_maintenances/message.create.success') . ' Nomor dokumen: <b>' . $documentNumber . '</b>';
             return redirect()->route('maintenances.index')
-                ->with('success', trans('admin/asset_maintenances/message.create.success'));
+                ->with('success', $successMessage);
         }
 
         return redirect()->back()->withInput()->withErrors(['asset_id' => 'No valid asset selected or failed to save.']);
@@ -229,11 +265,13 @@ class AssetMaintenancesController extends Controller
         }
 
         // Prepare Improvement Type List
-        $assetMaintenanceType = ['' => 'Select an improvement type'] + $this->maintenanceTypeOptions();
+        $assetMaintenanceType = ['' => 'Select an improvement type'] + AssetMaintenance::getImprovementOptions();
 
         return view('asset_maintenances/edit')
                    ->with('selectedAsset', null)
                    ->with('assetMaintenanceType', $assetMaintenanceType)
+                   ->with('eventChecklists', EventChecklist::with('template')->where('to_status_id', StatusLabel::where('name', $maintenance->asset_maintenance_type)->value('id'))
+                       ->whereNull('category_id')->get())
                    ->with('item', $maintenance);
     }
 
@@ -250,9 +288,6 @@ class AssetMaintenancesController extends Controller
     public function update(Request $request, AssetMaintenance $maintenance) : View | RedirectResponse
     {
         $this->authorize('update', Asset::class);
-        $request->validate([
-            'file.*' => 'required|mimes:png,gif,jpg,svg,jpeg,doc,docx,pdf,txt,zip,rar,xls,xlsx,lic,xml,rtf,json,webp,avif|max:'.Helper::file_upload_max_size(),
-        ]);
 
        if ((!$maintenance->asset) || ($maintenance->asset->deleted_at!='')) {
                 return redirect()->route('maintenances.index')->with('error', 'asset does not exist');
@@ -260,12 +295,43 @@ class AssetMaintenancesController extends Controller
             return static::getInsufficientPermissionsRedirect();
         }
 
+        $wasCompleted = $maintenance->is_warranty; // Using is_warranty as completed flag
+        $asset = Asset::find($request->input('asset_id'));
+
+        if (!$asset) {
+            return redirect()->back()->withInput()->with('error', 'The selected asset could not be found.');
+        }
+
+        $maintenanceStatus = StatusLabel::where('name', $request->input('asset_maintenance_type'))->first();
+        if (!$maintenanceStatus) {
+            return redirect()->back()->withInput()->with('error', 'The selected maintenance status is not configured.');
+        }
+
+        $checklistService = app(EventChecklistService::class);
+        $oldStatusId = (int) $asset->status_id;
+        $checklist = $checklistService->forStatus($asset, $maintenanceStatus->id);
+
+        if ($checklist && $checklistService->hasResponses(
+            $checklist,
+            $request->input('event_checklist_rows'),
+            $request->file('event_checklist_files')
+        )) {
+            $checklistErrors = $checklistService->validate(
+                $checklist,
+                $request->input('event_checklist_rows'),
+                $request->file('event_checklist_files'),
+                false
+            );
+            if ($checklistErrors->isNotEmpty()) {
+                return redirect()->back()->withInput()->withErrors($checklistErrors);
+            }
+        }
+        
+        // Don't update document_number - it's auto-generated and should not be changed
         $maintenance->supplier_id = $request->input('supplier_id');
-        $maintenance->is_warranty = $request->input('is_warranty');
+        $maintenance->is_warranty = $request->input('is_warranty'); // This now represents "completed" status
         $maintenance->cost =  $request->input('cost');
         $maintenance->notes = $request->input('notes');
-
-        $asset = Asset::find(request('asset_id'));
 
         if (! Company::isCurrentUserHasAccess($asset)) {
             return static::getInsufficientPermissionsRedirect();
@@ -277,6 +343,17 @@ class AssetMaintenancesController extends Controller
         $maintenance->title = $request->input('title');
         $maintenance->start_date = $request->input('start_date');
         $maintenance->completion_date = $request->input('completion_date');
+
+        // Update asset status based on maintenance type
+        if ($asset && $request->input('asset_maintenance_type')) {
+            $maintenanceType = $request->input('asset_maintenance_type');
+            $statusLabel = StatusLabel::where('name', $maintenanceType)->first();
+            
+            if ($statusLabel) {
+                $asset->status_id = $statusLabel->id;
+                $asset->save();
+            }
+        }
 
         if (($maintenance->completion_date == null)
         ) {
@@ -296,9 +373,35 @@ class AssetMaintenancesController extends Controller
             $maintenance->asset_maintenance_time = (int) $completionDate->diffInDays($startDate, true);
         }
 
-      // Was the asset maintenance created?
+        // Was the asset maintenance created?
         if ($maintenance->save()) {
-            $this->uploadTransactionFiles($maintenance->asset, $request, 'Maintenance: '.$maintenance->title);
+
+            // If maintenance is marked as completed (using is_warranty as completed flag), update asset status to in-checking
+            if ($maintenance->is_warranty && !$wasCompleted && $maintenance->completion_date && $asset) {
+                $inCheckingStatus = $this->inCheckingStatus();
+                
+                if ($inCheckingStatus) {
+                    $asset->status_id = $inCheckingStatus->id;
+                    $asset->save();
+                }
+
+            }
+
+            if ($checklist && $checklistService->hasResponses(
+                $checklist,
+                $request->input('event_checklist_rows'),
+                $request->file('event_checklist_files')
+            )) {
+                $checklistService->record(
+                    $checklist,
+                    $asset,
+                    $oldStatusId,
+                    (int) $maintenanceStatus->id,
+                    $request->input('event_checklist_rows'),
+                    Auth::id(),
+                    $request->file('event_checklist_files')
+                );
+            }
 
             // Redirect to the new asset maintenance page
             return redirect()->route('maintenances.index')
@@ -306,6 +409,17 @@ class AssetMaintenancesController extends Controller
         }
 
         return redirect()->back()->withInput()->withErrors($maintenance->getErrors());
+    }
+
+    private function inCheckingStatus(): ?StatusLabel
+    {
+        return StatusLabel::query()
+            ->where(function ($query) {
+                $query->whereRaw('LOWER(name) = ?', ['in checking'])
+                    ->orWhereRaw('LOWER(name) = ?', ['in-checking'])
+                    ->orWhereRaw('LOWER(name) = ?', ['in_checking']);
+            })
+            ->first();
     }
 
     /**
@@ -374,6 +488,14 @@ class AssetMaintenancesController extends Controller
             return static::getInsufficientPermissionsRedirect();
         }
 
-        return view('asset_maintenances.print')->with('assetMaintenance', $maintenance);
+        // Get all maintenances with the same document number
+        $allMaintenances = \App\Models\AssetMaintenance::with(['asset.model.category', 'asset.model.manufacturer', 'supplier'])
+            ->where('document_number', $maintenance->document_number)
+            ->get();
+
+        return view('asset_maintenances.print')
+            ->with('assetMaintenance', $maintenance)
+            ->with('allMaintenances', $allMaintenances)
+            ->with('snipeSettings', \App\Models\Setting::getSettings());
     }
 }

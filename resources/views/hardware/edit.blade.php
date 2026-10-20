@@ -3,6 +3,7 @@
     'createText' => trans('admin/hardware/form.create'),
     'updateText' => trans('admin/hardware/form.update'),
     'topSubmit' => true,
+    'formContainerClass' => 'col-lg-12 col-lg-offset-0 col-md-12 col-md-offset-0 col-sm-12 col-sm-offset-0',
     'helpText' => trans('help.assets'),
     'helpPosition' => 'right',
     'formAction' => ($item->id) ? route('hardware.update', $item) : route('hardware.store'),
@@ -54,10 +55,15 @@
     <div class="input_fields_wrap">
     </div>
 
-    @include ('partials.forms.edit.model-select', ['translated_name' => trans('admin/hardware/form.model'), 'fieldname' => 'model_id', 'field_req' => true])
+    @include ('partials.forms.edit.model-select', [
+        'translated_name' => trans('admin/hardware/form.model'),
+        'fieldname' => 'model_id',
+        'field_req' => true,
+        'selected_category_id' => \App\Models\AssetModel::find(old('model_id', $item->model_id ?? request('model_id')))?->category_id,
+    ])
 
 
-    @include ('partials.forms.edit.status', [ 'required' => 'true'])
+    @include ('partials.forms.edit.status', [ 'required' => 'true', 'checklist_button' => true])
     @if (!$item->id)
         @include ('partials.forms.checkout-selector', ['user_select' => 'true','asset_select' => 'true', 'location_select' => 'true', 'style' => 'display:none;'])
         @include ('partials.forms.edit.user-select', ['translated_name' => trans('admin/hardware/form.checkout_to'), 'fieldname' => 'assigned_user', 'style' => 'display:none;', 'required' => 'false'])
@@ -95,6 +101,11 @@
         @include("models/custom_fields_form",["model" => $model])
         @endif
     </div>
+
+    @include('partials.event-checklist', [
+        'statusChecklistMode' => true,
+        'checklistFromStatusId' => $item->status_id,
+    ])
 
     <div class="form-group">
     <label class="col-md-3 control-label"></label>

@@ -63,6 +63,7 @@ class AssetMaintenancesController extends Controller
 
         $allowed_columns = [
                                 'id',
+                                'document_number',
                                 'title',
                                 'asset_maintenance_time',
                                 'asset_maintenance_type',

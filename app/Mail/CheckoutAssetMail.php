@@ -56,7 +56,8 @@ class CheckoutAssetMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $from = new Address(config('mail.from.address'), config('mail.from.name'));
+        $fromAddress = config('mail.from.address');
+        $from = $fromAddress ? new Address($fromAddress, config('mail.from.name')) : null;
 
         return new Envelope(
             from: $from,

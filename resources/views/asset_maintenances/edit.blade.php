@@ -23,10 +23,10 @@
 <div class="row">
   <div class="col-md-9">
     @if ($item->id)
-      <form class="form-horizontal" method="post" enctype="multipart/form-data" action="{{ route('maintenances.update', $item->id) }}" autocomplete="off">
+      <form class="form-horizontal" method="post" action="{{ route('maintenances.update', $item->id) }}" autocomplete="off" enctype="multipart/form-data">
       {{ method_field('PUT') }}
     @else
-      <form class="form-horizontal" method="post" enctype="multipart/form-data" action="{{ route('maintenances.store') }}" autocomplete="off">
+      <form class="form-horizontal" method="post" action="{{ route('maintenances.store') }}" autocomplete="off" enctype="multipart/form-data">
     @endif
     <!-- CSRF Token -->
     {{ csrf_field() }}
@@ -56,7 +56,24 @@
               @endforeach
             </ul>
           </div>
-        @endif        <!-- Title -->
+        @endif        
+
+        <!-- Document Number (Read Only) -->
+        <div class="form-group">
+          <label class="col-md-3 control-label">
+            No. Dokumen
+          </label>
+          <div class="col-md-7">
+            <p class="form-control-static">
+              <strong>{{ $item->document_number }}</strong>
+              @if(!$item->document_number)
+                <span class="text-muted">(akan dibuat otomatis)</span>
+              @endif
+            </p>
+          </div>
+        </div>
+
+        <!-- Title -->
         <div class="form-group {{ $errors->has('title') ? ' has-error' : '' }}">
           <label for="title" class="col-md-3 control-label">
             {{ trans('admin/asset_maintenances/form.title') }}
@@ -85,9 +102,28 @@
             'disabled' => $item->id ? true : false, // disable when editing
             'hide_new' => $item->id ? 'true' : 'false' // hide "New supplier" button when editing
         ])
-        @include ('partials.forms.edit.maintenance_type', [
-            'disabled' => $item->id ? true : false // disable when editing
-        ])        <!-- Start Date -->
+
+        <!-- Asset Maintenance Type (from Status Labels) -->
+        <div class="form-group {{ $errors->has('asset_maintenance_type') ? ' has-error' : '' }}">
+          <label for="asset_maintenance_type" class="col-md-3 control-label">
+            {{ trans('admin/asset_maintenances/form.asset_maintenance_type') }}
+          </label>
+          <div class="col-md-7">
+            <select class="form-control select2" name="asset_maintenance_type" id="asset_maintenance_type" style="width: 100%" {{ $item->id ? 'disabled' : '' }} required>
+              <option value="">Pilih Jenis Maintenance</option>
+              @foreach(\App\Models\StatusLabel::whereIn('name', ['IN Repair - IT', 'IN Repair - Vendor'])->get() as $status)
+                <option value="{{ $status->name }}" {{ old('asset_maintenance_type', $item->asset_maintenance_type) == $status->name ? 'selected' : '' }}>
+                  {{ $status->name }}
+                </option>
+              @endforeach
+            </select>
+            @if($item->id && $item->asset_maintenance_type)
+                <!-- Hidden input to ensure value is submitted when field is disabled -->
+                <input type="hidden" name="asset_maintenance_type" value="{{ $item->asset_maintenance_type }}">
+            @endif
+            {!! $errors->first('asset_maintenance_type', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
+          </div>
+        </div>        <!-- Start Date -->
         <div class="form-group {{ $errors->has('start_date') ? ' has-error' : '' }}">
           <label for="start_date" class="col-md-3 control-label">{{ trans('admin/asset_maintenances/form.start_date') }}</label>
 
@@ -104,7 +140,7 @@
           </div>
         </div>
 
-
+        @include('partials.event-checklist', ['checklistOptional' => true])
 
         <!-- Completion Date -->
         <div class="form-group {{ $errors->has('completion_date') ? ' has-error' : '' }}">
@@ -127,11 +163,26 @@
             <div class="col-sm-offset-3 col-sm-9">
               <label class="form-control">
                 <input type="checkbox" value="1" name="is_warranty" id="is_warranty" {{ old('is_warranty', $item->is_warranty) == '1' ? ' checked="checked"' : '' }}>
-                <!-- <input type="checkbox" value="1" name="is_completed" id="is_completed" {{ old('is_completed', $item->is_completed) == '1' ? ' checked="checked"' : '' }}> -->
-                {{ "Is Completed" }}
+                Completed
               </label>
+              <p class="help-block">Centang jika maintenance sudah selesai. Status asset akan berubah menjadi In-Checking.</p>
+            </div>
           </div>
-        </div>        <!-- Asset Maintenance Cost -->
+
+          @if($item->toolTransaction)
+          <!-- Tool Transaction Info (read-only when editing) -->
+          <div class="form-group">
+            <label class="col-md-3 control-label">Tool Transaction</label>
+            <div class="col-md-8">
+              <p class="form-control-static">
+                <strong>{{ $item->toolTransaction->document_number }}</strong>
+                @if($item->toolTransaction->user)
+                  - {{ $item->toolTransaction->user->present()->fullName() }}
+                @endif
+              </p>
+            </div>
+          </div>
+          @endif        <!-- Asset Maintenance Cost -->
         <div class="form-group {{ $errors->has('cost') ? ' has-error' : '' }}">
           <label for="cost" class="col-md-3 control-label">{{ trans('admin/asset_maintenances/form.cost') }}</label>
           <div class="col-md-2">
@@ -152,14 +203,6 @@
             <textarea class="col-md-6 form-control" id="notes" name="notes">{{ old('notes', $item->notes) }}</textarea>
             {!! $errors->first('notes', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
           </div>
-
-          <div class="form-group {{ $errors->has('file.*') ? 'has-error' : '' }}">
-            <label for="file" class="col-md-3 control-label">Files</label>
-            <div class="col-md-7">
-              <input type="file" name="file[]" id="file" multiple class="form-control">
-              {!! $errors->first('file.*', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"></i> :message</span>') !!}
-            </div>
-          </div>
         </div>
       </div> <!-- .box-body -->
 
@@ -171,4 +214,24 @@
   </div>
 </div>
 
+@stop
+
+@section('moar_scripts')
+<script>
+$(document).ready(function() {
+    // Handle tool transaction checkbox
+    $('#create_tool_transaction').change(function() {
+        if ($(this).is(':checked')) {
+            $('#assigned_user_group').show();
+            $('#assigned_user_id').prop('required', true);
+        } else {
+            $('#assigned_user_group').hide();
+            $('#assigned_user_id').prop('required', false);
+        }
+    });
+
+    // Initialize Select2
+    $('.select2').select2();
+});
+</script>
 @stop

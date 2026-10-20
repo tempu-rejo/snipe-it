@@ -25,13 +25,14 @@ use App\Http\Controllers\StatuslabelsController;
 use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\ViewAssetsController;
 use App\Http\Controllers\AssetController;
-use App\Http\Controllers\QrCodeController;
 use App\Livewire\Importer;
 use App\Models\ReportTemplate;
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
-
-Route::get('qr-code', QrCodeController::class)->name('qr-code');
+use App\Http\Controllers\Api\ImageController as ApiImageController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\EventChecklistsController;
+use App\Http\Controllers\EventChecklistTemplatesController;
 
 Route::group(['middleware' => 'auth'], function () {
     /*
@@ -47,6 +48,13 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('categories', CategoriesController::class, [
         'parameters' => ['category' => 'category_id'],
     ]);
+
+    Route::resource('event-checklists', EventChecklistsController::class)
+        ->except(['show']);
+    Route::resource('event-checklist-templates', EventChecklistTemplatesController::class)
+        ->except(['show']);
+    Route::get('event-checklist-submissions/{submission}/files/{row}', [EventChecklistsController::class, 'downloadEvidence'])
+        ->name('event-checklist-submissions.evidence');
         
     // Maintenance printing
     Route::get('maintenances/{assetId}/print', [\App\Http\Controllers\AssetMaintenancesController::class, 'print'])
@@ -55,6 +63,20 @@ Route::group(['middleware' => 'auth'], function () {
     //History print
     Route::get('users/{userId}/printAllCheckIn/', [\App\Http\Controllers\AssetHistController::class, 'printACI'])
     ->name('users.printACI');
+
+    // Asset print forms
+    Route::get('assets/{assetId}/print-return-form', [\App\Http\Controllers\AssetHistController::class, 'printReturnForm'])
+    ->name('assets.print.return.form');
+    
+    Route::get('assets/{assetId}/print-accountability-form', [\App\Http\Controllers\AssetHistController::class, 'printAccountabilityForm'])
+    ->name('assets.print.accountability.form');
+
+    // Tool transaction print forms
+    Route::get('tool-transactions/{transactionId}/print-return-form', [\App\Http\Controllers\AssetHistController::class, 'printTransactionReturnForm'])
+    ->name('tool-transactions.print.return.form');
+    
+    Route::get('tool-transactions/{transactionId}/print-accountability-form', [\App\Http\Controllers\AssetHistController::class, 'printTransactionAccountabilityForm'])
+    ->name('tool-transactions.print.accountability.form');
     /*
     * Labels
     */
@@ -754,3 +776,80 @@ Route::middleware(['auth'])->get(
     $trail->push('Home', route('home'))
     );
 
+// Temporary test route for debugging serial numbers
+Route::get('/debug-asset-serial', function () {
+    try {
+        // Check database first
+        $count = \App\Models\Asset::whereNotNull('serial')->where('serial', '!=', '')->count();
+        echo "<h1>Debug Asset Serial Numbers</h1>";
+        echo "<p><strong>Assets with serial numbers in database:</strong> $count</p>";
+        
+        if ($count > 0) {
+            echo "<h3>Sample assets with serial numbers:</h3>";
+            $assets = \App\Models\Asset::whereNotNull('serial')->where('serial', '!=', '')->take(5)->get();
+            foreach ($assets as $asset) {
+                echo "<p>ID: {$asset->id}, Name: {$asset->name}, Tag: {$asset->asset_tag}, Serial: <strong>{$asset->serial}</strong></p>";
+            }
+        }
+        
+        // Test the selectlist API
+        echo "<hr><h3>Testing Selectlist API</h3>";
+        $controller = new \App\Http\Controllers\Api\AssetsController();
+        $request = new \Illuminate\Http\Request();
+        
+        $response = $controller->selectlist($request);
+        $data = $response->getData(true);
+        
+        if (isset($data['results']) && count($data['results']) > 0) {
+            echo "<p>Selectlist returned " . count($data['results']) . " assets</p>";
+            
+            $serialFound = 0;
+            foreach ($data['results'] as $asset) {
+                if (strpos($asset['text'], '[SN:') !== false) {
+                    $serialFound++;
+                    if ($serialFound <= 5) {
+                        echo "<p style='color: green;'>✓ <strong>{$asset['text']}</strong></p>";
+                    }
+                }
+            }
+            
+            if ($serialFound > 0) {
+                echo "<p style='color: green; font-size: 18px;'><strong>✅ SUCCESS: Found $serialFound assets with serial numbers!</strong></p>";
+            } else {
+                echo "<p style='color: red; font-size: 18px;'><strong>❌ ISSUE: No serial numbers in selectlist</strong></p>";
+                echo "<h4>Sample selectlist results (first 5):</h4>";
+                foreach (array_slice($data['results'], 0, 5) as $asset) {
+                    echo "<p>ID: {$asset['id']}, Text: <code>{$asset['text']}</code></p>";
+                }
+            }
+        } else {
+            echo "<p style='color: red;'>No results from selectlist API</p>";
+        }
+        
+    } catch (Exception $e) {
+        echo "<p style='color: red;'>Error: " . $e->getMessage() . "</p>";
+    }
+})->middleware('web');
+
+/*
+|--------------------------------------------------------------------------
+| Image Download Routes
+|--------------------------------------------------------------------------
+|
+| Routes for downloading multiple images from URLs
+|
+*/
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('admin/image-downloader', [ImageController::class, 'index'])
+        ->name('gambar.index')
+        ->middleware('authorize:superuser');
+        
+    Route::post('admin/image-downloader', [ImageController::class, 'storeMultiple'])
+        ->name('gambar.store')
+        ->middleware('authorize:superuser');
+});
+
+// Inventory routes
+require __DIR__.'/web/inventory.php';
+
+// End custom routes

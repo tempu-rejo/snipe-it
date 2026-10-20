@@ -121,6 +121,15 @@
                         </a>
                     </li>
 
+                    @if ($asset->eventChecklistSubmissions->isNotEmpty())
+                        <li>
+                            <a href="#event-checklists" data-toggle="tab">
+                                <span class="hidden-xs hidden-sm">Checklist <span class="badge badge-secondary">{{ $asset->eventChecklistSubmissions->count() }}</span></span>
+                                <span class="hidden-lg hidden-md"><i class="fas fa-clipboard-check fa-2x"></i></span>
+                            </a>
+                        </li>
+                    @endif
+
                     <li>
                         <a href="#maintenances" data-toggle="tab">
                           <span class="hidden-lg hidden-md">
@@ -1461,7 +1470,110 @@
                         </div> <!-- /.row -->
                     </div> <!-- /.tab-pane history -->
 
-                    <div class="tab-pane fade" id="files">
+                        @if ($asset->eventChecklistSubmissions->isNotEmpty())
+                            <div class="tab-pane fade" id="event-checklists">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        @foreach ($asset->eventChecklistSubmissions as $submission)
+                                            <div class="box box-default">
+                                                <div class="box-header with-border">
+                                                    <h3 class="box-title">{{ $submission->checklist?->name ?? 'Event checklist' }}</h3>
+                                                    <span class="pull-right text-muted">{{ $submission->created_at?->format('Y-m-d H:i') }}</span>
+                                                </div>
+                                                <div class="box-body">
+                                                    <p>
+                                                        <strong>Status:</strong>
+                                                        {{ $submission->fromStatus?->name ?? '—' }}
+                                                        &rarr;
+                                                        {{ $submission->toStatus?->name ?? '—' }}
+                                                        @if ($submission->submitter)
+                                                            &nbsp; <strong>Submitted by:</strong> {{ $submission->submitter->present()->fullName() }}
+                                                        @endif
+                                                    </p>
+
+                                                    @php
+                                                        $submissionChecklistColumns = $submission->checklist?->columns ?? [];
+                                                        $submissionHasEvidenceColumn = collect($submissionChecklistColumns)
+                                                            ->contains(fn ($column) => ($column['key'] ?? null) === 'evidence');
+                                                    @endphp
+                                                    @if ($submission->evidence_files !== [])
+                                                        <p>
+                                                            <strong>Evidence:</strong>
+                                                            @foreach ($submission->evidence_files as $fileIndex => $evidenceFile)
+                                                                <a href="{{ route('event-checklist-submissions.evidence', [$submission->id, 'header-'.$fileIndex]) }}">
+                                                                    <i class="fas fa-paperclip" aria-hidden="true"></i>
+                                                                    {{ $evidenceFile['name'] ?? 'Download evidence' }}
+                                                                </a>@if (!$loop->last), @endif
+                                                            @endforeach
+                                                        </p>
+                                                    @endif
+
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    @foreach ($submissionChecklistColumns as $column)
+                                                                        <th>{{ $column['label'] ?? $column['key'] }}</th>
+                                                                    @endforeach
+                                                                    @if (!$submissionHasEvidenceColumn)
+                                                                        <th>Evidence</th>
+                                                                    @endif
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @forelse ($submission->rows ?? [] as $rowIndex => $row)
+                                                                    <tr>
+                                                                        @foreach ($submissionChecklistColumns as $column)
+                                                                            @php
+                                                                                $columnKey = $column['key'] ?? '';
+                                                                                $value = data_get($row, $columnKey);
+                                                                                $value = is_array($value) ? implode(', ', $value) : $value;
+                                                                            @endphp
+                                                                            <td>
+                                                                                {{ is_bool($value) ? ($value ? 'Yes' : 'No') : ($value ?? '—') }}
+                                                                                @if ($columnKey === 'evidence' && !empty($row['evidence_file']['path']))
+                                                                                    <br>
+                                                                                    <a href="{{ route('event-checklist-submissions.evidence', [$submission->id, $rowIndex]) }}">
+                                                                                        <i class="fas fa-paperclip" aria-hidden="true"></i>
+                                                                                        {{ $row['evidence_file']['name'] ?? 'Download evidence' }}
+                                                                                    </a>
+                                                                                @endif
+                                                                            </td>
+                                                                        @endforeach
+                                                                        @if (!$submissionHasEvidenceColumn)
+                                                                            <td>
+                                                                                @if (!empty($row['evidence']))
+                                                                                    {{ $row['evidence'] }}
+                                                                                @endif
+                                                                                @if (!empty($row['evidence_file']['path']))
+                                                                                    <a href="{{ route('event-checklist-submissions.evidence', [$submission->id, $rowIndex]) }}">
+                                                                                        <i class="fas fa-paperclip" aria-hidden="true"></i>
+                                                                                        {{ $row['evidence_file']['name'] ?? 'Download evidence' }}
+                                                                                    </a>
+                                                                                @endif
+                                                                                @if (empty($row['evidence']) && empty($row['evidence_file']['path']))
+                                                                                    —
+                                                                                @endif
+                                                                            </td>
+                                                                        @endif
+                                                                    </tr>
+                                                                @empty
+                                                                    <tr>
+                                                                        <td colspan="{{ max(1, count($submissionChecklistColumns) + (int) !$submissionHasEvidenceColumn) }}">No checklist answers were saved.</td>
+                                                                    </tr>
+                                                                @endforelse
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="tab-pane fade" id="files">
                         <div class="row{{ ($asset->uploads->count() > 0 ) ? '' : ' hidden-print' }}">
                             <div class="col-md-12">
                                 <x-filestable

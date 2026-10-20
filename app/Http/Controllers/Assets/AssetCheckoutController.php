@@ -5,11 +5,12 @@ namespace App\Http\Controllers\Assets;
 use App\Exceptions\CheckoutNotAllowed;
 use App\Helpers\Helper;
 use App\Http\Controllers\CheckInOutRequest;
-use App\Http\Traits\HandlesTransactionUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssetCheckoutRequest;
 use App\Models\Asset;
-use App\Models\CustomField;
+use App\Models\EventChecklist;
+use App\Models\Statuslabel;
+use App\Services\EventChecklistService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Session;
 use \Illuminate\Contracts\View\View;
@@ -18,7 +19,6 @@ use \Illuminate\Http\RedirectResponse;
 class AssetCheckoutController extends Controller
 {
     use CheckInOutRequest;
-    use HandlesTransactionUploads;
 
     /**
      * Returns a view that presents a form to check an asset out to a
@@ -40,13 +40,22 @@ class AssetCheckoutController extends Controller
         }
 
         if ($asset->availableForCheckout()) {
+            $checklistStatus = Statuslabel::query()
+                ->whereRaw('LOWER(name) IN (?, ?, ?)', ['check out', 'checkout', 'checked out'])
+                ->first();
+            $checklist = $checklistStatus
+                ? app(EventChecklistService::class)->forStatus($asset, $checklistStatus->id)
+                : null;
+            if (!$checklist) {
+                return redirect()->route('hardware.show', $asset)
+                    ->with('error', 'The Check Out event checklist is not configured.');
+            }
+
             return view('hardware/checkout', compact('asset'))
                 ->with('statusLabel_list', Helper::deployableStatusLabelList())
+                ->with('eventChecklists', collect([$checklist]))
                 ->with('table_name', 'Assets')
-                ->with('item', $asset)
-                ->with('checkoutCustomFields', CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])
-                    ->get()
-                    ->keyBy('name'));
+                ->with('item', $asset);
         }
 
         return redirect()->route('hardware.index')
@@ -71,6 +80,26 @@ class AssetCheckoutController extends Controller
             }
             $this->authorize('checkout', $asset);
 
+            $oldStatusId = (int) $asset->status_id;
+            $checklistStatus = Statuslabel::query()
+                ->whereRaw('LOWER(name) IN (?, ?, ?)', ['check out', 'checkout', 'checked out'])
+                ->first();
+            if (!$checklistStatus) {
+                return redirect()->back()->withInput()->with('error', 'The Check Out status label is not configured.');
+            }
+
+            $newStatusId = (int) $checklistStatus->id;
+            $checklistService = app(EventChecklistService::class);
+            $checklist = $checklistService->forStatus($asset, $newStatusId);
+            if (!$checklist) {
+                return redirect()->back()->withInput()->with('error', 'The Check Out event checklist is not configured.');
+            }
+
+            $checklistErrors = $checklistService->validate($checklist, $request->input('event_checklist_rows'), $request->file('event_checklist_files'));
+            if ($checklistErrors->isNotEmpty()) {
+                return redirect()->back()->withInput()->withErrors($checklistErrors);
+            }
+
             if (!$asset->model) {
                 return redirect()->route('hardware.show', $asset)->with('error', trans('admin/hardware/general.model_invalid_fix'));
             }
@@ -80,14 +109,6 @@ class AssetCheckoutController extends Controller
             $target = $this->determineCheckoutTarget();
 
             $asset = $this->updateAssetLocation($asset, $target);
-
-            if ($request->input('checkout_to_type') === 'user') {
-                foreach (CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])->get() as $field) {
-                    if ($request->has($field->db_column_name())) {
-                        $asset->{$field->db_column_name()} = $request->input($field->db_column_name());
-                    }
-                }
-            }
 
             $checkout_at = date('Y-m-d H:i:s');
             if (($request->filled('checkout_at')) && ($request->get('checkout_at') != date('Y-m-d'))) {
@@ -127,12 +148,17 @@ class AssetCheckoutController extends Controller
 
             session()->put(['redirect_option' => $request->get('redirect_option'), 'checkout_to_type' => $request->get('checkout_to_type')]);
 
-            $checkoutLocationId = $request->input('checkout_to_type') === 'user'
-                ? $request->input('checkout_location_id')
-                : null;
+            if ($asset->checkOut($target, $admin, $checkout_at, $expected_checkin, $request->get('note'), $request->get('name'))) {
+                $checklistService->record(
+                    $checklist,
+                    $asset,
+                    $oldStatusId,
+                    $newStatusId,
+                    $request->input('event_checklist_rows'),
+                    auth()->id(),
+                    $request->file('event_checklist_files')
+                );
 
-            if ($asset->checkOut($target, $admin, $checkout_at, $expected_checkin, $request->get('note'), $request->get('name'), $checkoutLocationId)) {
-                $this->uploadTransactionFiles($asset, $request, 'Checkout: '.$request->input('note', ''));
                 return redirect()->to(Helper::getRedirectOption($request, $asset->id, 'Assets'))
                     ->with('success', trans('admin/hardware/message.checkout.success'));
             }

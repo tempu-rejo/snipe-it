@@ -7,10 +7,11 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssetCheckinRequest;
 use App\Http\Traits\MigratesLegacyAssetLocations;
-use App\Http\Traits\HandlesTransactionUploads;
 use App\Models\Asset;
 use App\Models\CheckoutAcceptance;
 use App\Models\LicenseSeat;
+use App\Models\Statuslabel;
+use App\Services\EventChecklistService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 use \Illuminate\Contracts\View\View;
@@ -19,7 +20,6 @@ use \Illuminate\Http\RedirectResponse;
 class AssetCheckinController extends Controller
 {
     use MigratesLegacyAssetLocations;
-    use HandlesTransactionUploads;
 
     /**
      * Returns a view that presents a form to check an asset back into inventory.
@@ -43,9 +43,20 @@ class AssetCheckinController extends Controller
             return redirect()->route('hardware.show', $asset->id)->with('error', trans('admin/hardware/general.model_invalid_fix'));
         }
 
+        $inCheckingStatus = $this->inCheckingStatus();
+        if (!$inCheckingStatus) {
+            return redirect()->route('hardware.show', $asset)->with('error', 'The In-Checking status label is not configured.');
+        }
+
+        $checklist = app(EventChecklistService::class)->forStatus($asset, $inCheckingStatus->id);
+        if (!$checklist) {
+            return redirect()->route('hardware.show', $asset)->with('error', 'The In-Checking event checklist is not configured.');
+        }
+
         return view('hardware/checkin', compact('asset'))
             ->with('item', $asset)
-            ->with('statusLabel_list', Helper::statusLabelList())
+            ->with('statusLabel_list', [$inCheckingStatus->id => $inCheckingStatus->name])
+            ->with('eventChecklists', collect([$checklist]))
             ->with('backto', $backto)
             ->with('table_name', 'Assets');
     }
@@ -77,6 +88,24 @@ class AssetCheckinController extends Controller
 
         $this->authorize('checkin', $asset);
 
+        $oldStatusId = (int) $asset->status_id;
+        $inCheckingStatus = $this->inCheckingStatus();
+        if (!$inCheckingStatus) {
+            return redirect()->back()->withInput()->with('error', 'The In-Checking status label is not configured.');
+        }
+
+        $newStatusId = (int) $inCheckingStatus->id;
+        $checklistService = app(EventChecklistService::class);
+        $checklist = $checklistService->forStatus($asset, $newStatusId);
+        if (!$checklist) {
+            return redirect()->back()->withInput()->with('error', 'The In-Checking event checklist is not configured.');
+        }
+
+        $checklistErrors = $checklistService->validate($checklist, $request->input('event_checklist_rows'), $request->file('event_checklist_files'));
+        if ($checklistErrors->isNotEmpty()) {
+            return redirect()->back()->withInput()->withErrors($checklistErrors);
+        }
+
         if ($asset->assignedType() == Asset::USER) {
             $user = $asset->assignedTo;
         }
@@ -87,9 +116,7 @@ class AssetCheckinController extends Controller
         $asset->accepted = null;
         $asset->name = $request->get('name');
 
-        if ($request->filled('status_id')) {
-            $asset->status_id = $request->input('status_id');
-        }
+        $asset->status_id = $newStatusId;
 
         // Add any custom fields that should be included in the checkout
         $asset->customFieldsForCheckinCheckout('display_checkin');
@@ -135,12 +162,33 @@ class AssetCheckinController extends Controller
         $asset->customFieldsForCheckinCheckout('display_checkin');
 
         if ($asset->save()) {
+            if ($checklist) {
+                $checklistService->record(
+                    $checklist,
+                    $asset,
+                    $oldStatusId,
+                    $newStatusId,
+                    $request->input('event_checklist_rows'),
+                    auth()->id(),
+                    $request->file('event_checklist_files')
+                );
+            }
 
             event(new CheckoutableCheckedIn($asset, $target, auth()->user(), $request->input('note'), $checkin_at, $originalValues));
-            $this->uploadTransactionFiles($asset, $request, 'Check-in: '.$request->input('note', ''));
             return redirect()->to(Helper::getRedirectOption($request, $asset->id, 'Assets'))->with('success', trans('admin/hardware/message.checkin.success'));
         }
         // Redirect to the asset management page with error
         return redirect()->route('hardware.index')->with('error', trans('admin/hardware/message.checkin.error').$asset->getErrors());
+    }
+
+    private function inCheckingStatus(): ?Statuslabel
+    {
+        return Statuslabel::query()
+            ->where(function ($query) {
+                $query->whereRaw('LOWER(name) = ?', ['in checking'])
+                    ->orWhereRaw('LOWER(name) = ?', ['in-checking'])
+                    ->orWhereRaw('LOWER(name) = ?', ['in_checking']);
+            })
+            ->first();
     }
 }

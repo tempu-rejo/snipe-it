@@ -64,6 +64,7 @@ class AssetMaintenance extends Model implements ICompanyableChild
      */
     protected $searchableAttributes =
         [
+            'document_number',
             'title',
             'notes',
             'asset_maintenance_type',
@@ -109,6 +110,21 @@ class AssetMaintenance extends Model implements ICompanyableChild
             trans('admin/asset_maintenances/general.hardware_support')      => trans('admin/asset_maintenances/general.hardware_support'),
             trans('admin/asset_maintenances/general.configuration_change')     => trans('admin/asset_maintenances/general.configuration_change'), */
         ];
+    }
+
+    public static function generateDocumentNumber(): string
+    {
+        $prefix = 'MNT-'.now()->format('ym');
+        $lastMaintenance = static::withTrashed()
+            ->where('document_number', 'like', $prefix.'-%')
+            ->orderByDesc('document_number')
+            ->first();
+
+        $increment = $lastMaintenance
+            ? ((int) substr($lastMaintenance->document_number, -5)) + 1
+            : 1;
+
+        return $prefix.'-'.str_pad((string) $increment, 5, '0', STR_PAD_LEFT);
     }
 
     public function setIsWarrantyAttribute($value)

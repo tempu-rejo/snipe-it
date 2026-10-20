@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Transformers\ActionlogsTransformer;
 use App\Models\Actionlog;
+use App\Models\Asset;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -19,8 +20,11 @@ class ReportsController extends Controller
      */
     public function index(Request $request) : JsonResponse | array
     {
+        if ($request->filled('item_id') && strtolower((string) $request->input('item_type')) === 'asset') {
+            $asset = Asset::findOrFail($request->input('item_id'));
+            $this->authorize('view', $asset);
         // If viewing a specific user's history, check user view permission instead of reports.view
-        if (($request->filled('target_type')) && ($request->filled('target_id')) && ($request->input('target_type') == 'user')) {
+        } elseif (($request->filled('target_type')) && ($request->filled('target_id')) && ($request->input('target_type') == 'user')) {
             $user = User::findOrFail($request->input('target_id'));
             $this->authorize('view', $user);
         } else {

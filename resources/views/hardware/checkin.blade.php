@@ -31,13 +31,13 @@
                     <div class="col-md-12"><!-- .col-md-12 -->
 
                         @if ($backto == 'user')
-                            <form class="form-horizontal" method="post" enctype="multipart/form-data"
+                            <form class="form-horizontal" method="post"
                                   action="{{ route('hardware.checkin.store', array('assetId'=> $asset->id, 'backto'=>'user')) }}"
-                                  autocomplete="off">
+                                  autocomplete="off" enctype="multipart/form-data">
                                 @else
-                                    <form class="form-horizontal" method="post" enctype="multipart/form-data"
+                                    <form class="form-horizontal" method="post"
                                           action="{{ route('hardware.checkin.store', array('assetId'=> $asset->id)) }}"
-                                          autocomplete="off">
+                                          autocomplete="off" enctype="multipart/form-data">
                                         @endif
                                         {{csrf_field()}}
 
@@ -88,7 +88,6 @@
                                                     name="status_id"
                                                     id="modal-statuslabel_types"
                                                     :options="$statusLabel_list"
-                                                    :selected="old('status_id', $asset->status_id)"
                                                     style="width: 100%"
                                                     aria-label="status_id"
                                                 />
@@ -126,6 +125,8 @@
                                                 'show_display_checkin_fields' => 'true'
                                         ])
 
+                                        @include('partials.event-checklist')
+
 
 
 
@@ -141,14 +142,6 @@
                                 <textarea class="col-md-6 form-control" id="note" @required($snipeSettings->require_checkinout_notes)
                                         name="note">{{ old('note', $asset->note) }}</textarea>
                                 {!! $errors->first('note', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
-                            </div>
-
-                            <div class="form-group {{ $errors->has('file.*') ? 'has-error' : '' }}">
-                                <label for="file" class="col-sm-3 control-label">Files</label>
-                                <div class="col-md-8">
-                                    <input type="file" name="file[]" id="file" multiple class="form-control">
-                                    {!! $errors->first('file.*', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"></i> :message</span>') !!}
-                                </div>
                             </div>
                         </div>
                     </div> <!--/.box-body-->

@@ -24,7 +24,7 @@ trait HandlesTransactionUploads
         foreach ($request->file('file', []) as $file) {
             $filename = $uploadRequest->handleFile(
                 'private_uploads/assets/',
-                'transaction-'.$asset->id,
+                $asset->uploadFilenamePrefix(),
                 $file
             );
 

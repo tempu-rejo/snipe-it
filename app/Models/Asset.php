@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Watson\Validating\ValidatingTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -484,6 +485,11 @@ class Asset extends Depreciable
                   ->orderBy('created_at', 'desc');
     }
 
+    public function eventChecklistSubmissions()
+    {
+        return $this->hasMany(EventChecklistSubmission::class)->latest();
+    }
+
     /**
      * Determines whether the asset is checked out to a user
      *
@@ -765,6 +771,30 @@ class Asset extends Depreciable
     public function assetstatus()
     {
         return $this->belongsTo(\App\Models\Statuslabel::class, 'status_id');
+    }
+
+    public function uploadFilenamePrefix(): string
+    {
+        $statusName = trim((string) $this->assetstatus?->name);
+        $words = preg_split('/[^\p{L}\p{N}]+/u', $statusName, -1, PREG_SPLIT_NO_EMPTY);
+
+        if (! is_array($words) || $words === [] || trim((string) $this->asset_tag) === '') {
+            throw new \LogicException('An asset status and asset tag are required to build an upload filename.');
+        }
+
+        $abbreviation = collect($words)
+            ->map(fn (string $word) => Str::substr($word, 0, 1))
+            ->implode('');
+
+        if (Str::length($abbreviation) < 3) {
+            $lastWord = end($words);
+            $abbreviation .= Str::substr($lastWord, 1, 3 - Str::length($abbreviation));
+        }
+
+        $abbreviation = Str::upper(Str::substr(str_pad($abbreviation, 3, 'X'), 0, 3));
+        $assetTag = preg_replace('/[^A-Za-z0-9._-]+/', '_', (string) $this->asset_tag);
+
+        return $abbreviation.'_'.$assetTag;
     }
 
     /**

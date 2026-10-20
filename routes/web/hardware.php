@@ -89,6 +89,9 @@ Route::group(
             [AssetsController::class, 'getAssetByTag']
         )->where('any', '.*')->name('findbytag/hardware');
 
+        Route::get('asset-details/{tag}', [AssetsController::class, 'getAssetDetails'])
+            ->name('hardware.asset-details');
+
         Route::get('byserial/{any?}',
             [AssetsController::class, 'getAssetBySerial']
         )->where('any', '.*')->name('findbyserial/hardware');
@@ -101,24 +104,17 @@ Route::group(
             [AssetsController::class, 'getLabel']
         )->name('label/hardware');
 
-        Route::get('{asset}/checkout', [AssetCheckoutController::class, 'create'])
-            ->name('hardware.checkout.create')
-            ->breadcrumbs(fn (Trail $trail, Asset $asset) =>
-            $trail->parent('hardware.show', $asset)
-                ->push(trans('admin/hardware/general.checkout'), route('hardware.index'))
-            );
+        Route::get('{asset}/checkout', function ($asset) {
+            return redirect()->route('inventory.bulk-checkout.create', ['asset_id' => $asset]);
+        })->name('hardware.checkout.create');
 
         Route::post('{assetId}/checkout',
             [AssetCheckoutController::class, 'store']
         )->name('hardware.checkout.store');
 
-        Route::get('{asset}/checkin/{backto?}',
-            [AssetCheckinController::class, 'create']
-        )->name('hardware.checkin.create')
-        ->breadcrumbs(fn (Trail $trail, Asset $asset) =>
-        $trail->parent('hardware.show', $asset)
-            ->push(trans('admin/hardware/general.checkin'), route('hardware.index'))
-        );
+        Route::get('{asset}/checkin/{backto?}', function ($asset, $backto = null) {
+            return redirect()->route('inventory.quickscan-checkin.create', ['asset_id' => $asset]);
+        })->name('hardware.checkin.create');
 
         Route::post('{assetId}/checkin/{backto?}',
             [AssetCheckinController::class, 'store']

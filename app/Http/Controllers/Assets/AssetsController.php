@@ -17,11 +17,15 @@ use App\Models\Location;
 use App\Models\Setting;
 use App\Models\Statuslabel;
 use App\Models\User;
+use App\Models\EventChecklist;
+use App\Models\EventChecklistSubmission;
+use App\Services\EventChecklistService;
 use App\View\Label;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -81,7 +85,8 @@ class AssetsController extends Controller
         $view = view('hardware/edit')
             ->with('statuslabel_list', Helper::statusLabelList())
             ->with('item', new Asset)
-            ->with('statuslabel_types', Helper::statusTypeList());
+            ->with('statuslabel_types', Helper::statusTypeList())
+            ->with('eventChecklists', EventChecklist::with(['fromStatus', 'toStatus', 'template'])->orderBy('id')->get());
 
         if ($request->filled('model_id')) {
             $selected_model = AssetModel::find($request->input('model_id'));
@@ -110,6 +115,30 @@ class AssetsController extends Controller
         // differently
         $asset_tags = $request->input('asset_tags');
 
+        $model = AssetModel::find($request->input('model_id'));
+        $newStatusId = (int) $request->input('status_id');
+        $checklistAsset = new Asset();
+        $checklistAsset->setRelation('model', $model);
+        $checklistService = app(EventChecklistService::class);
+        $checklist = $model && $newStatusId
+            ? $checklistService->forStatus($checklistAsset, $newStatusId)
+            : null;
+
+        if (! $checklist) {
+            return redirect()->back()->withInput()->withErrors([
+                'event_checklist' => 'A checklist must be configured for the selected status and asset category.',
+            ]);
+        }
+
+        $checklistErrors = $checklistService->validate(
+            $checklist,
+            $request->input('event_checklist_rows'),
+            $request->file('event_checklist_files')
+        );
+        if ($checklistErrors->isNotEmpty()) {
+            return redirect()->back()->withInput()->withErrors($checklistErrors);
+        }
+
         $settings = Setting::getSettings();
 
         $successes = [];
@@ -128,7 +157,7 @@ class AssetsController extends Controller
             }
 
             if (($asset_tags) && (array_key_exists($a, $asset_tags))) {
-                $device_type = $request->input('_snipeit_device_type_5');
+                $device_type = $request->input('_snipeit_device_type_2');
                 if (strtolower($device_type) == 'personal') {
                     $code_tag = 'P';
                 } else {
@@ -144,8 +173,7 @@ class AssetsController extends Controller
                         ->update(['order' => 1, 'year' => $year]);
                 }
 
-                $source_value = $request->input('_snipeit_source_10');
-                if(strtoupper($source_value) == 'NEW'){
+                if($request->_snipeit_source_3 == 'NEW'){
                     $Source = '1';
                 }else{  
                     $Source = '0';
@@ -236,6 +264,16 @@ class AssetsController extends Controller
                     $asset->checkOut($target, auth()->user(), date('Y-m-d H:i:s'), $request->input('expected_checkin', null), 'Checked out on asset creation', $request->get('name'), $location);
                 }
 
+                $checklistService->record(
+                    $checklist,
+                    $asset,
+                    null,
+                    $newStatusId,
+                    $request->input('event_checklist_rows'),
+                    auth()->id(),
+                    $request->file('event_checklist_files')
+                );
+
                 $successes[] = "<a href='" . route('hardware.show', $asset) . "' style='color: white;'>" . e($asset->asset_tag) . "</a>";
 
             } else {
@@ -281,10 +319,24 @@ class AssetsController extends Controller
     public function edit(Asset $asset) : View | RedirectResponse
     {
         $this->authorize($asset);
+        $eventChecklistSubmission = EventChecklistSubmission::query()
+            ->with(['checklist.fromStatus', 'checklist.toStatus', 'checklist.template'])
+            ->where('asset_id', $asset->id)
+            ->where('to_status_id', $asset->status_id)
+            ->latest('id')
+            ->first();
+
+        $eventChecklistValues = $eventChecklistSubmission && $eventChecklistSubmission->checklist
+            ? [$eventChecklistSubmission->event_checklist_id => ($eventChecklistSubmission->rows ?? [])]
+            : [];
+
         return view('hardware/edit')
             ->with('item', $asset)
             ->with('statuslabel_list', Helper::statusLabelList())
-            ->with('statuslabel_types', Helper::statusTypeList());
+            ->with('statuslabel_types', Helper::statusTypeList())
+            ->with('eventChecklists', EventChecklist::with(['fromStatus', 'toStatus', 'template'])->orderBy('id')->get())
+            ->with('eventChecklistSubmission', $eventChecklistSubmission)
+            ->with('eventChecklistValues', $eventChecklistValues);
     }
 
 
@@ -299,6 +351,12 @@ class AssetsController extends Controller
     public function show(Asset $asset) : View | RedirectResponse
     {
         $this->authorize('view', $asset);
+        $asset->load([
+            'eventChecklistSubmissions.checklist',
+            'eventChecklistSubmissions.fromStatus',
+            'eventChecklistSubmissions.toStatus',
+            'eventChecklistSubmissions.submitter',
+        ]);
         $settings = Setting::getSettings();
 
         if (isset($asset)) {
@@ -340,6 +398,52 @@ class AssetsController extends Controller
     {
 
         $this->authorize($asset);
+
+        $oldStatusId = (int) $asset->status_id;
+        $newStatusId = (int) $request->input('status_id');
+        $model = AssetModel::find($request->input('model_id'));
+        $asset->setRelation('model', $model);
+        $checklistService = app(EventChecklistService::class);
+        $statusChanged = $newStatusId !== $oldStatusId;
+        $checklistSubmission = null;
+        $checklist = null;
+
+        if ($statusChanged) {
+            $checklist = $model && $newStatusId
+                ? $checklistService->forStatus($asset, $newStatusId, $oldStatusId ?: null)
+                : null;
+
+            if (! $checklist) {
+                return redirect()->back()->withInput()->withErrors([
+                    'event_checklist' => 'A checklist must be configured for the selected status and asset category.',
+                ]);
+            }
+        } elseif ($request->filled('event_checklist_submission_id')) {
+            $checklistSubmission = $asset->eventChecklistSubmissions()
+                ->with('checklist')
+                ->whereKey($request->input('event_checklist_submission_id'))
+                ->where('to_status_id', $oldStatusId)
+                ->first();
+
+            if (! $checklistSubmission || ! $checklistSubmission->checklist) {
+                return redirect()->back()->withInput()->withErrors([
+                    'event_checklist' => 'The selected existing checklist submission is not available for this hardware.',
+                ]);
+            }
+
+            $checklist = $checklistSubmission->checklist;
+        }
+
+        if ($checklist) {
+            $checklistErrors = $checklistService->validate(
+                $checklist,
+                $request->input('event_checklist_rows'),
+                $request->file('event_checklist_files')
+            );
+            if ($checklistErrors->isNotEmpty()) {
+                return redirect()->back()->withInput()->withErrors($checklistErrors);
+            }
+        }
 
         $asset->status_id = $request->input('status_id', null);
         $asset->warranty_months = $request->input('warranty_months', null);
@@ -452,6 +556,24 @@ class AssetsController extends Controller
         session()->put(['redirect_option' => $request->get('redirect_option'), 'checkout_to_type' => $request->get('checkout_to_type')]);
 
         if ($asset->save()) {
+            if ($statusChanged && $checklist) {
+                $checklistService->record(
+                    $checklist,
+                    $asset,
+                    $oldStatusId,
+                    $newStatusId,
+                    $request->input('event_checklist_rows'),
+                    auth()->id(),
+                    $request->file('event_checklist_files')
+                );
+            } elseif ($checklistSubmission) {
+                $checklistService->updateSubmission(
+                    $checklistSubmission,
+                    $request->input('event_checklist_rows'),
+                    $request->file('event_checklist_files')
+                );
+            }
+
             return redirect()->to(Helper::getRedirectOption($request, $asset->id, 'Assets'))
                 ->with('success', trans('admin/hardware/message.update.success'));
         }
@@ -543,6 +665,33 @@ class AssetsController extends Controller
         $this->authorize('view', $asset);
 
         return redirect()->route('hardware.show', $asset->id)->with('topsearch', $topsearch);
+    }
+
+    public function getAssetDetails(string $tag): JsonResponse
+    {
+        $asset = Asset::query()
+            ->with(['model', 'assignedTo'])
+            ->where('asset_tag', $tag)
+            ->first();
+
+        if (! $asset) {
+            return response()->json(['message' => trans('admin/hardware/message.does_not_exist')], 404);
+        }
+
+        $this->authorize('view', $asset);
+        $assignedUser = $asset->assignedTo instanceof User ? $asset->assignedTo : null;
+
+        return response()->json([
+            'id' => $asset->id,
+            'name' => $asset->name,
+            'model' => ['name' => $asset->model?->name],
+            'serial' => $asset->serial,
+            'assigned_to' => $assignedUser ? [
+                'id' => $assignedUser->id,
+                'first_name' => $assignedUser->first_name,
+                'last_name' => $assignedUser->last_name,
+            ] : null,
+        ]);
     }
 
 

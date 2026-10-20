@@ -18,14 +18,13 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\AssetCheckoutRequest;
 use App\Models\CustomField;
+use App\Services\EventChecklistService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use App\Http\Traits\HandlesTransactionUploads;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BulkAssetsController extends Controller
 {
-    use HandlesTransactionUploads;
     use CheckInOutRequest;
 
     /**
@@ -260,6 +259,15 @@ class BulkAssetsController extends Controller
             foreach ($assets as $asset) {
 
                 $this->update_array = [];
+                $oldStatusId = (int) $asset->status_id;
+                $newStatusId = $request->filled('status_id') ? (int) $request->input('status_id') : $oldStatusId;
+                $checklistService = app(EventChecklistService::class);
+                $checklist = $checklistService->forTransition($asset, $oldStatusId, $newStatusId);
+                if ($checklist && $checklistService->validate($checklist, $request->input('event_checklist_rows'), $request->file('event_checklist_files'))->isNotEmpty()) {
+                    $error_array['event_checklist'][] = trans('general.asset').' '.$asset->id.': Event checklist is required.';
+                    $has_errors++;
+                    continue;
+                }
 
                 /**
                  * Leave out model_id and status here because we do math on that later. We have to do some
@@ -485,6 +493,16 @@ class BulkAssetsController extends Controller
                         }
                     }
 
+                } else if ($checklist) {
+                    $checklistService->record(
+                        $checklist,
+                        $asset,
+                        $oldStatusId,
+                        $newStatusId,
+                        $request->input('event_checklist_rows'),
+                        auth()->id(),
+                        $request->file('event_checklist_files')
+                    );
                 }  // end if saved
 
             } // end asset foreach
@@ -564,11 +582,7 @@ class BulkAssetsController extends Controller
     public function showCheckout() : View
     {
         $this->authorize('checkout', Asset::class);
-        $checkoutCustomFields = CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])
-            ->get()
-            ->keyBy('name');
-
-        return view('hardware/bulk-checkout', compact('checkoutCustomFields'));
+        return view('hardware/bulk-checkout');
     }
 
     /**
@@ -583,12 +597,6 @@ class BulkAssetsController extends Controller
             $admin = auth()->user();
 
             $target = $this->determineCheckoutTarget();
-            $checkoutLocationId = $request->input('checkout_to_type') === 'user'
-                ? $request->input('checkout_location_id')
-                : null;
-            $checkoutCustomFields = $request->input('checkout_to_type') === 'user'
-                ? CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])->get()
-                : collect();
 
             if (! is_array($request->get('selected_assets'))) {
                 return redirect()->route('hardware.bulkcheckout.show')->withInput()->with('error', trans('admin/hardware/message.checkout.no_assets_selected'));
@@ -615,21 +623,15 @@ class BulkAssetsController extends Controller
             }
 
             $errors = [];
-            DB::transaction(function () use ($target, $admin, $checkout_at, $expected_checkin, &$errors, $asset_ids, $request, $checkoutLocationId, $checkoutCustomFields) { //NOTE: $errors is passsed by reference!
+            DB::transaction(function () use ($target, $admin, $checkout_at, $expected_checkin, &$errors, $asset_ids, $request) { //NOTE: $errors is passsed by reference!
                 foreach ($asset_ids as $asset_id) {
                     $asset = Asset::findOrFail($asset_id);
                     $this->authorize('checkout', $asset);
 
-                    foreach ($checkoutCustomFields as $field) {
-                        if ($request->has($field->db_column_name())) {
-                            $asset->{$field->db_column_name()} = $request->input($field->db_column_name());
-                        }
-                    }
-
-                    $checkout_success = $asset->checkOut($target, $admin, $checkout_at, $expected_checkin, e($request->get('note')), $asset->name, $checkoutLocationId);
+                    $checkout_success = $asset->checkOut($target, $admin, $checkout_at, $expected_checkin, e($request->get('note')), $asset->name, null);
 
                     //TODO - I think this logic is duplicated in the checkOut method?
-                    if (! $checkoutLocationId && ($target->location_id != '')) {
+                    if ($target->location_id != '') {
                         $asset->location_id = $target->location_id;
                         // TODO - I don't know why this is being saved without events
                         $asset::withoutEvents(function () use ($asset) {
@@ -639,8 +641,6 @@ class BulkAssetsController extends Controller
 
                     if (!$checkout_success) {
                         $errors = array_merge_recursive($errors, $asset->getErrors()->toArray());
-                    } else {
-                        $this->uploadTransactionFiles($asset, $request, 'Bulk checkout: '.$request->input('note', ''));
                     }
                 }
             });

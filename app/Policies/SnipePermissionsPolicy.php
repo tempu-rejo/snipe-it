@@ -84,6 +84,11 @@ abstract class SnipePermissionsPolicy
         return $user->hasAccess($this->columnName().'.view');
     }
 
+    public function viewAny(User $user)
+    {
+        return $this->index($user);
+    }
+
     /**
      * Determine whether the user can view the accessory.
      *
