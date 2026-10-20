@@ -310,7 +310,7 @@
         <!-- Login Footer -->
         <div class="login-footer">
             <p>&copy; {{ date('Y') }} Universal Leaf. All rights reserved.</p>
-            <p>{{ $snipeSettings->site_name ?? config('app.name', 'UI-Trackin (IT)') }} v1.0</p>
+            <p>{{ $snipeSettings->site_name ?? config('app.name', 'UI-Trackin (IT)') }} v2.0</p>
             <p>Need help? Contact <a href="mailto:idhelp@universalleaf.com">IDHelp</a></p>
             <img src="{{ asset('img/IDIT.png') }}" alt="IDIT Logo" class="IDIT-logo">
         </div>
