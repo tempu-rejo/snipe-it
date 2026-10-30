@@ -22,7 +22,8 @@ class LivewireServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/' . config('livewire.url_prefix') . '/livewire/update', $handle);
+            return Route::post('/' . config('livewire.url_prefix') . '/livewire/update', $handle)
+                ->middleware('web');
         });
 
         Livewire::setScriptRoute(function ($handle) {
