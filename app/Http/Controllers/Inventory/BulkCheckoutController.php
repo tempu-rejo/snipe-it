@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventory;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\CustomField;
 use App\Models\EventChecklist;
 use App\Models\Location;
 use App\Models\Statuslabel;
@@ -186,6 +187,10 @@ class BulkCheckoutController extends Controller
             return redirect()->back()->withInput()->with('error', 'The Check Out status label is not configured.');
         }
 
+        $checkoutAssetFields = CustomField::whereIn('name', ['Loc. Detail', 'On Behalf'])
+            ->get()
+            ->keyBy('name');
+
         $assets = collect($request->input('assets'))->map(function ($assetData) {
             return Asset::where('asset_tag', $assetData['asset_tag'])->first();
         });
@@ -236,6 +241,18 @@ class BulkCheckoutController extends Controller
                     // Update location if default location is specified (before checkout)
                     if ($request->input('default_location')) {
                         $asset->location_id = $request->input('default_location');
+                    }
+                    foreach ([
+                        'Loc. Detail' => 'location_detail',
+                        'On Behalf' => 'on_behalf',
+                    ] as $fieldName => $inputName) {
+                        $field = $checkoutAssetFields->get($fieldName);
+                        if ($field && $request->filled($inputName)) {
+                            $asset->{$field->db_column_name()} = $request->input($inputName);
+                        }
+                    }
+                    if ($request->filled('notes')) {
+                        $asset->notes = $request->input('notes');
                     }
                     
                     // Check out the asset

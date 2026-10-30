@@ -139,6 +139,7 @@
                                 <label for="on_behalf" class="col-md-4 control-label">On behalf</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" name="on_behalf" id="on_behalf" value="{{ old('on_behalf') }}">
+                                    <span class="help-block">Nilai ini juga memperbarui On Behalf pada setiap aset yang berhasil di-check-out.</span>
                                     @if($errors->has('on_behalf'))
                                         <span class="help-block">{{ $errors->first('on_behalf') }}</span>
                                     @endif
@@ -150,6 +151,7 @@
                                 <label for="location_detail" class="col-md-4 control-label">Loc. Detail</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" name="location_detail" id="location_detail" value="{{ old('location_detail') }}">
+                                    <span class="help-block">Nilai ini juga memperbarui Loc. Detail pada setiap aset yang berhasil di-check-out.</span>
                                     @if($errors->has('location_detail'))
                                         <span class="help-block">{{ $errors->first('location_detail') }}</span>
                                     @endif
@@ -165,6 +167,7 @@
                         </label>
                         <div class="col-md-10">
                             <textarea class="form-control" name="notes" id="notes" rows="3">{{ old('notes') }}</textarea>
+                            <span class="help-block">Catatan transaksi ini juga memperbarui Notes pada setiap aset yang berhasil di-check-out.</span>
                             @if($errors->has('notes'))
                                 <span class="help-block">{{ $errors->first('notes') }}</span>
                             @endif
