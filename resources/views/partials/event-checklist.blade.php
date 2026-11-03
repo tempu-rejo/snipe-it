@@ -333,16 +333,32 @@
 
         var maintenanceType = document.getElementById('asset_maintenance_type');
         if (maintenanceType && !statusChecklist) {
+            var normalizeMaintenanceType = function (value) {
+                return (value || '').toLowerCase().replace(/[\u2013\u2014]/g, '-').trim();
+            };
             var updateVisibleChecklist = function () {
-                var selectedStatus = maintenanceType.value.toLowerCase();
+                var selectedStatus = normalizeMaintenanceType(maintenanceType.value);
                 document.querySelectorAll('.event-checklist').forEach(function (panel) {
-                    var isVisible = panel.dataset.targetStatus.toLowerCase() === selectedStatus;
+                    var isVisible = normalizeMaintenanceType(panel.dataset.targetStatus) === selectedStatus;
                     panel.hidden = !isVisible;
                     panel.querySelectorAll('input, select, textarea').forEach(function (field) {
                         field.disabled = !isVisible;
                     });
                 });
             };
+            document.getElementById('maintenance_checklist_button')?.addEventListener('click', function () {
+                updateVisibleChecklist();
+                if (!maintenanceType.value) {
+                    maintenanceType.focus();
+                    return;
+                }
+                var visibleChecklist = document.querySelector('.event-checklist:not([hidden])');
+                if (visibleChecklist) {
+                    visibleChecklist.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    alert('Checklist tidak dikonfigurasi untuk jenis maintenance yang dipilih.');
+                }
+            });
             maintenanceType.addEventListener('change', updateVisibleChecklist);
             updateVisibleChecklist();
         }

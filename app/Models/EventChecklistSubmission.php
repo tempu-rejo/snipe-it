@@ -12,6 +12,7 @@ class EventChecklistSubmission extends Model
     protected $fillable = [
         'event_checklist_id',
         'asset_id',
+        'asset_maintenance_id',
         'from_status_id',
         'to_status_id',
         'rows',
@@ -32,6 +33,11 @@ class EventChecklistSubmission extends Model
     public function asset()
     {
         return $this->belongsTo(Asset::class);
+    }
+
+    public function assetMaintenance()
+    {
+        return $this->belongsTo(AssetMaintenance::class);
     }
 
     public function fromStatus()

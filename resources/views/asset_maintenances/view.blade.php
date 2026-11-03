@@ -83,6 +83,25 @@ use Carbon\Carbon;
 
             <div class="row">
               <div class="col-md-3">
+                {{ trans('general.location') }}
+              </div>
+              <div class="col-md-9">
+                @if ($assetMaintenance->asset->defaultLoc)
+                  <a href="{{ route('locations.show', $assetMaintenance->asset->rtd_location_id) }}">
+                    {{ $assetMaintenance->asset->defaultLoc->name }}
+                  </a>
+                @elseif ($assetMaintenance->asset->location)
+                  <a href="{{ route('locations.show', $assetMaintenance->asset->location_id) }}">
+                    {{ $assetMaintenance->asset->location->name }}
+                  </a>
+                @else
+                  -
+                @endif
+              </div>
+            </div> <!-- /row -->
+
+            <div class="row">
+              <div class="col-md-3">
                 {{ trans('admin/asset_maintenances/form.start_date') }}
               </div>
               <div class="col-md-9">
@@ -143,8 +162,100 @@ use Carbon\Carbon;
             </div> <!-- /row -->
             @endif
 
+              @if ($checklistSubmissions->isNotEmpty())
+                @foreach ($checklistSubmissions as $submission)
+                  <div class="row">
+                    <div class="col-md-12">
+                      <h4>{{ $submission->checklist?->name ?? 'Event Checklist' }}</h4>
+                      <p class="text-muted">
+                        {{ $submission->created_at?->format('Y-m-d H:i') }}
+                        @if ($submission->submitter)
+                          &mdash; {{ $submission->submitter->present()->fullName() }}
+                        @endif
+                      </p>
+                      @php
+                        $submissionColumns = $submission->checklist?->columns ?? [];
+                        $submissionRows = $submission->rows ?? [];
+                      @endphp
+                      <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                          <thead>
+                            <tr>
+                              @if ($submissionColumns === [])
+                                <th>No</th>
+                                <th>Checkpoint</th>
+                                <th>Result</th>
+                                <th>Evidence</th>
+                              @else
+                                @foreach ($submissionColumns as $column)
+                                  <th>{{ $column['label'] ?? $column['key'] }}</th>
+                                @endforeach
+                                @if (!collect($submissionColumns)->contains(fn ($column) => ($column['key'] ?? null) === 'evidence'))
+                                  <th>Evidence</th>
+                                @endif
+                              @endif
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @foreach ($submissionRows as $rowIndex => $row)
+                              <tr>
+                                @if ($submissionColumns === [])
+                                  <td>{{ $rowIndex + 1 }}</td>
+                                  <td>{{ $row['checkpoint'] ?? '-' }}</td>
+                                  <td>{{ $row['result'] ?? '-' }}</td>
+                                  <td>
+                                    @if (!empty($row['evidence_file']['path']))
+                                      <a href="{{ route('event-checklist-submissions.evidence', [$submission->id, $rowIndex]) }}">
+                                        {{ $row['evidence_file']['name'] ?? 'Download evidence' }}
+                                      </a>
+                                    @else
+                                      {{ $row['evidence'] ?? '-' }}
+                                    @endif
+                                  </td>
+                                @else
+                                  @foreach ($submissionColumns as $column)
+                                    @php
+                                      $columnKey = $column['key'] ?? '';
+                                      $cellValue = $row[$columnKey] ?? '-';
+                                      if (is_bool($cellValue)) {
+                                          $cellValue = $cellValue ? 'Yes' : 'No';
+                                      }
+                                    @endphp
+                                    <td>{{ is_array($cellValue) ? implode(', ', $cellValue) : $cellValue }}</td>
+                                  @endforeach
+                                  @if (!collect($submissionColumns)->contains(fn ($column) => ($column['key'] ?? null) === 'evidence'))
+                                    <td>
+                                      @if (!empty($row['evidence_file']['path']))
+                                        <a href="{{ route('event-checklist-submissions.evidence', [$submission->id, $rowIndex]) }}">
+                                          {{ $row['evidence_file']['name'] ?? 'Download evidence' }}
+                                        </a>
+                                      @else
+                                        {{ $row['evidence'] ?? '-' }}
+                                      @endif
+                                    </td>
+                                  @endif
+                                @endif
+                              </tr>
+                            @endforeach
+                          </tbody>
+                        </table>
+                      </div>
+                      @if ($submission->evidence_files !== [])
+                        <p>
+                          <strong>Attachment:</strong>
+                          @foreach ($submission->evidence_files as $fileIndex => $evidenceFile)
+                            <a href="{{ route('event-checklist-submissions.evidence', [$submission->id, 'header-'.$fileIndex]) }}">
+                              {{ $evidenceFile['name'] ?? 'Download evidence' }}
+                            </a>@if (!$loop->last), @endif
+                          @endforeach
+                        </p>
+                      @endif
+                    </div>
+                  </div>
+                @endforeach
+              @endif
 
-          </div><!-- /row-new-striped -->
+              </div><!-- /row-new-striped -->
       </div><!-- /box-body -->
     </div><!-- /box -->
 

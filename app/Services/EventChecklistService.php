@@ -189,7 +189,8 @@ class EventChecklistService
         int $toStatusId,
         mixed $rows,
         ?int $submittedBy,
-        mixed $files = null
+        mixed $files = null,
+        ?int $assetMaintenanceId = null
     ): EventChecklistSubmission {
         if (is_array($rows) && array_key_exists((string) $checklist->id, $rows)) {
             $rows = $rows[$checklist->id];
@@ -211,6 +212,7 @@ class EventChecklistService
 
         return $checklist->submissions()->create([
             'asset_id' => $asset->id,
+            'asset_maintenance_id' => $assetMaintenanceId,
             'from_status_id' => $fromStatusId,
             'to_status_id' => $toStatusId,
             'rows' => $rows,

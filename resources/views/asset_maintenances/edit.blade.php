@@ -111,7 +111,7 @@
           <div class="col-md-7">
             <select class="form-control select2" name="asset_maintenance_type" id="asset_maintenance_type" style="width: 100%" {{ $item->id ? 'disabled' : '' }} required>
               <option value="">Pilih Jenis Maintenance</option>
-              @foreach(\App\Models\StatusLabel::whereIn('name', ['IN Repair - IT', 'IN Repair - Vendor'])->get() as $status)
+              @foreach($assetMaintenanceTypes as $status)
                 <option value="{{ $status->name }}" {{ old('asset_maintenance_type', $item->asset_maintenance_type) == $status->name ? 'selected' : '' }}>
                   {{ $status->name }}
                 </option>
@@ -121,6 +121,7 @@
                 <!-- Hidden input to ensure value is submitted when field is disabled -->
                 <input type="hidden" name="asset_maintenance_type" value="{{ $item->asset_maintenance_type }}">
             @endif
+            <button type="button" id="maintenance_checklist_button" class="btn btn-sm btn-primary" style="margin-top: 5px;">Checklist</button>
             {!! $errors->first('asset_maintenance_type', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
           </div>
         </div>        <!-- Start Date -->
@@ -232,6 +233,38 @@ $(document).ready(function() {
 
     // Initialize Select2
     $('.select2').select2();
+
+    var supplierSelect = $('#supplier_select');
+    if (supplierSelect.length) {
+        if (supplierSelect.data('select2')) {
+            supplierSelect.select2('destroy');
+        }
+
+        supplierSelect.select2({
+            placeholder: supplierSelect.data('placeholder') || '',
+            allowClear: true,
+            minimumInputLength: 0,
+            language: $('meta[name="language"]').attr('content'),
+            dir: $('meta[name="language-direction"]').attr('content'),
+            ajax: {
+                url: baseUrl + 'api/v1/suppliers/selectlist',
+                dataType: 'json',
+                delay: 250,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: function (params) {
+                    return {
+                        search: params.term || '',
+                        page: params.page || 1
+                    };
+                },
+                cache: true
+            },
+            templateResult: formatDatalistSafe
+        });
+    }
 });
 </script>
 @stop

@@ -21,6 +21,15 @@ class AssetMaintenance extends Model implements ICompanyableChild
     use CompanyableChildTrait;
     use ValidatingTrait;
 
+    protected static function booted(): void
+    {
+        static::creating(function (AssetMaintenance $maintenance): void {
+            if (! $maintenance->document_number) {
+                $maintenance->document_number = static::generateDocumentNumber();
+            }
+        });
+    }
+
 
 
     protected $table = 'asset_maintenances';

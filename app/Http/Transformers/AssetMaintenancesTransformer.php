@@ -50,11 +50,13 @@ class AssetMaintenancesTransformer
             ] : null,
             'document_number' => $assetmaintenance->document_number ? e($assetmaintenance->document_number) : null,
             'title'         => ($assetmaintenance->title) ? e($assetmaintenance->title) : null,
-            'location' => (($assetmaintenance->asset) && ($assetmaintenance->asset->location)) ? [
+            'location' => (($assetmaintenance->asset) && ($assetmaintenance->asset->defaultLoc)) ? [
+                'id' => (int) $assetmaintenance->asset->defaultLoc->id,
+                'name'=> e($assetmaintenance->asset->defaultLoc->name),
+            ] : (($assetmaintenance->asset && $assetmaintenance->asset->location) ? [
                 'id' => (int) $assetmaintenance->asset->location->id,
                 'name'=> e($assetmaintenance->asset->location->name),
-
-            ] : null,
+            ] : null),
             'rtd_location' => (($assetmaintenance->asset) && ($assetmaintenance->asset->defaultLoc)) ? [
                 'id' => (int) $assetmaintenance->asset->defaultLoc->id,
                 'name'=> e($assetmaintenance->asset->defaultLoc->name),
